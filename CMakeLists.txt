@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 2.8)
 
 # Options.
-OPTION(ENABLE_TESTING "Build library with tests" OFF)
+OPTION(ENABLE_TESTING "Build the library with tests" OFF)
+OPTION(METRICS_BUILD_STATIC "Build the library as static" OFF)
 
 # Workaround for OS X.
 if (APPLE)
@@ -21,7 +22,7 @@ include_directories(
     ${PROJECT_SOURCE_DIR}/include
 )
 
-add_library(${LIBRARY_NAME} SHARED
+set(SOURCES
     src/counter
     src/ewma
     src/gauge
@@ -29,6 +30,12 @@ add_library(${LIBRARY_NAME} SHARED
     src/metric
     src/registry
 )
+
+if (METRICS_BUILD_STATIC)
+    add_library(${LIBRARY_NAME} STATIC ${SOURCES})
+else()
+    add_library(${LIBRARY_NAME} SHARED ${SOURCES})
+endif()
 
 target_link_libraries(${LIBRARY_NAME}
     ${Boost_LIBRARIES}
@@ -43,19 +50,21 @@ set_target_properties(${LIBRARY_NAME} PROPERTIES
 )
 
 # Install section.
-install(
-    TARGETS
-        ${LIBRARY_NAME}
-    LIBRARY DESTINATION lib
-)
+if (NOT METRICS_BUILD_STATIC)
+    install(
+        TARGETS
+            ${LIBRARY_NAME}
+        LIBRARY DESTINATION lib
+    )
 
-install(
-    DIRECTORY
-        ${PROJECT_SOURCE_DIR}/include/
-    DESTINATION include
-    COMPONENT development
-    PATTERN "detail" EXCLUDE
-)
+    install(
+        DIRECTORY
+            ${PROJECT_SOURCE_DIR}/include/
+        DESTINATION include
+        COMPONENT development
+        PATTERN "detail" EXCLUDE
+    )
+endif()
 
 if (ENABLE_TESTING)
     list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/foreign/modules")
