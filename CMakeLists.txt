@@ -1,0 +1,104 @@
+cmake_minimum_required(VERSION 2.8)
+
+# Options.
+OPTION(ENABLE_TESTING "Build library with tests" OFF)
+
+# Workaround for OS X.
+if (APPLE)
+    set(CMAKE_MACOSX_RPATH ON)
+endif()
+
+# Description.
+set(LIBRARY_NAME metric)
+
+project(${LIBRARY_NAME})
+
+find_package(Boost 1.46 REQUIRED COMPONENTS
+    system
+)
+
+include_directories(
+    ${PROJECT_SOURCE_DIR}/include
+)
+
+add_library(${LIBRARY_NAME} SHARED
+    src/counter
+    src/ewma
+    src/gauge
+    src/meter
+    src/metric
+    src/registry
+)
+
+target_link_libraries(${LIBRARY_NAME}
+    ${Boost_LIBRARIES}
+)
+
+set_target_properties(${LIBRARY_NAME} PROPERTIES
+    COMPILE_FLAGS "-std=c++0x -Wall -Wextra -Winit-self -Wconversion -Wno-sign-conversion -Wold-style-cast -Woverloaded-virtual -Wctor-dtor-privacy -Wnon-virtual-dtor -Wunreachable-code -pedantic -pedantic-errors"
+)
+
+set_target_properties(${LIBRARY_NAME} PROPERTIES
+    VERSION 1
+)
+
+# Install section.
+install(
+    TARGETS
+        ${LIBRARY_NAME}
+    LIBRARY DESTINATION lib
+)
+
+install(
+    DIRECTORY
+        ${PROJECT_SOURCE_DIR}/include/
+    DESTINATION include
+    COMPONENT development
+    PATTERN "detail" EXCLUDE
+)
+
+if (ENABLE_TESTING)
+    list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/foreign/modules")
+
+    # Prepare testing infrastructure.
+    include(DownloadGoogleTesting)
+
+    download_google_testing()
+
+    include_directories(
+        SYSTEM ${GTEST_INCLUDE_DIR}
+        SYSTEM ${GMOCK_INCLUDE_DIR}
+    )
+
+    link_directories(${GTEST_BINARY_DIR} ${GMOCK_BINARY_DIR})
+
+    include_directories(
+        ${PROJECT_SOURCE_DIR}
+        ${PROJECT_SOURCE_DIR}/include
+    )
+
+    set(SOURCES
+        tests/accumulator/sliding/window
+        tests/accumulator/snapshot/uniform
+        tests/detail/ewma
+        tests/detail/histogram
+        tests/detail/meter
+        tests/detail/timer
+        tests/metric
+    )
+
+    add_executable(${LIBRARY_NAME}-tests ${SOURCES})
+
+    add_dependencies(${LIBRARY_NAME}-tests googlemock)
+
+    target_link_libraries(${LIBRARY_NAME}-tests
+        ${LIBRARY_NAME}
+        gmock
+        gtest
+        gtest_main
+    )
+
+    set_target_properties(${LIBRARY_NAME}-tests PROPERTIES
+        COMPILE_FLAGS "-std=c++0x -Wall -Wextra -Winit-self -Wconversion -Wno-sign-conversion -Wold-style-cast -Woverloaded-virtual -Wctor-dtor-privacy -Wnon-virtual-dtor -Wunreachable-code -pedantic -pedantic-errors"
+    )
+endif()
