@@ -1,9 +1,8 @@
 #pragma once
 
-#include "metrics/metric/metric.hpp"
+#include "metrics/metric.hpp"
 
 namespace metrics {
-namespace metric {
 
 /// A `meter` measures the rate at which a set of events occur.
 ///
@@ -20,5 +19,4 @@ public:
     mark();
 };
 
-}  // namespace metric
 }  // namespace metrics

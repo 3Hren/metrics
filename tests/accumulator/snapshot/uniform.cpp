@@ -2,12 +2,12 @@
 
 #include <limits>
 
-#include <metrics/metric/accumulator/snapshot/uniform.hpp>
+#include <metrics/accumulator/snapshot/uniform.hpp>
 
 namespace metrics {
 namespace testing {
 
-using metric::accumulator::snapshot::uniform_t;
+using accumulator::snapshot::uniform_t;
 
 TEST(uniform_t, small_quantiles) {
     uniform_t snapshot({5, 1, 3, 2, 4});

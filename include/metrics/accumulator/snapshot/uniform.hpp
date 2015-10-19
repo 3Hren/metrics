@@ -7,7 +7,6 @@
 #include <boost/range/numeric.hpp>
 
 namespace metrics {
-namespace metric {
 namespace accumulator {
 namespace snapshot {
 
@@ -150,5 +149,4 @@ public:
 
 }  // namespace snapshot
 }  // namespace accumulator
-}  // namespace metric
 }  // namespace metrics

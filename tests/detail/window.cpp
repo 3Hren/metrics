@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <metrics/metric/accumulator/sliding/window.hpp>
+#include <metrics/accumulator/sliding/window.hpp>
 
 namespace metrics {
 namespace testing {

@@ -4,18 +4,15 @@
 
 namespace metrics {
 namespace detail {
-namespace metric {
 
 class processor_t;
 
-}  // namespace metric
 }  // namespace detail
 }  // namespace metrics
 
 namespace metrics {
-namespace metric {
 
-using detail::metric::processor_t;
+using detail::processor_t;
 
 class metric_t {
     struct {
@@ -32,5 +29,4 @@ public:
     name() const;
 };
 
-}  // namespace metric
 }  // namespace metrics

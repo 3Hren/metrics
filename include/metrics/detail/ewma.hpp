@@ -4,7 +4,6 @@
 
 namespace metrics {
 namespace detail {
-namespace metric {
 
 /// An exponentially-weighted moving average.
 ///
@@ -61,6 +60,5 @@ public:
     }
 };
 
-}  // namespace metric
 }  // namespace detail
 }  // namespace metrics

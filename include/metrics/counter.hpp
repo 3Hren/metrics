@@ -2,10 +2,9 @@
 
 #include <future>
 
-#include "metrics/metric/metric.hpp"
+#include "metrics/metric.hpp"
 
 namespace metrics {
-namespace metric {
 
 /// An incrementing and decrementing counter metric.
 template<typename T>
@@ -39,5 +38,4 @@ public:
     dec(value_type value = 1);
 };
 
-}  // namespace metric
 }  // namespace metrics

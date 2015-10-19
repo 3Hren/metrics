@@ -1,12 +1,11 @@
-#include "metrics/metric/counter.hpp"
+#include "metrics/counter.hpp"
 
 #include <future>
 
-#include "metrics/detail/metric/processor.hpp"
-#include "metrics/detail/metric/utility.hpp"
+#include "metrics/detail/processor.hpp"
+#include "metrics/detail/utility.hpp"
 
 namespace metrics {
-namespace metric {
 
 template<typename T>
 counter<T>::counter(std::string name, processor_t& processor) :
@@ -59,5 +58,4 @@ counter<T>::dec(value_type value) {
 template class counter<std::int64_t>;
 template class counter<std::uint64_t>;
 
-}  // namespace metric
 }  // namespace metrics

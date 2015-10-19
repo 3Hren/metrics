@@ -1,9 +1,8 @@
 #pragma once
 
-#include "metrics/metric/accumulator/snapshot/uniform.hpp"
+#include "metrics/accumulator/snapshot/uniform.hpp"
 
 namespace metrics {
-namespace metric {
 namespace accumulator {
 namespace sliding {
 
@@ -51,5 +50,4 @@ public:
 
 }  // namespace sliding
 }  // namespace accumulator
-}  // namespace metric
 }  // namespace metrics

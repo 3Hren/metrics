@@ -1,19 +1,17 @@
 #include <gtest/gtest.h>
 
-#include <metrics/metric/counter.hpp>
-#include <metrics/metric/gauge.hpp>
-#include <metrics/metric/meter.hpp>
-#include <metrics/metric/registry.hpp>
+#include <metrics/counter.hpp>
+#include <metrics/gauge.hpp>
+#include <metrics/meter.hpp>
+#include <metrics/registry.hpp>
 
 namespace metrics {
 namespace testing {
 
-using metric::registry_t;
-
 TEST(metric, gauge) {
     registry_t registry;
 
-    registry.listen<metric::gauge<std::uint64_t>>("metrics.testing.gauge", [&]() -> std::uint64_t {
+    registry.listen<gauge<std::uint64_t>>("metrics.testing.gauge", [&]() -> std::uint64_t {
         static std::uint64_t counter = 0;
         return ++counter;
     });

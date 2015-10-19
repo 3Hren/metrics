@@ -2,7 +2,6 @@
 
 namespace metrics {
 namespace detail {
-namespace metric {
 
 /// A metric which calculates the distribution of a value.
 ///
@@ -63,6 +62,5 @@ public:
     }
 };
 
-}  // namespace metric
 }  // namespace detail
 }  // namespace metrics

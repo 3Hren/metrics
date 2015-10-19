@@ -1,8 +1,8 @@
-#include "metrics/detail/metric/ewma.hpp"
+#include "metrics/detail/ewma.hpp"
 
 #include <cmath>
 
-#include "metrics/detail/metric/utility.hpp"
+#include "metrics/detail/utility.hpp"
 
 namespace {
     const auto m01alpha = -std::expm1(-5.0 / 60 / std::chrono::minutes(1).count());
@@ -12,7 +12,6 @@ namespace {
 
 namespace metrics {
 namespace detail {
-namespace metric {
 
 ewma_t::ewma_t(double alpha, clock_type::duration interval) :
     initialized(false),
@@ -55,6 +54,5 @@ ewma_t::tick() {
     }
 }
 
-}  // namespace metric
 }  // namespace detail
 }  // namespace metrics

@@ -7,13 +7,12 @@
 #include <boost/asio/io_service.hpp>
 #include <boost/optional/optional.hpp>
 
-#include "metrics/detail/metric/ewma.hpp"
-#include "metrics/detail/metric/meter.hpp"
-#include "metrics/detail/metric/utility.hpp"
+#include "metrics/detail/ewma.hpp"
+#include "metrics/detail/meter.hpp"
+#include "metrics/detail/utility.hpp"
 
 namespace metrics {
 namespace detail {
-namespace metric {
 
 // template<typename... U>
 // struct counters_t {
@@ -148,6 +147,5 @@ processor_t::counters<std::uint64_t>() const {
     return data.counters.u64;
 }
 
-}  // namespace metric
 }  // namespace detail
 }  // namespace metrics

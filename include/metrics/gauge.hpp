@@ -1,9 +1,8 @@
 #pragma once
 
-#include "metrics/metric/metric.hpp"
+#include "metrics/metric.hpp"
 
 namespace metrics {
-namespace metric {
 
 /// A gauge is the simplest metric type. It just returns a value.
 ///
@@ -21,5 +20,4 @@ public:
     get() const;
 };
 
-}  // namespace metric
 }  // namespace metrics

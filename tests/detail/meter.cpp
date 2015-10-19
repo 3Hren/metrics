@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <metrics/detail/metric/meter.hpp>
+#include <metrics/detail/meter.hpp>
 
 namespace metrics {
 namespace testing {
@@ -32,7 +32,7 @@ struct clock_t {
 namespace metrics {
 namespace testing {
 
-typedef detail::metric::meter<mock::clock_t> meter_type;
+typedef detail::meter<mock::clock_t> meter_type;
 
 /// Starts with no rates or counts by default.
 TEST(meter, init) {

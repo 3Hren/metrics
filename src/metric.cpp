@@ -1,7 +1,6 @@
-#include "metrics/metric/metric.hpp"
+#include "metrics/metric.hpp"
 
 namespace metrics {
-namespace metric {
 
 metric_t::metric_t(std::string name, processor_t& processor):
     processor(processor)
@@ -14,5 +13,4 @@ metric_t::name() const {
     return d.name;
 }
 
-}  // namespace metric
 }  // namespace metrics

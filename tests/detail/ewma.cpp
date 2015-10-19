@@ -1,11 +1,11 @@
 #include <gtest/gtest.h>
 
-#include <metrics/detail/metric/ewma.hpp>
+#include <metrics/detail/ewma.hpp>
 
 namespace metrics {
 namespace testing {
 
-using detail::metric::ewma_t;
+using detail::ewma_t;
 
 void
 elapse_minute(ewma_t* ewma) {

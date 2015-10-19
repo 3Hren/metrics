@@ -3,11 +3,10 @@
 #include <array>
 #include <chrono>
 
-#include "metrics/detail/metric/ewma.hpp"
+#include "metrics/detail/ewma.hpp"
 
 namespace metrics {
 namespace detail {
-namespace metric {
 
 template<class Clock>
 class meter {
@@ -119,6 +118,5 @@ private:
 
 typedef meter<std::chrono::high_resolution_clock> meter_t;
 
-}  // namespace metric
 }  // namespace detail
 }  // namespace metrics

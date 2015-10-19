@@ -1,8 +1,9 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include <metrics/detail/metric/histogram.hpp>
-#include <metrics/metric/accumulator/snapshot/uniform.hpp>
+#include <metrics/accumulator/snapshot/uniform.hpp>
+
+#include <metrics/detail/histogram.hpp>
 
 namespace metrics {
 namespace testing {
@@ -12,7 +13,7 @@ using ::testing::Return;
 namespace mock {
 
 struct accumulator_t {
-    typedef metric::accumulator::snapshot::uniform_t snapshot_type;
+    typedef accumulator::snapshot::uniform_t snapshot_type;
 
     MOCK_CONST_METHOD0(snapshot, snapshot_type());
     MOCK_CONST_METHOD1(update, void(std::uint64_t));
@@ -20,7 +21,7 @@ struct accumulator_t {
 
 } // namespace mock
 
-typedef detail::metric::histogram<mock::accumulator_t> histogram_type;
+typedef detail::histogram<mock::accumulator_t> histogram_type;
 
 TEST(Histogram, Constructor) {
     histogram_type histogram;
@@ -41,7 +42,7 @@ TEST(Histogram, UpdatesCountOnUpdates) {
 
 TEST(Histogram, DelegatesSnapshot) {
     histogram_type histogram;
-    metric::accumulator::snapshot::uniform_t snapshot({1, 2, 3});
+    accumulator::snapshot::uniform_t snapshot({1, 2, 3});
 
     EXPECT_CALL(histogram.accumulator(), snapshot())
         .Times(1)

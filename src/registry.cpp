@@ -1,12 +1,11 @@
-#include "metrics/metric/registry.hpp"
+#include "metrics/registry.hpp"
 
-#include "metrics/metric/counter.hpp"
-#include "metrics/metric/gauge.hpp"
+#include "metrics/counter.hpp"
+#include "metrics/gauge.hpp"
 
-#include "metrics/detail/metric/processor.hpp"
+#include "metrics/detail/processor.hpp"
 
 namespace metrics {
-namespace metric {
 
 template<class M>
 struct metric_traits;
@@ -36,13 +35,13 @@ registry_t::listen(std::string name, std::function<typename M::value_type()> met
 template<typename T>
 gauge<T>
 registry_t::gauge(const std::string& name) const {
-    return metric::gauge<T>(name, *processor);
+    return metrics::gauge<T>(name, *processor);
 }
 
 template<typename T>
 counter<T>
 registry_t::counter(const std::string& name) const {
-    return metrics::metric::counter<T>(name, *processor);
+    return metrics::counter<T>(name, *processor);
 }
 
 meter_t
@@ -67,5 +66,4 @@ template
 counter<std::uint64_t>
 registry_t::counter<std::uint64_t>(const std::string&) const;
 
-}  // namespace metric
 }  // namespace metrics

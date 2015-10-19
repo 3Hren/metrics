@@ -1,11 +1,10 @@
-#include "metrics/metric/gauge.hpp"
+#include "metrics/gauge.hpp"
 
 #include <future>
 
-#include "metrics/detail/metric/processor.hpp"
+#include "metrics/detail/processor.hpp"
 
 namespace metrics {
-namespace metric {
 
 template<typename T>
 gauge<T>::gauge(std::string name, processor_t& processor) :
@@ -32,5 +31,4 @@ gauge<T>::get() const {
 /// Instantiations.
 template class gauge<std::uint64_t>;
 
-}  // namespace metric
 }  // namespace metrics

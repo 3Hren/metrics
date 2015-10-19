@@ -1,8 +1,9 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include <metrics/detail/metric/timer.hpp>
-#include <metrics/metric/accumulator/snapshot/uniform.hpp>
+#include <metrics/accumulator/snapshot/uniform.hpp>
+
+#include <metrics/detail/timer.hpp>
 
 namespace metrics {
 namespace testing {
@@ -33,7 +34,7 @@ namespace testing {
 
 using ::testing::Return;
 
-typedef detail::metric::timer<mock::clock_t, mock::histogram_t> timer_type;
+typedef detail::timer<mock::clock_t, mock::histogram_t> timer_type;
 
 TEST(Timer, Constructor) {
     timer_type timer;

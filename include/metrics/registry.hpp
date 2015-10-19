@@ -4,20 +4,17 @@
 #include <memory>
 #include <string>
 
-#include "metrics/metric/meter.hpp"
+#include "metrics/meter.hpp"
 
 namespace metrics {
 namespace detail {
-namespace metric {
 
 class processor_t;
 
-}  // namespace metric
 }  // namespace detail
 }  // namespace metrics
 
 namespace metrics {
-namespace metric {
 
 template<typename T>
 class gauge;
@@ -25,7 +22,7 @@ class gauge;
 template<typename T>
 class counter;
 
-using detail::metric::processor_t;
+using detail::processor_t;
 
 class registry_t {
     std::unique_ptr<processor_t> processor;
@@ -54,5 +51,4 @@ public:
     meter(const std::string& name) const;
 };
 
-}  // namespace meter
 }  // namespace metrics

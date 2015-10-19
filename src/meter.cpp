@@ -1,11 +1,10 @@
-#include "metrics/metric/meter.hpp"
+#include "metrics/meter.hpp"
 
 #include <future>
 
-#include "metrics/detail/metric/processor.hpp"
+#include "metrics/detail/processor.hpp"
 
 namespace metrics {
-namespace metric {
 
 meter_t::meter_t(std::string name, processor_t& processor) :
     metric_t(std::move(name), processor)
@@ -34,5 +33,4 @@ meter_t::mark() {
     });
 }
 
-}  // namespace metric
 }  // namespace metrics

@@ -1,11 +1,11 @@
 #include <gtest/gtest.h>
 
-#include <metrics/metric/accumulator/sliding/window.hpp>
+#include <metrics/accumulator/sliding/window.hpp>
 
 namespace metrics {
 namespace testing {
 
-using metric::accumulator::sliding::window_t;
+using accumulator::sliding::window_t;
 
 TEST(window_t, small) {
     window_t acc(3);

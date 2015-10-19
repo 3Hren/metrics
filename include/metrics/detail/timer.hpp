@@ -5,7 +5,6 @@
 
 namespace metrics {
 namespace detail {
-namespace metric {
 
 /// A timer metric which aggregates timing durations and provides duration statistics, plus
 /// throughput statistics via `meter`.
@@ -99,6 +98,5 @@ public:
     }
 };
 
-}  // namespace metric
 }  // namespace detail
 }  // namespace metrics
