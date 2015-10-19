@@ -69,6 +69,8 @@ endif()
 if (ENABLE_TESTING)
     list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/foreign/modules")
 
+    find_package(Threads)
+
     # Prepare testing infrastructure.
     include(DownloadGoogleTesting)
 
@@ -102,6 +104,7 @@ if (ENABLE_TESTING)
 
     target_link_libraries(${LIBRARY_NAME}-tests
         ${LIBRARY_NAME}
+        ${CMAKE_THREAD_LIBS_INIT}
         gmock
         gtest
         gtest_main
