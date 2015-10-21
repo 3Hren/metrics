@@ -22,7 +22,7 @@ TEST(timer_t, TimerContextNoncopyableButMovable) {
     EXPECT_FALSE(std::is_copy_assignable<context_type>::value);
 }
 
-TEST(timer_t, WithContext) {
+TEST(timer_t, Count) {
     registry_t registry;
 
     const auto timer = registry.timer("#");
