@@ -41,6 +41,9 @@ private:
             timestamp(parent->clock().now())
         {}
 
+        context_t(const context_t& other) = delete;
+        context_t(context_t&&) = default;
+
         ~context_t() {
             const auto now = parent->clock().now();
             const auto elapsed = now - timestamp;

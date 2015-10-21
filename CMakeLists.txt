@@ -29,6 +29,7 @@ set(SOURCES
     src/meter
     src/metric
     src/registry
+    src/timer
 )
 
 if (METRICS_BUILD_STATIC)
