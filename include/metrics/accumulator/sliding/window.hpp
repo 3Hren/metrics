@@ -16,6 +16,12 @@ public:
     std::size_t count;
 
 public:
+    /// Creates a new sliding window accumulator which stores the last 1024 measurements.
+    window_t():
+        measurements(1024),
+        count(0)
+    {}
+
     /// Creates a new sliding window accumulator which stores the last `size` measurements.
     ///
     /// \param `size` the number of measurements to store.
