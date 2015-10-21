@@ -90,7 +90,7 @@ public:
     void
     update(duration_type duration) {
         histogram().update(std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count());
-        // meter.mark();
+        // TODO: meter.mark();
     }
 
     template<typename F>
