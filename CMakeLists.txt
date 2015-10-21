@@ -98,6 +98,7 @@ if (ENABLE_TESTING)
         tests/detail/meter
         tests/detail/timer
         tests/metric
+        tests/timer
     )
 
     add_executable(${LIBRARY_NAME}-tests ${SOURCES})

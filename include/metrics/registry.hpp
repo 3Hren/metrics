@@ -22,6 +22,17 @@ class gauge;
 template<typename T>
 class counter;
 
+template<class Accumulate>
+class timer;
+
+namespace accumulator {
+namespace sliding {
+
+class window_t;
+
+}  // namespace sliding
+}  // namespace accumulator
+
 using detail::processor_t;
 
 class registry_t {
@@ -49,6 +60,11 @@ public:
 
     meter_t
     meter(const std::string& name) const;
+
+    // TODO: Change default accumulator to `exponentially_decaying_t`.
+    template<class Accumulate = accumulator::sliding::window_t>
+    timer<Accumulate>
+    timer(const std::string& name) const;
 };
 
 }  // namespace metrics

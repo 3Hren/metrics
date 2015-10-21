@@ -2,6 +2,7 @@
 
 #include "metrics/counter.hpp"
 #include "metrics/gauge.hpp"
+#include "metrics/timer.hpp"
 
 #include "metrics/detail/processor.hpp"
 
@@ -49,6 +50,12 @@ registry_t::meter(const std::string& name) const {
     return meter_t(name, *processor);
 }
 
+template<class Accumulate>
+timer<Accumulate>
+registry_t::timer(const std::string& name) const {
+    return metrics::timer<Accumulate>(name, *processor);
+}
+
 /// Instantiations.
 template
 void
@@ -65,5 +72,9 @@ registry_t::counter<std::int64_t>(const std::string&) const;
 template
 counter<std::uint64_t>
 registry_t::counter<std::uint64_t>(const std::string&) const;
+
+template
+timer<accumulator::sliding::window_t>
+registry_t::timer<accumulator::sliding::window_t>(const std::string&) const;
 
 }  // namespace metrics
