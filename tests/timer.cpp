@@ -31,5 +31,18 @@ TEST(timer_t, Count) {
     EXPECT_EQ(0, timer.count());
 }
 
+TEST(timer_t, WithContext) {
+    registry_t registry;
+
+    auto timer = registry.timer("#");
+
+    {
+        const auto context = timer.context();
+        // Do the work... bang!
+    }
+
+    EXPECT_EQ(1, timer.count());
+}
+
 }  // namespace testing
 }  // namespace metrics

@@ -6,24 +6,35 @@
 
 namespace metrics {
 
-/// \type `Accumulate` must implement `Accumulate` concept.
+/// \type `Accumulate` must meet `Accumulate` requirements.
 template<class Accumulate>
 class timer : public metric_t {
 public:
+    typedef std::chrono::high_resolution_clock clock_type;
+    typedef clock_type::time_point time_point;
+
     typedef Accumulate accumulator_type;
 
     class context_t {
         timer* parent;
+        const time_point timestamp;
 
     public:
-        context_t(timer* parent) :
-            parent(parent)
-        {}
-
+        explicit
+        context_t(timer* parent);
         context_t(const context_t& other) = delete;
         context_t(context_t&&) = default;
+
+        ~context_t();
+
+        context_t&
+        operator=(const context_t& other) = delete;
+
+        context_t&
+        operator=(context_t&& other) = delete;
     };
 
+    // friend class context_t;
     typedef context_t context_type;
 
 public:
@@ -38,9 +49,9 @@ public:
     // template<typename F>
     // auto
     // measure(F fn) -> decltype(fn());
-    //
-    // context_type
-    // context();
+
+    context_type
+    context();
 };
 
 }  // namespace metrics
