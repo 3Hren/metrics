@@ -89,7 +89,7 @@ public:
     /// Adds a recorded duration.
     void
     update(duration_type duration) {
-        histogram().update(std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count());
+        d.histogram.update(std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count());
         // TODO: meter.mark();
     }
 
