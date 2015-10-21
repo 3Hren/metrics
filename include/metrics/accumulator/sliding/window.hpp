@@ -49,8 +49,13 @@ public:
     }
 
     void
-    operator()(value_type value) noexcept {
+    update(value_type value) noexcept {
         measurements[count++ % measurements.size()] = value;
+    }
+
+    void
+    operator()(value_type value) noexcept {
+        update(value);
     }
 };
 
