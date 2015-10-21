@@ -91,6 +91,7 @@ if (ENABLE_TESTING)
     set(SOURCES
         tests/accumulator/sliding/window
         tests/accumulator/snapshot/uniform
+        tests/counter
         tests/detail/ewma
         tests/detail/histogram
         tests/detail/meter

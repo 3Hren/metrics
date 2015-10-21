@@ -19,8 +19,8 @@ meter_t::count() const {
     std::promise<std::uint64_t> tx;
     auto rx = tx.get_future();
 
-    processor.post([&] {
-        tx.set_value(processor.meter(name()).count());
+    processor->post([&] {
+        tx.set_value(processor->meter(name()).count());
     });
 
     return rx.get();
@@ -28,8 +28,8 @@ meter_t::count() const {
 
 void
 meter_t::mark() {
-    processor.post([&] {
-        processor.meter(name()).mark();
+    processor->post([&] {
+        processor->meter(name()).mark();
     });
 }
 

@@ -18,8 +18,8 @@ counter<T>::get() const {
     std::promise<T> tx;
     auto rx = tx.get_future();
 
-    processor.post([&] {
-        tx.set_value(processor.counter<T>(name()));
+    processor->post([&] {
+        tx.set_value(processor->counter<T>(name()));
     });
 
     return rx.get();
@@ -31,8 +31,8 @@ counter<T>::inc(value_type value) {
     auto tx = std::make_shared<std::promise<T>>();
     auto rx = tx->get_future();
 
-    processor.post([=] {
-        auto& counter = processor.counter<T>(name());
+    processor->post([=] {
+        auto& counter = processor->counter<T>(name());
         tx->set_value(std::exchange(counter, counter + value));
     });
 
@@ -46,8 +46,8 @@ counter<T>::dec(value_type value) {
     auto tx = std::make_shared<std::promise<T>>();
     auto rx = tx->get_future();
 
-    processor.post([=] {
-        auto& counter = processor.counter<T>(name());
+    processor->post([=] {
+        auto& counter = processor->counter<T>(name());
         tx->set_value(std::exchange(counter, counter - value));
     });
 

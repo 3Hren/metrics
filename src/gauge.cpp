@@ -17,8 +17,8 @@ gauge<T>::get() const {
     std::promise<T> tx;
     auto rx = tx.get_future();
 
-    processor.post([&] {
-        if (auto fn = processor.gauge<T>(name())) {
+    processor->post([&] {
+        if (auto fn = processor->gauge<T>(name())) {
             tx.set_value((*fn)());
         } else {
             tx.set_exception(std::make_exception_ptr(std::out_of_range(name())));

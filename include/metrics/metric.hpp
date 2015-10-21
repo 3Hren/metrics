@@ -20,7 +20,7 @@ class metric_t {
     } d;
 
 protected:
-    processor_t& processor;
+    processor_t* processor;
 
 public:
     metric_t(std::string name, processor_t& processor);

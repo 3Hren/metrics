@@ -1,9 +1,11 @@
 #include "metrics/metric.hpp"
 
+#include <memory>
+
 namespace metrics {
 
 metric_t::metric_t(std::string name, processor_t& processor):
-    processor(processor)
+    processor(std::addressof(processor))
 {
     d.name = std::move(name);
 }
