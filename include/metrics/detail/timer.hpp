@@ -10,7 +10,7 @@ namespace detail {
 /// throughput statistics via `meter`.
 ///
 /// \type `Clock` must meet `TrivialClock` requirements and must be steady.
-template<class Clock, class Histogram, class = void>
+template<class Clock, class Histogram>
 class timer {
 public:
     typedef Clock clock_type;
