@@ -23,6 +23,7 @@ include_directories(
 )
 
 set(SOURCES
+    src/accumulator/snapshot/uniform
     src/counter
     src/ewma
     src/gauge

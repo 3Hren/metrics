@@ -24,69 +24,33 @@ public:
     ///
     /// \param `values` an unordered set of values in the accumulator.
     explicit
-    uniform_t(std::vector<value_type> values) {
-        std::sort(values.begin(), values.end());
+    uniform_t(std::vector<value_type> values);
 
-        d.values = std::move(values);
-    }
-
+    /// Returns a reference for the entire set of values in the snapshot.
+    // TODO: Make `noexcept`.
     const std::vector<value_type>&
-    values() const {
-        return d.values;
-    }
+    values() const;
 
+    /// Returns the number of values in the snapshot.
+    // TODO: Make `noexcept`.
     std::size_t
-    size() const {
-        return d.values.size();
-    }
+    size() const;
 
+    /// Returns the lowest value in the snapshot.
     std::uint64_t
-    min() const {
-        if (size() == 0) {
-            return 0;
-        }
+    min() const;
 
-        return d.values.front();
-    }
-
+    /// Returns the highest value in the snapshot.
     std::uint64_t
-    max() const {
-        if (size() == 0) {
-            return 0;
-        }
+    max() const;
 
-        return d.values.back();
-    }
-
+    /// Returns the arithmetic mean of the values in the snapshot.
     double
-    mean() const {
-        const auto size = this->size();
+    mean() const;
 
-        if (size == 0) {
-            return 0;
-        }
-
-        return boost::accumulate(d.values, 0.0) / size;
-    }
-
+    /// Returns the standard deviation of the values in the snapshot.
     double
-    stddev() const {
-        const auto size = this->size();
-
-        if (size <= 1) {
-            return 0;
-        }
-
-        const auto mean = this->mean();
-        const auto sum = boost::accumulate(d.values, 0.0, [&](double accumulator, double value) {
-            const auto diff = value - mean;
-            return accumulator + diff * diff;
-        });
-
-        const auto variance = sum / (size - 1);
-
-        return std::sqrt(variance);
-    }
+    stddev() const;
 
     // TODO: Think about adapters.
     double
@@ -119,32 +83,11 @@ public:
         return value(0.99);
     }
 
+    /// Returns the value at the given quantile.
+    ///
+    /// \param quantile a given quantile, in [0; 1] range.
     double
-    value(double quantile) const {
-        if (quantile < 0.0 || quantile > 1.0 || std::isnan(quantile)) {
-            throw std::invalid_argument("quantile must be in [0; 1] range");
-        }
-
-        if (d.values.empty()) {
-            return 0.0;
-        }
-
-        const auto pos = quantile * (d.values.size() + 1);
-        const auto id = static_cast<std::size_t>(pos);
-
-        if (id < 1) {
-            return d.values.front();
-        }
-
-        if (id >= d.values.size()) {
-            return d.values.back();
-        }
-
-        const auto lower = d.values[id - 1];
-        const auto upper = d.values[id];
-
-        return lower + (pos - std::floor(pos)) * (upper - lower);
-    }
+    value(double quantile) const;
 };
 
 }  // namespace snapshot
