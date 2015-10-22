@@ -19,7 +19,10 @@ public:
 
     typedef Histogram histogram_type;
 
+    // TODO: Suppress this check for GCC and pray, because `steady_clock` isn't available until 4.9.
+#ifdef __clang__
     static_assert(clock_type::is_steady, "clock type must be steady");
+#endif
 
 private:
     struct data_t {
