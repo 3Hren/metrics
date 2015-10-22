@@ -16,14 +16,14 @@ public:
     typedef Accumulate accumulator_type;
 
     class context_t {
-        timer* parent;
+        std::unique_ptr<timer, void(*)(timer*)> parent;
         const time_point timestamp;
 
     public:
         explicit
         context_t(timer* parent);
         context_t(const context_t& other) = delete;
-        context_t(context_t&& other);
+        context_t(context_t&& other) = default;
 
         ~context_t();
 
