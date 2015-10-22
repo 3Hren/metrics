@@ -6,6 +6,18 @@
 
 namespace metrics {
 
+namespace {
+
+// Workaround for GCC 4.6, which can't compile the similar lambda with the error: invalid use of
+// ‘class metrics::timer<Accumulate>’.
+template<typename Duration, typename Accumulate>
+void
+update(processor_t* processor, std::string name, Duration elapsed) {
+    processor->timer<Accumulate>(name).update(elapsed);
+}
+
+}  // namespace
+
 template<class Accumulate>
 timer<Accumulate>::context_t::context_t(timer* parent) :
     parent(parent, [](timer*) {}),
@@ -24,9 +36,9 @@ timer<Accumulate>::context_t::~context_t() {
     const auto name = parent->name();
     const auto processor = parent->processor;
 
-    processor->post([=] {
-        processor->timer<Accumulate>(name).update(elapsed);
-    });
+    processor->post(
+        std::bind(&update<clock_type::duration, Accumulate>, processor, std::move(name), elapsed)
+    );
 }
 
 template<class Accumulate>
