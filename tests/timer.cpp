@@ -4,8 +4,10 @@
 #include <metrics/registry.hpp>
 #include <metrics/timer.hpp>
 
-#if defined(__GNUC__)
-    #define __GNUC_VERSION__ (__GNUC__ * 10000 + __GNUC_MINOR__ * 100)
+#ifndef __GNUC_VERSION__
+    #if defined(__GNUC__)
+        #define __GNUC_VERSION__ (__GNUC__ * 10000 + __GNUC_MINOR__ * 100)
+    #endif
 #endif
 
 namespace metrics {
