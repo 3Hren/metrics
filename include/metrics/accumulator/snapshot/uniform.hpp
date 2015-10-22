@@ -1,10 +1,7 @@
 #pragma once
 
-#include <algorithm>
-#include <cmath>
+#include <cstdint>
 #include <vector>
-
-#include <boost/range/numeric.hpp>
 
 namespace metrics {
 namespace accumulator {

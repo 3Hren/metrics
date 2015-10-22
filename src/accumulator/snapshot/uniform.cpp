@@ -1,9 +1,9 @@
-#include "metrics/counter.hpp"
+#include "metrics/accumulator/snapshot/uniform.hpp"
 
-#include <future>
+#include <algorithm>
+#include <cmath>
 
-#include "metrics/detail/processor.hpp"
-#include "metrics/detail/utility.hpp"
+#include <boost/range/numeric.hpp>
 
 namespace metrics {
 namespace accumulator {
