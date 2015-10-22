@@ -48,6 +48,19 @@ timer<Accumulate>::count() const {
 }
 
 template<class Accumulate>
+typename timer<Accumulate>::snapshot_type
+timer<Accumulate>::snapshot() const {
+    std::promise<snapshot_type> tx;
+    auto rx = tx.get_future();
+
+    processor->post([&] {
+        tx.set_value(processor->timer<Accumulate>(name()).histogram().snapshot());
+    });
+
+    return rx.get();
+}
+
+template<class Accumulate>
 typename timer<Accumulate>::context_type
 timer<Accumulate>::context() {
     return context_t(this);

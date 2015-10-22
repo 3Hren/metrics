@@ -14,6 +14,7 @@ public:
     typedef clock_type::time_point time_point;
 
     typedef Accumulate accumulator_type;
+    typedef typename accumulator_type::snapshot_type snapshot_type;
 
     class context_t {
         std::unique_ptr<timer, void(*)(timer*)> parent;
@@ -44,7 +45,9 @@ public:
     count() const;
 
     // TODO: All `meter` getters.
-    // TODO: All `snapshot` getters.
+
+    snapshot_type
+    snapshot() const;
 
     template<typename F>
     auto

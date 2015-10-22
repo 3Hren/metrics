@@ -70,5 +70,13 @@ TEST(timer_t, WithMeasure) {
     EXPECT_EQ(42, actual);
 }
 
+TEST(timer_t, Snapshot) {
+    registry_t registry;
+
+    const auto timer = registry.timer("#");
+
+    EXPECT_EQ(0, timer.snapshot().size());
+}
+
 }  // namespace testing
 }  // namespace metrics
