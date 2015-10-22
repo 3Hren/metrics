@@ -44,5 +44,18 @@ TEST(timer_t, WithContext) {
     EXPECT_EQ(1, timer.count());
 }
 
+TEST(timer_t, WithMeasure) {
+    registry_t registry;
+
+    auto timer = registry.timer("#");
+
+    const auto actual = timer.measure([]() -> int {
+        return 42;
+    });
+
+    EXPECT_EQ(1, timer.count());
+    EXPECT_EQ(42, actual);
+}
+
 }  // namespace testing
 }  // namespace metrics

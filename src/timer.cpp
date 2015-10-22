@@ -13,13 +13,20 @@ timer<Accumulate>::context_t::context_t(timer* parent) :
 {}
 
 template<class Accumulate>
+template<class Accumulate>
 timer<Accumulate>::context_t::~context_t() {
-    // TODO: Check pointer invalidation.
+    if (parent == nullptr) {
+        return;
+    }
+
     const auto now = clock_type::now();
     const auto elapsed = now - timestamp;
 
-    parent->processor->post([=] {
-        parent->processor->timer<Accumulate>(parent->name()).update(elapsed);
+    const auto name = parent->name();
+    const auto processor = parent->processor;
+
+    processor->post([=] {
+        processor->timer<Accumulate>(name).update(elapsed);
     });
 }
 

@@ -46,9 +46,12 @@ public:
     // TODO: All `meter` getters.
     // TODO: All `snapshot` getters.
 
-    // template<typename F>
-    // auto
-    // measure(F fn) -> decltype(fn());
+    template<typename F>
+    auto
+    measure(F fn) -> decltype(fn()) {
+        context_t context(this);
+        return fn();
+    }
 
     context_type
     context();
