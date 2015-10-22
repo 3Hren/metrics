@@ -17,12 +17,12 @@ uniform_t::uniform_t(std::vector<value_type> values) {
 }
 
 const std::vector<uniform_t::value_type>&
-uniform_t::values() const {
+uniform_t::values() const noexcept {
    return d.values;
 }
 
 std::size_t
-uniform_t::size() const {
+uniform_t::size() const noexcept {
     return d.values.size();
 }
 

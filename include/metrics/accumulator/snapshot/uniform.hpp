@@ -24,14 +24,12 @@ public:
     uniform_t(std::vector<value_type> values);
 
     /// Returns a reference for the entire set of values in the snapshot.
-    // TODO: Make `noexcept`.
     const std::vector<value_type>&
-    values() const;
+    values() const noexcept;
 
     /// Returns the number of values in the snapshot.
-    // TODO: Make `noexcept`.
     std::size_t
-    size() const;
+    size() const noexcept;
 
     /// Returns the lowest value in the snapshot.
     std::uint64_t
