@@ -23,7 +23,7 @@ public:
         explicit
         context_t(timer* parent);
         context_t(const context_t& other) = delete;
-        context_t(context_t&&) = default;
+        context_t(context_t&& other);
 
         ~context_t();
 

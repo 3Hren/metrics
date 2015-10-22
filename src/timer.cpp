@@ -13,6 +13,13 @@ timer<Accumulate>::context_t::context_t(timer* parent) :
 {}
 
 template<class Accumulate>
+timer<Accumulate>::context_t::context_t(context_t&& other) :
+    parent(std::move(other.parent)),
+    timestamp(std::move(other.timestamp))
+{
+    other.parent = nullptr;
+}
+
 template<class Accumulate>
 timer<Accumulate>::context_t::~context_t() {
     if (parent == nullptr) {

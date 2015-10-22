@@ -44,6 +44,19 @@ TEST(timer_t, WithContext) {
     EXPECT_EQ(1, timer.count());
 }
 
+TEST(timer_t, WithContextMoved) {
+    registry_t registry;
+
+    auto timer = registry.timer("#");
+
+    {
+        auto context1 = timer.context();
+        auto context2 = std::move(context1);
+    }
+
+    EXPECT_EQ(1, timer.count());
+}
+
 TEST(timer_t, WithMeasure) {
     registry_t registry;
 
