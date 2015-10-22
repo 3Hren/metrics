@@ -1,5 +1,7 @@
 #pragma once
 
+#include <algorithm>
+
 #include "metrics/accumulator/snapshot/uniform.hpp"
 
 namespace metrics {

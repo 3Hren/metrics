@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <limits>
+#include <stdexcept>
 
 #include <metrics/accumulator/snapshot/uniform.hpp>
 

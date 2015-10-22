@@ -1,6 +1,8 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include <stdexcept>
+
 #include <metrics/accumulator/snapshot/uniform.hpp>
 
 #include <metrics/detail/timer.hpp>

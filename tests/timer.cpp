@@ -4,6 +4,10 @@
 #include <metrics/registry.hpp>
 #include <metrics/timer.hpp>
 
+#if defined(__GNUC__)
+    #define __GNUC_VERSION__ (__GNUC__ * 10000 + __GNUC_MINOR__ * 100)
+#endif
+
 namespace metrics {
 namespace testing {
 
@@ -13,6 +17,7 @@ TEST(timer_t, Obtain) {
     registry.timer("metrics.testing.timer");
 }
 
+#if __GNUC_VERSION__ > 40600
 TEST(timer_t, TimerContextNoncopyableButMovable) {
     typedef timer<accumulator::sliding::window_t>::context_type context_type;
 
@@ -21,6 +26,7 @@ TEST(timer_t, TimerContextNoncopyableButMovable) {
     EXPECT_FALSE(std::is_copy_constructible<context_type>::value);
     EXPECT_FALSE(std::is_copy_assignable<context_type>::value);
 }
+#endif
 
 TEST(timer_t, Count) {
     registry_t registry;
