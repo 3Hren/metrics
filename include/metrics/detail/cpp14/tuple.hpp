@@ -10,40 +10,43 @@ struct count;
 
 template<typename T>
 struct count<T> {
-    static constexpr auto value = 0;
+    static constexpr std::size_t value = 0;
 };
 
 template<typename T, typename... Other>
 struct count<T, T, Other...> {
-    static constexpr auto value = 1 + count<T, Other...>::value;
+    static constexpr std::size_t value = 1 + count<T, Other...>::value;
 };
 
 template<typename T, typename U, typename... Other>
 struct count<T, U, Other...> {
-    static constexpr auto value = count<T, Other...>::value;
+    static constexpr std::size_t value = count<T, Other...>::value;
 };
 
 /// Returns `true` if the type T is unique in a variadic list [U, Other...].
+template<typename T, typename... Other>
+struct is_unique;
+
 template<typename T, typename U, typename... Other>
-struct is_unique {
-    static constexpr auto value = count<T, U, Other...>::value == 1;
+struct is_unique<T, U, Other...> {
+    static constexpr std::size_t value = count<T, U, Other...>::value == 1;
 };
 
 namespace detail {
 
 template <class T, std::size_t N, class... Args>
 struct get_index {
-    static constexpr auto value = N;
+    static constexpr std::size_t value = N;
 };
 
 template <class T, std::size_t N, class... Args>
 struct get_index<T, N, T, Args...> {
-    static constexpr auto value = N;
+    static constexpr std::size_t value = N;
 };
 
 template <class T, std::size_t N, class U, class... Args>
 struct get_index<T, N, U, Args...> {
-    static constexpr auto value = get_index<T, N + 1, Args...>::value;
+    static constexpr std::size_t value = get_index<T, N + 1, Args...>::value;
 };
 
 }  // namespace detail
