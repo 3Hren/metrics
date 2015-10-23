@@ -18,6 +18,8 @@
 namespace metrics {
 namespace detail {
 
+typedef std::chrono::high_resolution_clock clock_type;
+
 template<typename... U>
 struct gauges_t {
     std::tuple<std::map<std::string, std::function<U()>>...> containers;
@@ -46,10 +48,19 @@ struct counters_t {
     }
 };
 
+template<typename... U>
+struct timers_t {
+    std::tuple<std::map<std::string, timer<clock_type, meter<clock_type>, histogram<U>>>...> containers;
+
+    template<typename T>
+    std::map<std::string, timer<clock_type, meter<clock_type>, histogram<T>>>&
+    get() noexcept {
+        return cpp14::get<std::map<std::string, timer<clock_type, meter<clock_type>, histogram<T>>>>(containers);
+    }
+};
+
 /// \internal
 class processor_t {
-    typedef std::chrono::high_resolution_clock clock_type;
-
     boost::asio::io_service loop;
     boost::optional<boost::asio::io_service::work> work;
 
@@ -59,15 +70,8 @@ class processor_t {
     struct {
         gauges_t<std::uint64_t> gauges;
         counters_t<std::int64_t, std::uint64_t> counters;
-
         std::map<std::string, meter_t> meters;
-
-        struct {
-            std::map<
-                std::string,
-                timer<clock_type, meter<clock_type>, histogram<accumulator::sliding::window_t>>
-            > sw;
-        } timers;
+        timers_t<accumulator::sliding::window_t> timers;
     } data;
 
 public:
@@ -119,19 +123,16 @@ public:
     /// \warning must be called from event loop's thread.
     template<class Accumulate>
     const std::map<std::string, timer<clock_type, meter<clock_type>, histogram<Accumulate>>>&
-    timers() const;
+    timers() const {
+        return data.timers.get<Accumulate>();
+    }
 
     /// \overload
     /// \warning must be called from event loop's thread.
     template<class Accumulate>
     std::map<std::string, timer<clock_type, meter<clock_type>, histogram<Accumulate>>>&
     timers() {
-        typedef std::map<
-            std::string,
-            metrics::detail::timer<clock_type, metrics::detail::meter<clock_type>, histogram<Accumulate>>
-        >& result_type;
-
-        return const_cast<result_type>(static_cast<const processor_t&>(*this).timers<Accumulate>());
+        return data.timers.get<Accumulate>();
     }
 
     /// \warning must be called from event loop's thread.
@@ -168,16 +169,6 @@ public:
         return timers<Accumulate>()[name];
     }
 };
-
-template<>
-inline
-const std::map<
-    std::string,
-    timer<processor_t::clock_type, meter<processor_t::clock_type>, histogram<accumulator::sliding::window_t>>
->&
-processor_t::timers<accumulator::sliding::window_t>() const {
-    return data.timers.sw;
-}
 
 }  // namespace detail
 }  // namespace metrics
