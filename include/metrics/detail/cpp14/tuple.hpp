@@ -56,7 +56,7 @@ struct get_index<T, N, U, Args...> {
 template<class T, class... Types>
 constexpr
 T&
-get(std::tuple<Types...>& t) {
+get(std::tuple<Types...>& t) noexcept {
     static_assert(is_unique<T, Types...>::value, "type can only occur once in type list");
     return std::get<detail::get_index<T, 0, Types...>::value>(t);
 }
@@ -66,7 +66,7 @@ get(std::tuple<Types...>& t) {
 template<class T, class... Types>
 constexpr
 const T&
-get(const std::tuple<Types...>& t) {
+get(const std::tuple<Types...>& t) noexcept {
     static_assert(is_unique<T, Types...>::value, "type can only occur once in type list");
     return std::get<detail::get_index<T, 0, Types...>::value>(t);
 }
