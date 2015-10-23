@@ -13,7 +13,6 @@
 #include "metrics/detail/histogram.hpp"
 #include "metrics/detail/meter.hpp"
 #include "metrics/detail/timer.hpp"
-#include "metrics/detail/utility.hpp"
 
 namespace metrics {
 namespace detail {
