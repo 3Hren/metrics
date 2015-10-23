@@ -10,13 +10,14 @@ namespace detail {
 /// throughput statistics via `meter`.
 ///
 /// \type `Clock` must meet `TrivialClock` requirements and must be steady.
-template<class Clock, class Histogram>
+template<class Clock, class Meter, class Histogram>
 class timer {
 public:
     typedef Clock clock_type;
     typedef typename clock_type::time_point time_point;
     typedef typename clock_type::duration duration_type;
 
+    typedef Meter meter_type;
     typedef Histogram histogram_type;
 
     // TODO: Suppress this check for GCC and pray, because `steady_clock` isn't available until 4.9.
@@ -27,6 +28,7 @@ public:
 private:
     struct data_t {
         clock_type clock;
+        meter_type meter;
         histogram_type histogram;
 
         template<typename... Args>
@@ -80,6 +82,11 @@ public:
         return d.histogram;
     }
 
+    const meter_type&
+    meter() const noexcept {
+        return d.meter;
+    }
+
     /// Lookup.
 
     std::uint64_t
@@ -93,7 +100,7 @@ public:
     void
     update(duration_type duration) {
         d.histogram.update(std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count());
-        // TODO: meter.mark();
+        d.meter.mark();
     }
 
     template<typename F>

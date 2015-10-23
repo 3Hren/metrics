@@ -54,7 +54,7 @@ class processor_t {
         struct {
             std::map<
                 std::string,
-                timer<clock_type, histogram<accumulator::sliding::window_t>>
+                timer<clock_type, meter<clock_type>, histogram<accumulator::sliding::window_t>>
             > sw;
         } timers;
     } data;
@@ -113,17 +113,17 @@ public:
 
     /// \warning must be called from event loop's thread.
     template<class Accumulate>
-    const std::map<std::string, timer<clock_type, histogram<Accumulate>>>&
+    const std::map<std::string, timer<clock_type, meter<clock_type>, histogram<Accumulate>>>&
     timers() const;
 
     /// \overload
     /// \warning must be called from event loop's thread.
     template<class Accumulate>
-    std::map<std::string, timer<clock_type, histogram<Accumulate>>>&
+    std::map<std::string, timer<clock_type, meter<clock_type>, histogram<Accumulate>>>&
     timers() {
         typedef std::map<
             std::string,
-            metrics::detail::timer<clock_type, histogram<Accumulate>>
+            metrics::detail::timer<clock_type, metrics::detail::meter<clock_type>, histogram<Accumulate>>
         >& result_type;
 
         return const_cast<result_type>(static_cast<const processor_t&>(*this).timers<Accumulate>());
@@ -158,7 +158,7 @@ public:
 
     /// \warning must be called from event loop's thread.
     template<typename Accumulate>
-    timer<clock_type, histogram<Accumulate>>&
+    timer<clock_type, metrics::detail::meter<clock_type>, histogram<Accumulate>>&
     timer(const std::string& name) {
         return timers<Accumulate>()[name];
     }
@@ -187,7 +187,10 @@ processor_t::counters<std::uint64_t>() const {
 
 template<>
 inline
-const std::map<std::string, timer<processor_t::clock_type, histogram<accumulator::sliding::window_t>>>&
+const std::map<
+    std::string,
+    timer<processor_t::clock_type, meter<processor_t::clock_type>, histogram<accumulator::sliding::window_t>>
+>&
 processor_t::timers<accumulator::sliding::window_t>() const {
     return data.timers.sw;
 }

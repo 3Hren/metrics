@@ -21,6 +21,10 @@ struct clock_t {
     MOCK_CONST_METHOD0(now, time_point());
 };
 
+struct meter_t {
+    MOCK_CONST_METHOD0(mark, void());
+};
+
 struct histogram_t {
     MOCK_CONST_METHOD0(count, std::uint64_t());
     MOCK_CONST_METHOD1(update, void(std::uint64_t));
@@ -36,7 +40,7 @@ namespace testing {
 
 using ::testing::Return;
 
-typedef detail::timer<mock::clock_t, mock::histogram_t> timer_type;
+typedef detail::timer<mock::clock_t, mock::meter_t, mock::histogram_t> timer_type;
 
 TEST(Timer, Constructor) {
     timer_type timer;
@@ -52,6 +56,9 @@ TEST(Timer, UpdatesCountOnUpdate) {
     timer_type timer;
 
     EXPECT_CALL(timer.histogram(), update(1e9))
+        .Times(1);
+
+    EXPECT_CALL(timer.meter(), mark())
         .Times(1);
 
     timer.update(std::chrono::seconds(1));
@@ -74,6 +81,9 @@ TEST(Timer, MeasureCallable) {
     EXPECT_CALL(timer.histogram(), update(50000000))
         .Times(1);
 
+    EXPECT_CALL(timer.meter(), mark())
+        .Times(1);
+
     const auto actual = timer.measure([]() -> int {
         return 42;
     });
@@ -90,6 +100,9 @@ TEST(Timer, MeasureCallableOnThrow) {
         .WillRepeatedly(Return(mock::clock_t::time_point(std::chrono::milliseconds(50))));
 
     EXPECT_CALL(timer.histogram(), update(50000000))
+        .Times(1);
+
+    EXPECT_CALL(timer.meter(), mark())
         .Times(1);
 
     EXPECT_THROW(timer.measure([]() -> int {
