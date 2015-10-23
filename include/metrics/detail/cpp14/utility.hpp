@@ -14,6 +14,6 @@ exchange(T& curr, U&& next) {
     return prev;
 }
 
-} // namespace std
+}  // namespace std
 
 #endif
