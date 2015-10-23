@@ -34,17 +34,17 @@ struct is_unique<T, U, Other...> {
 
 namespace detail {
 
-template <class T, std::size_t N, class... Args>
+template<class T, std::size_t N, class... Args>
 struct get_index {
     static constexpr std::size_t value = N;
 };
 
-template <class T, std::size_t N, class... Args>
+template<class T, std::size_t N, class... Args>
 struct get_index<T, N, T, Args...> {
     static constexpr std::size_t value = N;
 };
 
-template <class T, std::size_t N, class U, class... Args>
+template<class T, std::size_t N, class U, class... Args>
 struct get_index<T, N, U, Args...> {
     static constexpr std::size_t value = get_index<T, N + 1, Args...>::value;
 };
