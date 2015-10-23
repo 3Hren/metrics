@@ -9,6 +9,7 @@
 
 #include "metrics/accumulator/sliding/window.hpp"
 
+#include "metrics/detail/cpp14/tuple.hpp"
 #include "metrics/detail/ewma.hpp"
 #include "metrics/detail/histogram.hpp"
 #include "metrics/detail/meter.hpp"
@@ -17,16 +18,33 @@
 namespace metrics {
 namespace detail {
 
-// template<typename... U>
-// struct counters_t {
-//     std::tuple<std::map<std::string, U>...> containers;
-//
-//     template<typename T>
-//     std::map<std::string, T>&
-//     get() {
-//         return std::get<T>(containers);
-//     }
-// };
+template<typename... U>
+struct gauges_t {
+    std::tuple<std::map<std::string, std::function<U()>>...> containers;
+
+    template<typename T>
+    const std::map<std::string, std::function<T()>>&
+    get() const noexcept {
+        return cpp14::get<std::map<std::string, std::function<T()>>>(containers);
+    }
+
+    template<typename T>
+    std::map<std::string, std::function<T()>>&
+    get() noexcept {
+        return cpp14::get<std::map<std::string, std::function<T()>>>(containers);
+    }
+};
+
+template<typename... U>
+struct counters_t {
+    std::tuple<std::map<std::string, U>...> containers;
+
+    template<typename T>
+    std::map<std::string, T>&
+    get() noexcept {
+        return cpp14::get<std::map<std::string, T>>(containers);
+    }
+};
 
 /// \internal
 class processor_t {
@@ -39,14 +57,8 @@ class processor_t {
 
     /// Data.
     struct {
-        struct {
-            std::map<std::string, std::function<std::uint64_t()>> u64;
-        } gauges;
-
-        struct {
-            std::map<std::string, std::int64_t>  i64;
-            std::map<std::string, std::uint64_t> u64;
-        } counters;
+        gauges_t<std::uint64_t> gauges;
+        counters_t<std::int64_t, std::uint64_t> counters;
 
         std::map<std::string, meter_t> meters;
 
@@ -77,37 +89,31 @@ public:
     /// \warning must be called from event loop's thread.
     template<typename T>
     const std::map<std::string, std::function<T()>>&
-    gauges() const;
+    gauges() const {
+        return data.gauges.get<T>();
+    }
 
     /// \overload
     /// \warning must be called from event loop's thread.
     template<typename T>
     std::map<std::string, std::function<T()>>&
     gauges() {
-        typedef std::map<
-            std::string,
-            std::function<T()>
-        >& result_type;
-
-        return const_cast<result_type>(static_cast<const processor_t&>(*this).gauges<T>());
+        return data.gauges.get<T>();
     }
 
     /// \warning must be called from event loop's thread.
     template<typename T>
     const std::map<std::string, T>&
-    counters() const;
+    counters() const {
+        return data.counters.get<T>();
+    }
 
     /// \overload
     /// \warning must be called from event loop's thread.
     template<typename T>
     std::map<std::string, T>&
     counters() {
-        typedef std::map<
-            std::string,
-            T
-        >& result_type;
-
-        return const_cast<result_type>(static_cast<const processor_t&>(*this).counters<T>());
+        return data.counters.get<T>();
     }
 
     /// \warning must be called from event loop's thread.
@@ -162,27 +168,6 @@ public:
         return timers<Accumulate>()[name];
     }
 };
-
-template<>
-inline
-const std::map<std::string, std::function<std::uint64_t()>>&
-processor_t::gauges<std::uint64_t>() const {
-    return data.gauges.u64;
-}
-
-template<>
-inline
-const std::map<std::string, std::int64_t>&
-processor_t::counters<std::int64_t>() const {
-    return data.counters.i64;
-}
-
-template<>
-inline
-const std::map<std::string, std::uint64_t>&
-processor_t::counters<std::uint64_t>() const {
-    return data.counters.u64;
-}
 
 template<>
 inline
