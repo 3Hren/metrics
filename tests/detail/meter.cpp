@@ -1,4 +1,7 @@
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
+
+#include <chrono>
 
 #include <metrics/detail/meter.hpp>
 
@@ -7,20 +10,17 @@ namespace testing {
 namespace {
 namespace mock {
 
+using ::testing::Return;
+
 struct clock_t {
+    typedef std::chrono::high_resolution_clock::duration duration;
     typedef std::chrono::high_resolution_clock::time_point time_point;
 
-    mutable int counter;
+    MOCK_CONST_METHOD0(now, time_point());
 
-    clock_t(): counter(0) {}
-
-    time_point now() const {
-        // For first two calls (one for ctor, the second for tick).
-        if (counter++ < 2) {
-            return time_point(std::chrono::seconds(0));
-        }
-
-        return time_point(std::chrono::seconds(10));
+    clock_t() {
+        ON_CALL(*this, now())
+            .WillByDefault(Return(time_point(std::chrono::seconds(0))));
     }
 };
 
@@ -32,7 +32,10 @@ struct clock_t {
 namespace metrics {
 namespace testing {
 
-typedef detail::meter<mock::clock_t> meter_type;
+using ::testing::NiceMock;
+using ::testing::Return;
+
+typedef detail::meter<NiceMock<mock::clock_t>> meter_type;
 
 /// Starts with no rates or counts by default.
 TEST(meter, init) {
@@ -49,6 +52,11 @@ TEST(meter, init) {
 
 TEST(meter, mark) {
     meter_type meter;
+
+    EXPECT_CALL(meter.clock(), now())
+        .Times(6)
+        .WillOnce(Return(mock::clock_t::time_point()))
+        .WillRepeatedly(Return(mock::clock_t::time_point(std::chrono::seconds(10))));
 
     meter.mark();
     meter.mark(2);

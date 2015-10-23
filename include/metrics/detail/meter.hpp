@@ -13,9 +13,8 @@ class meter {
     typedef Clock clock_type;
     typedef typename clock_type::time_point time_point;
 
-    clock_type clock;
-
     struct {
+        clock_type clock;
         std::uint64_t count;
     } d;
 
@@ -27,11 +26,19 @@ class meter {
 public:
     /// Creates a new `meter`.
     meter() :
-        birthstamp(clock.now()),
+        birthstamp(d.clock.now()),
         prev(birthstamp),
         rates({{ewma_t::m01rate(), ewma_t::m05rate(), ewma_t::m15rate()}})
     {
         d.count = 0;
+    }
+
+    /// Dependency observers.
+
+    /// Returns a const reference to the clock implementation.
+    const clock_type&
+    clock() const noexcept {
+        return d.clock;
     }
 
     /// Returns the number of events which have been marked.
@@ -51,7 +58,7 @@ public:
 
         const auto elapsed = std::chrono::duration_cast<
             std::chrono::seconds
-        >(clock.now() - birthstamp).count();
+        >(clock().now() - birthstamp).count();
 
         return static_cast<double>(count) / elapsed;
     }
@@ -99,7 +106,7 @@ private:
 
     void
     tick_maybe() {
-        const auto now = clock.now();
+        const auto now = clock().now();
         const auto elapsed = now - prev;
 
         if (elapsed > std::chrono::seconds(5)) {
