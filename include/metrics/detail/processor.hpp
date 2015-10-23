@@ -20,42 +20,38 @@ namespace detail {
 
 typedef std::chrono::high_resolution_clock clock_type;
 
-template<typename... U>
-struct gauges_t {
-    std::tuple<std::map<std::string, std::function<U()>>...> containers;
+template<typename T>
+struct map_gauge {
+    typedef std::function<T()> type;
+};
+
+template<typename T>
+struct map_counter {
+    typedef T type;
+};
+
+template<typename T>
+struct map_timer {
+    typedef timer<clock_type, meter<clock_type>, histogram<T>> type;
+};
+
+/// Represents a tagged collection of metrics with various specializations.
+template<template<typename> class Map, typename... U>
+struct tagged_collection {
+    typedef std::string tag_type;
+
+    std::tuple<std::map<tag_type, typename Map<U>::type>...> containers;
 
     template<typename T>
-    const std::map<std::string, std::function<T()>>&
+    const std::map<tag_type, typename Map<T>::type>&
     get() const noexcept {
-        return cpp14::get<std::map<std::string, std::function<T()>>>(containers);
+        return cpp14::get<std::map<tag_type, typename Map<T>::type>>(containers);
     }
 
     template<typename T>
-    std::map<std::string, std::function<T()>>&
+    std::map<tag_type, typename Map<T>::type>&
     get() noexcept {
-        return cpp14::get<std::map<std::string, std::function<T()>>>(containers);
-    }
-};
-
-template<typename... U>
-struct counters_t {
-    std::tuple<std::map<std::string, U>...> containers;
-
-    template<typename T>
-    std::map<std::string, T>&
-    get() noexcept {
-        return cpp14::get<std::map<std::string, T>>(containers);
-    }
-};
-
-template<typename... U>
-struct timers_t {
-    std::tuple<std::map<std::string, timer<clock_type, meter<clock_type>, histogram<U>>>...> containers;
-
-    template<typename T>
-    std::map<std::string, timer<clock_type, meter<clock_type>, histogram<T>>>&
-    get() noexcept {
-        return cpp14::get<std::map<std::string, timer<clock_type, meter<clock_type>, histogram<T>>>>(containers);
+        return cpp14::get<std::map<tag_type, typename Map<T>::type>>(containers);
     }
 };
 
@@ -68,10 +64,10 @@ class processor_t {
 
     /// Data.
     struct {
-        gauges_t<std::uint64_t> gauges;
-        counters_t<std::int64_t, std::uint64_t> counters;
+        tagged_collection<map_gauge, std::uint64_t> gauges;
+        tagged_collection<map_counter, std::int64_t, std::uint64_t> counters;
         std::map<std::string, meter_t> meters;
-        timers_t<accumulator::sliding::window_t> timers;
+        tagged_collection<map_timer, accumulator::sliding::window_t> timers;
     } data;
 
 public:
