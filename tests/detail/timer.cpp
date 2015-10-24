@@ -23,6 +23,10 @@ struct clock_t {
 
 struct meter_t {
     MOCK_CONST_METHOD0(mark, void());
+
+    MOCK_CONST_METHOD0(m01rate, double());
+    MOCK_CONST_METHOD0(m05rate, double());
+    MOCK_CONST_METHOD0(m15rate, double());
 };
 
 struct histogram_t {
@@ -108,6 +112,28 @@ TEST(Timer, MeasureCallableOnThrow) {
     EXPECT_THROW(timer.measure([]() -> int {
         throw std::runtime_error("expected");
     }), std::runtime_error);
+}
+
+TEST(Timer, DelegatesRateCalls) {
+    timer_type timer;
+
+    EXPECT_CALL(timer.meter(), m01rate())
+        .Times(1)
+        .WillOnce(Return(1.0));
+
+    EXPECT_DOUBLE_EQ(1.0, timer.m01rate());
+
+    EXPECT_CALL(timer.meter(), m05rate())
+        .Times(1)
+        .WillOnce(Return(0.5));
+
+    EXPECT_DOUBLE_EQ(0.5, timer.m05rate());
+
+    EXPECT_CALL(timer.meter(), m15rate())
+        .Times(1)
+        .WillOnce(Return(0.1));
+
+    EXPECT_DOUBLE_EQ(0.1, timer.m15rate());
 }
 
 }  // namespace testing

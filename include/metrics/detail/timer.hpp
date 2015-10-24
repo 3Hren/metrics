@@ -28,7 +28,7 @@ public:
 private:
     struct data_t {
         clock_type clock;
-        meter_type meter;
+        mutable meter_type meter;
         histogram_type histogram;
 
         template<typename... Args>
@@ -92,6 +92,27 @@ public:
     std::uint64_t
     count() const noexcept {
         return histogram().count();
+    }
+
+    /// Returns the one-minute exponentially-weighted moving average rate at which events have
+    /// occurred since the timer was created.
+    double
+    m01rate() const {
+        return d.meter.m01rate();
+    }
+
+    /// Returns the five-minute exponentially-weighted moving average rate at which events have
+    /// occurred since the timer was created.
+    double
+    m05rate() const {
+        return d.meter.m05rate();
+    }
+
+    /// Returns the fifteen-minute exponentially-weighted moving average rate at which events have
+    /// occurred since the timer was created.
+    double
+    m15rate() const {
+        return d.meter.m15rate();
     }
 
     /// Modifiers.
