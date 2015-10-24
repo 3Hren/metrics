@@ -44,7 +44,20 @@ public:
     std::uint64_t
     count() const;
 
-    // TODO: All `meter` getters.
+    /// Returns the one-minute exponentially-weighted moving average rate at which events have
+    /// occurred since the timer was created.
+    double
+    m01rate() const;
+
+    /// Returns the five-minute exponentially-weighted moving average rate at which events have
+    /// occurred since the timer was created.
+    double
+    m05rate() const;
+
+    /// Returns the fifteen-minute exponentially-weighted moving average rate at which events have
+    /// occurred since the timer was created.
+    double
+    m15rate() const;
 
     snapshot_type
     snapshot() const;

@@ -86,5 +86,15 @@ TEST(timer_t, Snapshot) {
     EXPECT_EQ(0, timer.snapshot().size());
 }
 
+TEST(timer_t, MeterGetters) {
+    registry_t registry;
+
+    const auto timer = registry.timer("#");
+
+    EXPECT_DOUBLE_EQ(0.0, timer.m01rate());
+    EXPECT_DOUBLE_EQ(0.0, timer.m05rate());
+    EXPECT_DOUBLE_EQ(0.0, timer.m15rate());
+}
+
 }  // namespace testing
 }  // namespace metrics

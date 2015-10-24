@@ -60,6 +60,45 @@ timer<Accumulate>::count() const {
 }
 
 template<class Accumulate>
+double
+timer<Accumulate>::m01rate() const {
+    std::promise<double> tx;
+    auto rx = tx.get_future();
+
+    processor->post([&] {
+        tx.set_value(processor->timer<Accumulate>(name()).m01rate());
+    });
+
+    return rx.get();
+}
+
+template<class Accumulate>
+double
+timer<Accumulate>::m05rate() const {
+    std::promise<double> tx;
+    auto rx = tx.get_future();
+
+    processor->post([&] {
+        tx.set_value(processor->timer<Accumulate>(name()).m05rate());
+    });
+
+    return rx.get();
+}
+
+template<class Accumulate>
+double
+timer<Accumulate>::m15rate() const {
+    std::promise<double> tx;
+    auto rx = tx.get_future();
+
+    processor->post([&] {
+        tx.set_value(processor->timer<Accumulate>(name()).m15rate());
+    });
+
+    return rx.get();
+}
+
+template<class Accumulate>
 typename timer<Accumulate>::snapshot_type
 timer<Accumulate>::snapshot() const {
     std::promise<snapshot_type> tx;
