@@ -13,7 +13,7 @@ public:
     typedef T value_type;
 
 public:
-    counter(std::string name, processor_t& processor);
+    counter(tagged_t tagged, processor_t& processor);
 
     /// Returns the counter's current value.
     value_type

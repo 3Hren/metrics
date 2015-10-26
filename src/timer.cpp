@@ -42,8 +42,8 @@ timer<Accumulate>::context_t::~context_t() {
 }
 
 template<class Accumulate>
-timer<Accumulate>::timer(std::string name, processor_t& processor) :
-    metric_t(std::move(name), processor)
+timer<Accumulate>::timer(tagged_t tagged, processor_t& processor) :
+    metric_t(std::move(tagged), processor)
 {}
 
 template<class Accumulate>

@@ -37,24 +37,30 @@ registry_t::listen(std::string name, std::function<typename M::value_type()> met
 template<typename T>
 gauge<T>
 registry_t::gauge(const std::string& name) const {
-    return metrics::gauge<T>(name, *processor);
+    return metrics::gauge<T>({name}, *processor);
 }
 
 template<typename T>
 counter<T>
 registry_t::counter(const std::string& name) const {
-    return metrics::counter<T>(name, *processor);
+    return metrics::counter<T>({name}, *processor);
+}
+
+template<typename T>
+counter<T>
+registry_t::counter(std::string name, tagged_t::container_type tags) const {
+    return metrics::counter<T>({name, std::move(tags)}, *processor);
 }
 
 meter_t
 registry_t::meter(const std::string& name) const {
-    return meter_t(name, *processor);
+    return meter_t({name}, *processor);
 }
 
 template<class Accumulate>
 timer<Accumulate>
 registry_t::timer(const std::string& name) const {
-    return metrics::timer<Accumulate>(name, *processor);
+    return metrics::timer<Accumulate>({name}, *processor);
 }
 
 /// Instantiations.
@@ -73,6 +79,14 @@ registry_t::counter<std::int64_t>(const std::string&) const;
 template
 counter<std::uint64_t>
 registry_t::counter<std::uint64_t>(const std::string&) const;
+
+template
+counter<std::int64_t>
+registry_t::counter<std::int64_t>(std::string, tagged_t::container_type) const;
+
+template
+counter<std::uint64_t>
+registry_t::counter<std::uint64_t>(std::string, tagged_t::container_type) const;
 
 template
 timer<accumulator::sliding::window_t>

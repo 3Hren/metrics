@@ -6,8 +6,8 @@
 
 namespace metrics {
 
-meter_t::meter_t(std::string name, processor_t& processor) :
-    metric_t(std::move(name), processor)
+meter_t::meter_t(tagged_t tagged, processor_t& processor) :
+    metric_t(std::move(tagged), processor)
 {
     processor.post([&] {
         processor.meter(this->name());

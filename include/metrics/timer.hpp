@@ -39,7 +39,7 @@ public:
     typedef context_t context_type;
 
 public:
-    timer(std::string name, processor_t& processor);
+    timer(tagged_t tagged, processor_t& processor);
 
     std::uint64_t
     count() const;

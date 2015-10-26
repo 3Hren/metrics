@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include <boost/optional/optional.hpp>
+
 #include <metrics/counter.hpp>
 #include <metrics/registry.hpp>
 
@@ -107,6 +109,20 @@ TEST(Counter, Name) {
     const registry_t registry;
     const auto counter = registry.counter<std::uint64_t>("metrics.testing.counter");
     EXPECT_EQ("metrics.testing.counter", counter.name());
+}
+
+TEST(Counter, TaggedName) {
+    registry_t registry;
+
+    auto counter = registry.counter<std::uint64_t>("connections.accepted", {
+        {"service", "storage"},
+        {"scope",   "testing"}
+    });
+
+    EXPECT_EQ("storage", *counter.tag("service"));
+    EXPECT_EQ("testing", *counter.tag("scope"));
+
+    EXPECT_FALSE(!!counter.tag("missing"));
 }
 
 }  // namespace testing

@@ -4,6 +4,8 @@
 #include <memory>
 #include <string>
 
+#include "metrics/tagged.hpp"
+
 namespace metrics {
 namespace detail {
 
@@ -57,6 +59,11 @@ public:
     template<typename T>
     counter<T>
     counter(const std::string& name) const;
+
+    /// \where `T` must be either `std::uint64_t` or `std::int64_t`.
+    template<typename T>
+    metrics::counter<T>
+    counter(std::string name, tagged_t::container_type tags) const;
 
     meter_t
     meter(const std::string& name) const;

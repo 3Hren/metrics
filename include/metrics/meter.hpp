@@ -9,7 +9,7 @@ namespace metrics {
 /// Just like the Unix load averages visible in `top`.
 class meter_t : public metric_t {
 public:
-    meter_t(std::string name, processor_t& processor);
+    meter_t(tagged_t tagged, processor_t& processor);
 
     std::uint64_t
     count() const;

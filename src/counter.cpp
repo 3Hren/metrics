@@ -8,8 +8,8 @@
 namespace metrics {
 
 template<typename T>
-counter<T>::counter(std::string name, processor_t& processor) :
-    metric_t(std::move(name), processor)
+counter<T>::counter(tagged_t tagged, processor_t& processor) :
+    metric_t(std::move(tagged), processor)
 {}
 
 template<typename T>

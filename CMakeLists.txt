@@ -31,6 +31,7 @@ set(SOURCES
     src/meter
     src/metric
     src/registry
+    src/tagged
     src/timer
 )
 

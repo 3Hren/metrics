@@ -14,7 +14,7 @@ public:
     typedef T value_type;
 
 public:
-    gauge(std::string name, processor_t& processor);
+    gauge(tagged_t tagged, processor_t& processor);
 
     value_type
     get() const;

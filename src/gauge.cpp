@@ -7,8 +7,8 @@
 namespace metrics {
 
 template<typename T>
-gauge<T>::gauge(std::string name, processor_t& processor) :
-    metric_t(std::move(name), processor)
+gauge<T>::gauge(tagged_t tagged, processor_t& processor) :
+    metric_t(std::move(tagged), processor)
 {}
 
 template<typename T>
