@@ -30,7 +30,7 @@ public:
     metric_t(tagged_t tagged, processor_t& processor);
 
     const std::string&
-    name() const;
+    name() const noexcept;
 
     const tagged_t&
     tagged() const noexcept;

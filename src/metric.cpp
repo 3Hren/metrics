@@ -16,7 +16,7 @@ metric_t::metric_t(tagged_t tagged, processor_t& processor):
 {}
 
 const std::string&
-metric_t::name() const {
+metric_t::name() const noexcept {
     return d.tagged.name();
 }
 
