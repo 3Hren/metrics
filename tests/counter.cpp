@@ -125,5 +125,39 @@ TEST(Counter, TaggedName) {
     EXPECT_FALSE(!!counter.tag("missing"));
 }
 
+TEST(Counter, DifferentByTagsInc) {
+    registry_t registry;
+
+    auto counter1 = registry.counter<std::uint64_t>("metrics.testing.counter", {
+        {"tag", "#1"}
+    });
+
+    counter1.inc();
+
+    auto counter2 = registry.counter<std::uint64_t>("metrics.testing.counter", {
+        {"tag", "#2"}
+    });
+
+    EXPECT_EQ(1, counter1.get());
+    EXPECT_EQ(0, counter2.get());
+}
+
+TEST(Counter, DifferentByTagsDec) {
+    registry_t registry;
+
+    auto counter1 = registry.counter<std::int64_t>("metrics.testing.counter", {
+        {"tag", "#1"}
+    });
+
+    counter1.dec();
+
+    auto counter2 = registry.counter<std::int64_t>("metrics.testing.counter", {
+        {"tag", "#2"}
+    });
+
+    EXPECT_EQ(-1, counter1.get());
+    EXPECT_EQ(0, counter2.get());
+}
+
 }  // namespace testing
 }  // namespace metrics

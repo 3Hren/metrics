@@ -19,7 +19,7 @@ counter<T>::get() const {
     auto rx = tx.get_future();
 
     processor->post([&] {
-        tx.set_value(processor->counter<T>(name()));
+        tx.set_value(processor->counter<T>(tagged()));
     });
 
     return rx.get();
@@ -32,7 +32,7 @@ counter<T>::inc(value_type value) {
     auto rx = tx->get_future();
 
     processor->post([=] {
-        auto& counter = processor->counter<T>(name());
+        auto& counter = processor->counter<T>(tagged());
         tx->set_value(std::exchange(counter, counter + value));
     });
 
@@ -47,7 +47,7 @@ counter<T>::dec(value_type value) {
     auto rx = tx->get_future();
 
     processor->post([=] {
-        auto& counter = processor->counter<T>(name());
+        auto& counter = processor->counter<T>(tagged());
         tx->set_value(std::exchange(counter, counter - value));
     });
 
