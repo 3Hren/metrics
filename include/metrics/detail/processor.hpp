@@ -70,9 +70,10 @@ class processor_t {
     } data;
 
 public:
-    processor_t()
-        : work(boost::optional<boost::asio::io_service::work>(boost::asio::io_service::work(loop))),
-          thread([&] { loop.run(); }) {}
+    processor_t():
+        work(boost::optional<boost::asio::io_service::work>(boost::asio::io_service::work(loop))),
+        thread([&] { loop.run(); })
+    {}
 
     ~processor_t() {
         work.reset();
