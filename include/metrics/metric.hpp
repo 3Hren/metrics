@@ -32,6 +32,9 @@ public:
     const std::string&
     name() const;
 
+    const tagged_t&
+    tagged() const noexcept;
+
     boost::optional<std::string>
     tag(const std::string& key) const;
 };

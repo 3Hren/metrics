@@ -20,6 +20,11 @@ metric_t::name() const {
     return d.tagged.name();
 }
 
+const tagged_t&
+metric_t::tagged() const noexcept {
+    return d.tagged;
+}
+
 boost::optional<std::string>
 metric_t::tag(const std::string& key) const {
     return d.tagged.tag(key);
