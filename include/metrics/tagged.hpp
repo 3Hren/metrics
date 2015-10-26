@@ -42,3 +42,16 @@ public:
 };
 
 }  // namespace metrics
+
+namespace std {
+
+template<>
+struct hash<metrics::tagged_t> {
+    typedef metrics::tagged_t argument_type;
+    typedef std::size_t result_type;
+
+    result_type
+    operator()(const argument_type& v) const;
+};
+
+}  // namespace std

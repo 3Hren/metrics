@@ -45,6 +45,19 @@ tagged_t::operator!=(const tagged_t& other) const {
     return !(*this == other);
 }
 
-// TODO: hash.
-
 }  // namespace metrics
+
+std::hash<metrics::tagged_t>::result_type
+std::hash<metrics::tagged_t>::operator()(const argument_type& v) const {
+    result_type result = std::hash<std::string>()("");
+
+    for (const auto& kv : v.tags()) {
+        const result_type hk = std::hash<std::string>()(kv.first);
+        const result_type hv = std::hash<std::string>()(kv.second);
+
+        result ^= (hk << 1);
+        result ^= (hv << 1);
+    }
+
+    return result;
+}

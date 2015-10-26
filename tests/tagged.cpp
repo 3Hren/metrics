@@ -32,5 +32,11 @@ TEST(Tagged, Eq) {
     EXPECT_TRUE(tagged3 != tagged2);
 }
 
+TEST(Tagged, Hash) {
+    tagged_t tagged("name", {{"tag", "value"}});
+
+    EXPECT_TRUE(std::hash<tagged_t>()(tagged) != 0);
+}
+
 }  // namespace testing
 }  // namespace metrics
