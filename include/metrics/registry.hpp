@@ -4,8 +4,6 @@
 #include <memory>
 #include <string>
 
-#include "metrics/meter.hpp"
-
 namespace metrics {
 namespace detail {
 
@@ -21,6 +19,8 @@ class gauge;
 
 template<typename T>
 class counter;
+
+class meter_t;
 
 template<class Accumulate>
 class timer;

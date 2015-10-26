@@ -2,6 +2,7 @@
 
 #include "metrics/counter.hpp"
 #include "metrics/gauge.hpp"
+#include "metrics/meter.hpp"
 #include "metrics/timer.hpp"
 
 #include "metrics/detail/processor.hpp"
