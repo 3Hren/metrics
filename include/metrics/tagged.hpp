@@ -22,9 +22,6 @@ public:
     /// Creates a tagged struct with the given tags, overriding the `name` tag if required.
     tagged_t(std::string name, container_type tags);
 
-    virtual
-    ~tagged_t();
-
     /// Returns a const reference to the underlying tag map.
     const container_type&
     tags() const noexcept;

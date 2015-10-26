@@ -14,8 +14,6 @@ tagged_t::tagged_t(std::string name, container_type tags):
     container["name"] = std::move(name);
 }
 
-tagged_t::~tagged_t() {}
-
 const tagged_t::container_type&
 tagged_t::tags() const noexcept {
     return container;
