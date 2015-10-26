@@ -34,8 +34,11 @@ public:
     boost::optional<std::string>
     tag(const std::string& key) const;
 
-    // TODO: hash.
-    // TODO: operator==.
+    bool
+    operator==(const tagged_t& other) const;
+
+    bool
+    operator!=(const tagged_t& other) const;
 };
 
 }  // namespace metrics

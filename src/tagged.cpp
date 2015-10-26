@@ -35,7 +35,16 @@ tagged_t::tag(const std::string& key) const {
     return it->second;
 }
 
+bool
+tagged_t::operator==(const tagged_t& other) const {
+    return container == other.container;
+}
+
+bool
+tagged_t::operator!=(const tagged_t& other) const {
+    return !(*this == other);
+}
+
 // TODO: hash.
-// TODO: operator==.
 
 }  // namespace metrics

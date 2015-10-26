@@ -103,6 +103,7 @@ if (ENABLE_TESTING)
         tests/detail/timer
         tests/gauge
         tests/meter
+        tests/tagged
         tests/timer
     )
 
