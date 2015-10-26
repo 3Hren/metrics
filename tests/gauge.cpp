@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include <stdexcept>
+
 #include <metrics/gauge.hpp>
 #include <metrics/registry.hpp>
 
