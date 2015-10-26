@@ -100,7 +100,8 @@ if (ENABLE_TESTING)
         tests/detail/histogram
         tests/detail/meter
         tests/detail/timer
-        tests/metric
+        tests/gauge
+        tests/meter
         tests/timer
     )
 

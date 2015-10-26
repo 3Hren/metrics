@@ -1,0 +1,32 @@
+#include <gtest/gtest.h>
+
+#include <metrics/gauge.hpp>
+#include <metrics/registry.hpp>
+
+namespace metrics {
+namespace testing {
+
+TEST(Gauge, Factory) {
+    registry_t registry;
+
+    registry.listen<gauge<std::uint64_t>>("metrics.testing.gauge", [&]() -> std::uint64_t {
+        static std::uint64_t counter = 0;
+        return ++counter;
+    });
+
+    auto gauge = registry.gauge<std::uint64_t>("metrics.testing.gauge");
+
+    EXPECT_EQ(1, gauge.get());
+    EXPECT_EQ(2, gauge.get());
+}
+
+TEST(Gauge, ThrowsIfNotRegistered) {
+    registry_t registry;
+
+    auto gauge = registry.gauge<std::uint64_t>("metrics.testing.gauge");
+
+    EXPECT_THROW(gauge.get(), std::out_of_range);
+}
+
+}  // namespace testing
+}  // namespace metrics
