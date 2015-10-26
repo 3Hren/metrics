@@ -39,6 +39,9 @@ public:
 
     bool
     operator!=(const tagged_t& other) const;
+
+    bool
+    operator<(const tagged_t& other) const;
 };
 
 }  // namespace metrics

@@ -45,6 +45,11 @@ tagged_t::operator!=(const tagged_t& other) const {
     return !(*this == other);
 }
 
+bool
+tagged_t::operator<(const tagged_t& other) const {
+    return container < other.container;
+}
+
 }  // namespace metrics
 
 std::hash<metrics::tagged_t>::result_type

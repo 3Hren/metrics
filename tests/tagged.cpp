@@ -38,5 +38,18 @@ TEST(Tagged, Hash) {
     EXPECT_TRUE(std::hash<tagged_t>()(tagged) != 0);
 }
 
+TEST(Tagged, Less) {
+    tagged_t tagged1("name", {{"tag", "value"}});
+    tagged_t tagged2("name", {{"tag", "value"}});
+    tagged_t tagged3("name", {{"tag", "ooops"}});
+
+    EXPECT_FALSE(tagged1 < tagged2);
+    EXPECT_FALSE(tagged2 < tagged1);
+    EXPECT_FALSE(tagged1 < tagged3);
+    EXPECT_FALSE(tagged2 < tagged3);
+    EXPECT_TRUE (tagged3 < tagged1);
+    EXPECT_TRUE (tagged3 < tagged2);
+}
+
 }  // namespace testing
 }  // namespace metrics
