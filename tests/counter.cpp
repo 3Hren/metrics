@@ -103,5 +103,11 @@ TEST(Counter, CopyAssignable) {
     EXPECT_EQ(0, counter.get());
 }
 
+TEST(Counter, Name) {
+    const registry_t registry;
+    const auto counter = registry.counter<std::uint64_t>("metrics.testing.counter");
+    EXPECT_EQ("metrics.testing.counter", counter.name());
+}
+
 }  // namespace testing
 }  // namespace metrics
