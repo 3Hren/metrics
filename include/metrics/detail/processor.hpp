@@ -18,6 +18,7 @@
 namespace metrics {
 namespace detail {
 
+typedef tagged_t tagged_type;
 typedef std::chrono::high_resolution_clock clock_type;
 
 template<typename T>
@@ -38,20 +39,18 @@ struct map_timer {
 /// Represents a tagged collection of metrics with various specializations.
 template<template<typename> class Map, typename... U>
 struct tagged_collection {
-    typedef std::string tag_type;
-
-    std::tuple<std::map<tag_type, typename Map<U>::type>...> containers;
+    std::tuple<std::map<tagged_type, typename Map<U>::type>...> containers;
 
     template<typename T>
-    const std::map<tag_type, typename Map<T>::type>&
+    const std::map<tagged_type, typename Map<T>::type>&
     get() const noexcept {
-        return cpp14::get<std::map<tag_type, typename Map<T>::type>>(containers);
+        return cpp14::get<std::map<tagged_type, typename Map<T>::type>>(containers);
     }
 
     template<typename T>
-    std::map<tag_type, typename Map<T>::type>&
+    std::map<tagged_type, typename Map<T>::type>&
     get() noexcept {
-        return cpp14::get<std::map<tag_type, typename Map<T>::type>>(containers);
+        return cpp14::get<std::map<tagged_type, typename Map<T>::type>>(containers);
     }
 };
 
@@ -66,7 +65,7 @@ class processor_t {
     struct {
         tagged_collection<map_gauge, std::uint64_t> gauges;
         tagged_collection<map_counter, std::int64_t, std::uint64_t> counters;
-        std::map<std::string, meter_t> meters;
+        std::map<tagged_type, meter_t> meters;
         tagged_collection<map_timer, accumulator::sliding::window_t> timers;
     } data;
 
@@ -88,7 +87,7 @@ public:
 
     /// \warning must be called from event loop's thread.
     template<typename T>
-    const std::map<std::string, std::function<T()>>&
+    const std::map<tagged_type, std::function<T()>>&
     gauges() const {
         return data.gauges.get<T>();
     }
@@ -96,14 +95,14 @@ public:
     /// \overload
     /// \warning must be called from event loop's thread.
     template<typename T>
-    std::map<std::string, std::function<T()>>&
+    std::map<tagged_type, std::function<T()>>&
     gauges() {
         return data.gauges.get<T>();
     }
 
     /// \warning must be called from event loop's thread.
     template<typename T>
-    const std::map<std::string, T>&
+    const std::map<tagged_type, T>&
     counters() const {
         return data.counters.get<T>();
     }
@@ -111,14 +110,14 @@ public:
     /// \overload
     /// \warning must be called from event loop's thread.
     template<typename T>
-    std::map<std::string, T>&
+    std::map<tagged_type, T>&
     counters() {
         return data.counters.get<T>();
     }
 
     /// \warning must be called from event loop's thread.
     template<class Accumulate>
-    const std::map<std::string, timer<clock_type, meter<clock_type>, histogram<Accumulate>>>&
+    const std::map<tagged_type, timer<clock_type, meter<clock_type>, histogram<Accumulate>>>&
     timers() const {
         return data.timers.get<Accumulate>();
     }
@@ -126,7 +125,7 @@ public:
     /// \overload
     /// \warning must be called from event loop's thread.
     template<class Accumulate>
-    std::map<std::string, timer<clock_type, meter<clock_type>, histogram<Accumulate>>>&
+    std::map<tagged_type, timer<clock_type, meter<clock_type>, histogram<Accumulate>>>&
     timers() {
         return data.timers.get<Accumulate>();
     }
@@ -134,9 +133,9 @@ public:
     /// \warning must be called from event loop's thread.
     template<typename T>
     boost::optional<std::function<T()>>
-    gauge(const std::string& name) const {
+    gauge(const tagged_type& tagged) const {
         const auto& gauges = this->gauges<T>();
-        const auto it = gauges.find(name);
+        const auto it = gauges.find(tagged);
 
         if (it != gauges.end()) {
             return boost::make_optional(it->second);
@@ -148,21 +147,21 @@ public:
     /// \warning must be called from event loop's thread.
     template<typename T>
     T&
-    counter(const std::string& name) {
-        return counters<T>()[name];
+    counter(const tagged_type& tagged) {
+        return counters<T>()[tagged];
     }
 
     /// \warning must be called from event loop's thread.
     meter_t&
-    meter(const std::string& name) {
-        return data.meters[name];
+    meter(const tagged_type& tagged) {
+        return data.meters[tagged];
     }
 
     /// \warning must be called from event loop's thread.
     template<typename Accumulate>
     timer<clock_type, metrics::detail::meter<clock_type>, histogram<Accumulate>>&
-    timer(const std::string& name) {
-        return timers<Accumulate>()[name];
+    timer(const tagged_type& tagged) {
+        return timers<Accumulate>()[tagged];
     }
 };
 
