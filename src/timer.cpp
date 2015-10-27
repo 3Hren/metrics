@@ -13,7 +13,7 @@ namespace {
 template<typename Duration, typename Accumulate>
 void
 update(processor_t* processor, tagged_t tagged, Duration elapsed) {
-    processor->timer<Accumulate>(tagged).update(elapsed);
+    processor->timer<Accumulate>(std::move(tagged)).update(elapsed);
 }
 
 }  // namespace
