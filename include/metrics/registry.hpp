@@ -47,13 +47,17 @@ public:
     /// Given a `metric` gauge, registers it under the given name.
     template<typename M>
     void
-    listen(std::string name, std::function<typename M::value_type()> metric);
+    listen(std::string name, typename M::function_type metric);
 
-    ///
+    /// Given a `metric` gauge, registers it under the given name with the given tags.
+    template<typename M>
+    void
+    listen(std::string name, tagged_t::container_type tags, typename M::function_type metric);
+
     /// \where `T` must be either `std::uint64_t`, `std::int64_t` or `long double`.
     template<typename T>
-    gauge<T>
-    gauge(const std::string& name) const;
+    metrics::gauge<T>
+    gauge(std::string name, tagged_t::container_type tags = tagged_t::container_type()) const;
 
     /// \where `T` must be either `std::uint64_t` or `std::int64_t`.
     template<typename T>

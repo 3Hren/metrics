@@ -18,7 +18,7 @@ gauge<T>::get() const {
     auto rx = tx.get_future();
 
     processor->post([&] {
-        if (auto fn = processor->gauge<T>(name())) {
+        if (auto fn = processor->gauge<T>(tagged())) {
             tx.set_value((*fn)());
         } else {
             tx.set_exception(std::make_exception_ptr(std::out_of_range(name())));

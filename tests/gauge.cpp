@@ -30,5 +30,19 @@ TEST(Gauge, ThrowsIfNotRegistered) {
     EXPECT_THROW(gauge.get(), std::out_of_range);
 }
 
+TEST(Gauge, Tagged) {
+    registry_t registry;
+
+    registry.listen<gauge<std::uint64_t>>("queue.age", {{"service", "node"}}, [&]() -> std::uint64_t {
+        static std::uint64_t counter = 0;
+        return ++counter;
+    });
+
+    auto gauge = registry.gauge<std::uint64_t>("queue.age", {{"service", "node"}});
+
+    EXPECT_EQ(1, gauge.get());
+    EXPECT_EQ(2, gauge.get());
+}
+
 }  // namespace testing
 }  // namespace metrics

@@ -15,9 +15,9 @@ struct metric_traits;
 template<typename T>
 struct metric_traits<gauge<T>> {
     static void
-    apply(processor_t& processor, std::string name, std::function<T()> metric) {
-        processor.post([&, name, metric] {
-            processor.gauges<T>().insert({std::move(name), std::move(metric)});
+    apply(processor_t& processor, std::string name, tagged_t::container_type tags, std::function<T()> metric) {
+        processor.post([&, name, tags, metric] {
+            processor.gauges<T>().insert({{std::move(name), std::move(tags)}, std::move(metric)});
         });
     }
 };
@@ -30,14 +30,20 @@ registry_t::~registry_t() {}
 
 template<typename M>
 void
-registry_t::listen(std::string name, std::function<typename M::value_type()> metric) {
-    metric_traits<M>::apply(*processor, std::move(name), std::move(metric));
+registry_t::listen(std::string name, typename M::function_type metric) {
+    metric_traits<M>::apply(*processor, std::move(name), {}, std::move(metric));
+}
+
+template<typename M>
+void
+registry_t::listen(std::string name, tagged_t::container_type tags, typename M::function_type metric) {
+    metric_traits<M>::apply(*processor, std::move(name), std::move(tags), std::move(metric));
 }
 
 template<typename T>
 gauge<T>
-registry_t::gauge(const std::string& name) const {
-    return metrics::gauge<T>({name}, *processor);
+registry_t::gauge(std::string name, tagged_t::container_type tags) const {
+    return metrics::gauge<T>({std::move(name), std::move(tags)}, *processor);
 }
 
 template<typename T>
@@ -49,7 +55,7 @@ registry_t::counter(const std::string& name) const {
 template<typename T>
 counter<T>
 registry_t::counter(std::string name, tagged_t::container_type tags) const {
-    return metrics::counter<T>({name, std::move(tags)}, *processor);
+    return metrics::counter<T>({std::move(name), std::move(tags)}, *processor);
 }
 
 meter_t
@@ -66,11 +72,15 @@ registry_t::timer(const std::string& name) const {
 /// Instantiations.
 template
 void
-registry_t::listen<gauge<std::uint64_t>>(std::string name, std::function<std::uint64_t()> metric);
+registry_t::listen<gauge<std::uint64_t>>(std::string, std::function<std::uint64_t()>);
+
+template
+void
+registry_t::listen<gauge<std::uint64_t>>(std::string, tagged_t::container_type, std::function<std::uint64_t()>);
 
 template
 gauge<std::uint64_t>
-registry_t::gauge<std::uint64_t>(const std::string&) const;
+registry_t::gauge<std::uint64_t>(std::string, tagged_t::container_type) const;
 
 template
 counter<std::int64_t>
