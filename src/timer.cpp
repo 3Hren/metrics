@@ -12,8 +12,8 @@ namespace {
 // ‘class metrics::timer<Accumulate>’.
 template<typename Duration, typename Accumulate>
 void
-update(processor_t* processor, std::string name, Duration elapsed) {
-    processor->timer<Accumulate>(name).update(elapsed);
+update(processor_t* processor, tagged_t tagged, Duration elapsed) {
+    processor->timer<Accumulate>(tagged).update(elapsed);
 }
 
 }  // namespace
@@ -33,11 +33,11 @@ timer<Accumulate>::context_t::~context_t() {
     const auto now = clock_type::now();
     const auto elapsed = now - timestamp;
 
-    const auto name = parent->name();
+    const auto tagged = parent->tagged();
     const auto processor = parent->processor;
 
     processor->post(
-        std::bind(&update<clock_type::duration, Accumulate>, processor, std::move(name), elapsed)
+        std::bind(&update<clock_type::duration, Accumulate>, processor, std::move(tagged), elapsed)
     );
 }
 
@@ -53,7 +53,7 @@ timer<Accumulate>::count() const {
     auto rx = tx.get_future();
 
     processor->post([&] {
-        tx.set_value(processor->timer<Accumulate>(name()).count());
+        tx.set_value(processor->timer<Accumulate>(tagged()).count());
     });
 
     return rx.get();
@@ -66,7 +66,7 @@ timer<Accumulate>::m01rate() const {
     auto rx = tx.get_future();
 
     processor->post([&] {
-        tx.set_value(processor->timer<Accumulate>(name()).m01rate());
+        tx.set_value(processor->timer<Accumulate>(tagged()).m01rate());
     });
 
     return rx.get();
@@ -79,7 +79,7 @@ timer<Accumulate>::m05rate() const {
     auto rx = tx.get_future();
 
     processor->post([&] {
-        tx.set_value(processor->timer<Accumulate>(name()).m05rate());
+        tx.set_value(processor->timer<Accumulate>(tagged()).m05rate());
     });
 
     return rx.get();
@@ -92,7 +92,7 @@ timer<Accumulate>::m15rate() const {
     auto rx = tx.get_future();
 
     processor->post([&] {
-        tx.set_value(processor->timer<Accumulate>(name()).m15rate());
+        tx.set_value(processor->timer<Accumulate>(tagged()).m15rate());
     });
 
     return rx.get();
@@ -105,7 +105,7 @@ timer<Accumulate>::snapshot() const {
     auto rx = tx.get_future();
 
     processor->post([&] {
-        tx.set_value(processor->timer<Accumulate>(name()).histogram().snapshot());
+        tx.set_value(processor->timer<Accumulate>(tagged()).histogram().snapshot());
     });
 
     return rx.get();

@@ -70,7 +70,7 @@ public:
     // TODO: Change default accumulator to `exponentially_decaying_t`.
     template<class Accumulate = accumulator::sliding::window_t>
     timer<Accumulate>
-    timer(const std::string& name) const;
+    timer(std::string name, tagged_t::container_type tags = tagged_t::container_type()) const;
 };
 
 }  // namespace metrics

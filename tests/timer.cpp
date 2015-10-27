@@ -96,5 +96,20 @@ TEST(timer_t, MeterGetters) {
     EXPECT_DOUBLE_EQ(0.0, timer.m15rate());
 }
 
+TEST(timer_t, Tagged) {
+    registry_t registry;
+
+    auto timer1 = registry.timer("#", {{"tag", "#1"}});
+
+    {
+        const auto context = timer1.context();
+        // Do the work... bang!
+    }
+
+    auto timer2 = registry.timer("#");
+
+    EXPECT_EQ(0, timer2.count());
+}
+
 }  // namespace testing
 }  // namespace metrics

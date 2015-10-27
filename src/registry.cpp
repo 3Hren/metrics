@@ -59,8 +59,8 @@ registry_t::meter(std::string name, tagged_t::container_type tags) const {
 
 template<class Accumulate>
 timer<Accumulate>
-registry_t::timer(const std::string& name) const {
-    return metrics::timer<Accumulate>({name}, *processor);
+registry_t::timer(std::string name, tagged_t::container_type tags) const {
+    return metrics::timer<Accumulate>({std::move(name), std::move(tags)}, *processor);
 }
 
 /// Instantiations.
@@ -86,6 +86,6 @@ registry_t::counter<std::uint64_t>(std::string, tagged_t::container_type) const;
 
 template
 timer<accumulator::sliding::window_t>
-registry_t::timer<accumulator::sliding::window_t>(const std::string&) const;
+registry_t::timer<accumulator::sliding::window_t>(std::string, tagged_t::container_type tags) const;
 
 }  // namespace metrics
