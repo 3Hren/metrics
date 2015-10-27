@@ -12,6 +12,7 @@ template<typename T>
 class gauge : public metric_t {
 public:
     typedef T value_type;
+    typedef std::function<value_type()> function_type;
 
 public:
     gauge(tagged_t tagged, processor_t& processor);
