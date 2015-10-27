@@ -62,12 +62,7 @@ public:
     /// \where `T` must be either `std::uint64_t` or `std::int64_t`.
     template<typename T>
     counter<T>
-    counter(const std::string& name) const;
-
-    /// \where `T` must be either `std::uint64_t` or `std::int64_t`.
-    template<typename T>
-    metrics::counter<T>
-    counter(std::string name, tagged_t::container_type tags) const;
+    counter(std::string name, tagged_t::container_type tags = tagged_t::container_type()) const;
 
     meter_t
     meter(std::string name, tagged_t::container_type tags = tagged_t::container_type()) const;

@@ -48,12 +48,6 @@ registry_t::gauge(std::string name, tagged_t::container_type tags) const {
 
 template<typename T>
 counter<T>
-registry_t::counter(const std::string& name) const {
-    return metrics::counter<T>({name}, *processor);
-}
-
-template<typename T>
-counter<T>
 registry_t::counter(std::string name, tagged_t::container_type tags) const {
     return metrics::counter<T>({std::move(name), std::move(tags)}, *processor);
 }
@@ -81,14 +75,6 @@ registry_t::listen<gauge<std::uint64_t>>(std::string, tagged_t::container_type, 
 template
 gauge<std::uint64_t>
 registry_t::gauge<std::uint64_t>(std::string, tagged_t::container_type) const;
-
-template
-counter<std::int64_t>
-registry_t::counter<std::int64_t>(const std::string&) const;
-
-template
-counter<std::uint64_t>
-registry_t::counter<std::uint64_t>(const std::string&) const;
 
 template
 counter<std::int64_t>
