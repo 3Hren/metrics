@@ -59,8 +59,8 @@ registry_t::counter(std::string name, tagged_t::container_type tags) const {
 }
 
 meter_t
-registry_t::meter(const std::string& name) const {
-    return meter_t({name}, *processor);
+registry_t::meter(std::string name, tagged_t::container_type tags) const {
+    return meter_t({std::move(name), std::move(tags)}, *processor);
 }
 
 template<class Accumulate>

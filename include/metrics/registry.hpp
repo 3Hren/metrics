@@ -70,7 +70,7 @@ public:
     counter(std::string name, tagged_t::container_type tags) const;
 
     meter_t
-    meter(const std::string& name) const;
+    meter(std::string name, tagged_t::container_type tags = tagged_t::container_type()) const;
 
     // TODO: Change default accumulator to `exponentially_decaying_t`.
     template<class Accumulate = accumulator::sliding::window_t>

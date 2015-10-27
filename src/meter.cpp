@@ -10,7 +10,7 @@ meter_t::meter_t(tagged_t tagged, processor_t& processor) :
     metric_t(std::move(tagged), processor)
 {
     processor.post([&] {
-        processor.meter(this->name());
+        processor.meter(this->tagged());
     });
 }
 
@@ -20,7 +20,7 @@ meter_t::count() const {
     auto rx = tx.get_future();
 
     processor->post([&] {
-        tx.set_value(processor->meter(name()).count());
+        tx.set_value(processor->meter(tagged()).count());
     });
 
     return rx.get();
@@ -29,7 +29,7 @@ meter_t::count() const {
 void
 meter_t::mark() {
     processor->post([&] {
-        processor->meter(name()).mark();
+        processor->meter(tagged()).mark();
     });
 }
 
