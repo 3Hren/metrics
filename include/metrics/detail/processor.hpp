@@ -80,10 +80,26 @@ public:
         thread.join();
     }
 
+    /// Request the processor to invoke the given handler and return immediately.
+    ///
+    /// Returns a `std::future` associated with the promised result.
+    ///
+    /// \type `F` must meet `CopyConstructible` requirements.
+    /// \note this method involves heap allocation to match I/O service requirements for completion
+    ///       handler object, which must be `CopyConstructible`.
     template<class F>
-    void
-    post(F fn) {
-        loop.post(std::move(fn));
+    auto
+    post(F fn) -> std::future<decltype(fn())> {
+        typedef decltype(fn()) result_type;
+        typedef std::packaged_task<result_type()> task_type;
+
+        auto tx = std::make_shared<task_type>([=]() -> result_type {
+            return fn();
+        });
+
+        loop.post(std::bind(&task_type::operator(), tx));
+
+        return tx->get_future();
     }
 
     /// \warning must be called from event loop's thread.

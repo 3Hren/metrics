@@ -49,11 +49,8 @@ timer<Accumulate>::timer(tagged_t tagged, processor_t& processor) :
 template<class Accumulate>
 std::uint64_t
 timer<Accumulate>::count() const {
-    std::promise<std::uint64_t> tx;
-    auto rx = tx.get_future();
-
-    processor->post([&] {
-        tx.set_value(processor->timer<Accumulate>(tagged()).count());
+    auto rx = processor->post([&]() -> std::uint64_t {
+        return processor->timer<Accumulate>(tagged()).count();
     });
 
     return rx.get();
@@ -62,11 +59,8 @@ timer<Accumulate>::count() const {
 template<class Accumulate>
 double
 timer<Accumulate>::m01rate() const {
-    std::promise<double> tx;
-    auto rx = tx.get_future();
-
-    processor->post([&] {
-        tx.set_value(processor->timer<Accumulate>(tagged()).m01rate());
+    auto rx = processor->post([&]() -> double {
+        return processor->timer<Accumulate>(tagged()).m01rate();
     });
 
     return rx.get();
@@ -75,11 +69,8 @@ timer<Accumulate>::m01rate() const {
 template<class Accumulate>
 double
 timer<Accumulate>::m05rate() const {
-    std::promise<double> tx;
-    auto rx = tx.get_future();
-
-    processor->post([&] {
-        tx.set_value(processor->timer<Accumulate>(tagged()).m05rate());
+    auto rx = processor->post([&]() -> double {
+        return processor->timer<Accumulate>(tagged()).m05rate();
     });
 
     return rx.get();
@@ -88,11 +79,8 @@ timer<Accumulate>::m05rate() const {
 template<class Accumulate>
 double
 timer<Accumulate>::m15rate() const {
-    std::promise<double> tx;
-    auto rx = tx.get_future();
-
-    processor->post([&] {
-        tx.set_value(processor->timer<Accumulate>(tagged()).m15rate());
+    auto rx = processor->post([&]() -> double {
+        return processor->timer<Accumulate>(tagged()).m15rate();
     });
 
     return rx.get();
@@ -101,11 +89,8 @@ timer<Accumulate>::m15rate() const {
 template<class Accumulate>
 typename timer<Accumulate>::snapshot_type
 timer<Accumulate>::snapshot() const {
-    std::promise<snapshot_type> tx;
-    auto rx = tx.get_future();
-
-    processor->post([&] {
-        tx.set_value(processor->timer<Accumulate>(tagged()).histogram().snapshot());
+    auto rx = processor->post([&]() -> typename timer<Accumulate>::snapshot_type {
+        return processor->timer<Accumulate>(tagged()).histogram().snapshot();
     });
 
     return rx.get();

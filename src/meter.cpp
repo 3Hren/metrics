@@ -9,6 +9,7 @@ namespace metrics {
 meter_t::meter_t(tagged_t tagged, processor_t& processor) :
     metric_t(std::move(tagged), processor)
 {
+    // Initialize the meter.
     processor.post([&] {
         processor.meter(this->tagged());
     });
@@ -16,11 +17,8 @@ meter_t::meter_t(tagged_t tagged, processor_t& processor) :
 
 std::uint64_t
 meter_t::count() const {
-    std::promise<std::uint64_t> tx;
-    auto rx = tx.get_future();
-
-    processor->post([&] {
-        tx.set_value(processor->meter(tagged()).count());
+    auto rx = processor->post([&]() -> std::uint64_t {
+        return processor->meter(tagged()).count();
     });
 
     return rx.get();

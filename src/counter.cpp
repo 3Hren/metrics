@@ -15,11 +15,8 @@ counter<T>::counter(tagged_t tagged, processor_t& processor) :
 template<typename T>
 T
 counter<T>::get() const {
-    std::promise<T> tx;
-    auto rx = tx.get_future();
-
-    processor->post([&] {
-        tx.set_value(processor->counter<T>(tagged()));
+    auto rx = processor->post([&]() -> T {
+        return processor->counter<T>(tagged());
     });
 
     return rx.get();
@@ -28,12 +25,9 @@ counter<T>::get() const {
 template<typename T>
 std::future<T>
 counter<T>::inc(value_type value) {
-    auto tx = std::make_shared<std::promise<T>>();
-    auto rx = tx->get_future();
-
-    processor->post([=] {
+    auto rx = processor->post([=]() -> T {
         auto& counter = processor->counter<T>(tagged());
-        tx->set_value(std::exchange(counter, counter + value));
+        return std::exchange(counter, counter + value);
     });
 
     return rx;
@@ -42,13 +36,9 @@ counter<T>::inc(value_type value) {
 template<typename T>
 std::future<T>
 counter<T>::dec(value_type value) {
-    // TODO: Refactor.
-    auto tx = std::make_shared<std::promise<T>>();
-    auto rx = tx->get_future();
-
-    processor->post([=] {
+    auto rx = processor->post([=]() -> T {
         auto& counter = processor->counter<T>(tagged());
-        tx->set_value(std::exchange(counter, counter - value));
+        return std::exchange(counter, counter - value);
     });
 
     return rx;
