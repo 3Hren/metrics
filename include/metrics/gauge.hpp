@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include "metrics/metric.hpp"
 
 namespace metrics {
