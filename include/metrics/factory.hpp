@@ -6,6 +6,7 @@ namespace metrics {
 
 class meter_t;
 
+/// Represents a factory for standalone non-tagged isolated metrics.
 class factory_t {
 public:
     /// Creates default meter implementation.
