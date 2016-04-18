@@ -27,8 +27,14 @@ private:
     double interval;
 
 public:
-    /// Creates a new EWMA with a specific smoothing constant.
+    /// Creates a new EWMA with a specific smoothing constant and the expected tick interval.
     ewma_t(double alpha, clock_type::duration interval);
+
+    /// \note we declare but not define both copy and move constructors to put our compilers into
+    ///     submission to allow copy elision to be able to initialize EWMA from the following
+    ///     initializers.
+    /// \todo not sure it's an ideal solution.
+    ewma_t(const ewma_t& other);
 
     /// Creates a new EWMA which is equivalent to the UNIX one minute load average and which
     /// expects to be ticked every 5 seconds.

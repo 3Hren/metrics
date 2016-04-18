@@ -29,11 +29,7 @@ public:
     meter() :
         birthstamp(d.clock.now()),
         prev(birthstamp),
-        rates{{
-            {-std::expm1(-5.0 / 60 / std::chrono::minutes(1).count()), std::chrono::seconds(5)},
-            {-std::expm1(-5.0 / 60 / std::chrono::minutes(5).count()), std::chrono::seconds(5)},
-            {-std::expm1(-5.0 / 60 / std::chrono::minutes(15).count()), std::chrono::seconds(5)}
-        }}
+        rates{{ewma_t::m01rate(), ewma_t::m05rate(), ewma_t::m15rate()}}
     {
         d.count = 0;
     }
