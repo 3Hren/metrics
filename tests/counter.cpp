@@ -25,10 +25,10 @@ TEST(Counter, Inc) {
     counter.inc();
     EXPECT_EQ(1, counter.get());
 
-    EXPECT_EQ(1, counter.inc().get());
+    EXPECT_EQ(1, counter.inc());
     EXPECT_EQ(2, counter.get());
 
-    EXPECT_EQ(2, counter.inc().get());
+    EXPECT_EQ(2, counter.inc());
     EXPECT_EQ(3, counter.get());
 }
 
@@ -40,10 +40,10 @@ TEST(Counter, IncVal) {
     counter.inc(42);
     EXPECT_EQ(42, counter.get());
 
-    EXPECT_EQ(42, counter.inc(10).get());
+    EXPECT_EQ(42, counter.inc(10));
     EXPECT_EQ(52, counter.get());
 
-    EXPECT_EQ(52, counter.inc(8).get());
+    EXPECT_EQ(52, counter.inc(8));
     EXPECT_EQ(60, counter.get());
 }
 
@@ -55,12 +55,12 @@ TEST(Counter, Shared) {
     counter.inc();
     EXPECT_EQ(1, counter.get());
 
-    EXPECT_EQ(1, counter.inc().get());
+    EXPECT_EQ(1, counter.inc());
     EXPECT_EQ(2, counter.get());
 
     auto other = registry.counter<std::uint64_t>("metrics.testing.counter");
 
-    EXPECT_EQ(2, other.inc().get());
+    EXPECT_EQ(2, other.inc());
     EXPECT_EQ(3, other.get());
 }
 
@@ -72,10 +72,10 @@ TEST(Counter, Dec) {
     counter.dec();
     EXPECT_EQ(-1, counter.get());
 
-    EXPECT_EQ(-1, counter.dec().get());
+    EXPECT_EQ(-1, counter.dec());
     EXPECT_EQ(-2, counter.get());
 
-    EXPECT_EQ(-2, counter.dec().get());
+    EXPECT_EQ(-2, counter.dec());
     EXPECT_EQ(-3, counter.get());
 }
 
@@ -88,10 +88,10 @@ TEST(metric, counter_dec_val) {
     counter.dec(42);
     EXPECT_EQ(-42, counter.get());
 
-    EXPECT_EQ(-42, counter.dec(10).get());
+    EXPECT_EQ(-42, counter.dec(10));
     EXPECT_EQ(-52, counter.get());
 
-    EXPECT_EQ(-52, counter.dec(8).get());
+    EXPECT_EQ(-52, counter.dec(8));
     EXPECT_EQ(-60, counter.get());
 }
 

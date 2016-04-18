@@ -27,7 +27,7 @@ struct map_gauge {
 
 template<typename T>
 struct map_counter {
-    typedef T type;
+    typedef std::weak_ptr<std::atomic<T>> type;
 };
 
 template<typename T>
@@ -63,8 +63,11 @@ class processor_t {
     /// Data.
     struct {
         tagged_collection<map_gauge, std::uint64_t> gauges;
+
         tagged_collection<map_counter, std::int64_t, std::uint64_t> counters;
+
         std::map<tagged_type, meter_t> meters;
+
         tagged_collection<map_timer, accumulator::sliding::window_t> timers;
     } data;
 
@@ -118,16 +121,18 @@ public:
 
     /// \warning must be called from event loop's thread.
     template<typename T>
-    const std::map<tagged_type, T>&
-    counters() const {
+    auto counters() -> std::map<tagged_type, std::weak_ptr<std::atomic<T>>>& {
+        BOOST_ASSERT(std::this_thread::get_id() == thread.get_id());
+
         return data.counters.get<T>();
     }
 
     /// \overload
     /// \warning must be called from event loop's thread.
     template<typename T>
-    std::map<tagged_type, T>&
-    counters() {
+    auto counters() const -> const std::map<tagged_type, std::weak_ptr<std::atomic<T>>>& {
+        BOOST_ASSERT(std::this_thread::get_id() == thread.get_id());
+
         return data.counters.get<T>();
     }
 
@@ -162,9 +167,16 @@ public:
 
     /// \warning must be called from event loop's thread.
     template<typename T>
-    T&
-    counter(const tagged_type& tagged) {
-        return counters<T>()[tagged];
+    auto counter(const tagged_type& tagged) -> std::shared_ptr<std::atomic<T>> {
+        auto& instances = counters<T>();
+
+        std::shared_ptr<std::atomic<T>> instance;
+        if((instance = instances[tagged].lock()) == nullptr) {
+            instance = std::make_shared<std::atomic<T>>();
+            instances[tagged] = instance;
+        }
+
+        return instance;
     }
 
     /// \warning must be called from event loop's thread.

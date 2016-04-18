@@ -10,38 +10,27 @@ namespace metrics {
 template<typename T>
 counter<T>::counter(tagged_t tagged, processor_t& processor) :
     metric_t(std::move(tagged), processor)
-{}
-
-template<typename T>
-T
-counter<T>::get() const {
-    auto rx = processor->post([&]() -> T {
-        return processor->counter<T>(tagged());
+{
+    auto rx = processor.post([&]() -> std::shared_ptr<std::atomic<T>> {
+        return processor.counter<T>(this->tagged());
     });
 
-    return rx.get();
+    value = rx.get();
 }
 
 template<typename T>
-std::future<T>
-counter<T>::inc(value_type value) {
-    auto rx = processor->post([=]() -> T {
-        auto& counter = processor->counter<T>(tagged());
-        return std::exchange(counter, counter + value);
-    });
-
-    return rx;
+auto counter<T>::get() const -> T {
+    return value->load();
 }
 
 template<typename T>
-std::future<T>
-counter<T>::dec(value_type value) {
-    auto rx = processor->post([=]() -> T {
-        auto& counter = processor->counter<T>(tagged());
-        return std::exchange(counter, counter - value);
-    });
+auto counter<T>::inc(value_type v) -> T {
+    return value->fetch_add(v);
+}
 
-    return rx;
+template<typename T>
+auto counter<T>::dec(value_type value) -> T {
+    return inc(-value);
 }
 
 /// Instantiations.
