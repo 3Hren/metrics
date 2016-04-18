@@ -1,9 +1,9 @@
 #pragma once
 
+#include <atomic>
 #include <chrono>
 
 namespace metrics {
-namespace detail {
 
 /// An exponentially-weighted moving average.
 ///
@@ -15,13 +15,13 @@ public:
     typedef std::chrono::high_resolution_clock clock_type;
 
 private:
-    bool initialized;
+    std::atomic_flag initialized;
 
     struct {
-        double rate;
+        std::atomic<double> rate;
     } d;
 
-    std::uint64_t uncounted;
+    std::atomic<std::uint64_t> uncounted;
 
     double alpha;
     double interval;
@@ -60,5 +60,4 @@ public:
     }
 };
 
-}  // namespace detail
 }  // namespace metrics

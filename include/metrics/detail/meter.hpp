@@ -2,8 +2,9 @@
 
 #include <array>
 #include <chrono>
+#include <cmath>
 
-#include "metrics/detail/ewma.hpp"
+#include "metrics/ewma.hpp"
 
 namespace metrics {
 namespace detail {
@@ -28,7 +29,11 @@ public:
     meter() :
         birthstamp(d.clock.now()),
         prev(birthstamp),
-        rates({{ewma_t::m01rate(), ewma_t::m05rate(), ewma_t::m15rate()}})
+        rates{{
+            {-std::expm1(-5.0 / 60 / std::chrono::minutes(1).count()), std::chrono::seconds(5)},
+            {-std::expm1(-5.0 / 60 / std::chrono::minutes(5).count()), std::chrono::seconds(5)},
+            {-std::expm1(-5.0 / 60 / std::chrono::minutes(15).count()), std::chrono::seconds(5)}
+        }}
     {
         d.count = 0;
     }

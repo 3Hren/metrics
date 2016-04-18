@@ -1,4 +1,4 @@
-#include "metrics/detail/ewma.hpp"
+#include "metrics/ewma.hpp"
 
 #include <cmath>
 
@@ -11,30 +11,29 @@ namespace {
 }  // namespace
 
 namespace metrics {
-namespace detail {
 
 ewma_t::ewma_t(double alpha, clock_type::duration interval) :
-    initialized(false),
     uncounted(0),
     alpha(alpha),
     interval(std::chrono::duration_cast<std::chrono::nanoseconds>(interval).count())
 {
+    initialized.clear();
     d.rate = 0.0;
 }
 
 ewma_t
 ewma_t::m01rate() {
-    return ewma_t(m01alpha, std::chrono::seconds(5));
+    return {m01alpha, std::chrono::seconds(5)};
 }
 
 ewma_t
 ewma_t::m05rate() {
-    return ewma_t(m05alpha, std::chrono::seconds(5));
+    return {m05alpha, std::chrono::seconds(5)};
 }
 
 ewma_t
 ewma_t::m15rate() {
-    return ewma_t(m15alpha, std::chrono::seconds(5));
+    return {m15alpha, std::chrono::seconds(5)};
 }
 
 void
@@ -44,15 +43,15 @@ ewma_t::update(std::uint64_t value) {
 
 void
 ewma_t::tick() {
-    const auto count = std::exchange(uncounted, 0);
+    const auto count = std::atomic_exchange(&uncounted, 0LLU);
     const auto instant_rate = count / interval;
 
-    if (std::exchange(initialized, true)) {
-        d.rate += (alpha * (instant_rate - d.rate));
+    if (initialized.test_and_set()) {
+        // TODO: Spinlock required.
+        d.rate = d.rate + (alpha * (instant_rate - d.rate));
     } else {
         d.rate = instant_rate;
     }
 }
 
-}  // namespace detail
 }  // namespace metrics

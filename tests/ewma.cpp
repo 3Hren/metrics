@@ -1,11 +1,11 @@
 #include <gtest/gtest.h>
 
-#include <metrics/detail/ewma.hpp>
+#include <cmath>
+
+#include <metrics/ewma.hpp>
 
 namespace metrics {
 namespace testing {
-
-using detail::ewma_t;
 
 void
 elapse_minute(ewma_t* ewma) {
@@ -15,7 +15,7 @@ elapse_minute(ewma_t* ewma) {
 }
 
 TEST(ewma, m01rate) {
-    auto ewma = ewma_t::m01rate();
+    ewma_t ewma(-std::expm1(-5.0 / 60 / std::chrono::minutes(1).count()), std::chrono::seconds(5));
     ewma.update(3);
     ewma.tick();
 
@@ -28,7 +28,7 @@ TEST(ewma, m01rate) {
 }
 
 TEST(ewma, m05rate) {
-    auto ewma = ewma_t::m05rate();
+    ewma_t ewma(-std::expm1(-5.0 / 60 / std::chrono::minutes(5).count()), std::chrono::seconds(5));
     ewma.update(3);
     ewma.tick();
 
@@ -41,7 +41,7 @@ TEST(ewma, m05rate) {
 }
 
 TEST(ewma, m15rate) {
-    auto ewma = ewma_t::m15rate();
+    ewma_t ewma(-std::expm1(-5.0 / 60 / std::chrono::minutes(15).count()), std::chrono::seconds(5));
     ewma.update(3);
     ewma.tick();
 

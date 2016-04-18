@@ -97,10 +97,10 @@ if (ENABLE_TESTING)
         tests/accumulator/snapshot/uniform
         tests/counter
         tests/detail/cpp14/tuple
-        tests/detail/ewma
         tests/detail/histogram
         tests/detail/meter
         tests/detail/timer
+        tests/ewma
         tests/gauge
         tests/meter
         tests/tagged
