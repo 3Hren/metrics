@@ -10,7 +10,6 @@
 #include "metrics/accumulator/sliding/window.hpp"
 
 #include "metrics/detail/cpp14/tuple.hpp"
-#include "metrics/detail/ewma.hpp"
 #include "metrics/detail/histogram.hpp"
 #include "metrics/detail/meter.hpp"
 #include "metrics/detail/timer.hpp"
