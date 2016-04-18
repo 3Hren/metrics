@@ -4,6 +4,7 @@
 #include <chrono>
 
 namespace metrics {
+namespace detail {
 
 /// An exponentially-weighted moving average.
 ///
@@ -66,4 +67,5 @@ public:
     }
 };
 
+}  // namespace detail
 }  // namespace metrics

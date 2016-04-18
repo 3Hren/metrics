@@ -8,11 +8,11 @@
 namespace metrics {
 
 template<typename T>
-counter<T>::counter(tagged_t tagged, processor_t& processor) :
-    metric_t(std::move(tagged), processor)
+counter<T>::counter(tags_t tags, processor_t& processor) :
+    metric_t(std::move(tags), processor)
 {
     auto rx = processor.post([&]() -> std::shared_ptr<std::atomic<T>> {
-        return processor.counter<T>(this->tagged());
+        return processor.counter<T>(this->tags());
     });
 
     value = rx.get();

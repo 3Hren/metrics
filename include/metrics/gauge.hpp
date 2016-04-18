@@ -17,7 +17,7 @@ public:
     typedef std::function<value_type()> function_type;
 
 public:
-    gauge(tagged_t tagged, processor_t& processor);
+    gauge(tags_t tags, processor_t& processor);
 
     value_type
     get() const;

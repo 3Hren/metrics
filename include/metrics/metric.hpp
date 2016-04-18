@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "metrics/tagged.hpp"
+#include "metrics/tags.hpp"
 
 namespace metrics {
 namespace detail {
@@ -18,22 +18,22 @@ using detail::processor_t;
 
 class metric_t {
     struct data_t {
-        tagged_t tagged;
+        tags_t tags;
 
-        data_t(tagged_t tagged);
+        data_t(tags_t tags);
     } d;
 
 protected:
     processor_t* processor;
 
 public:
-    metric_t(tagged_t tagged, processor_t& processor);
+    metric_t(tags_t tags, processor_t& processor);
 
     const std::string&
     name() const noexcept;
 
-    const tagged_t&
-    tagged() const noexcept;
+    const tags_t&
+    tags() const noexcept;
 
     boost::optional<std::string>
     tag(const std::string& key) const;

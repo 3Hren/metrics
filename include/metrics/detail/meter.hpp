@@ -4,13 +4,15 @@
 #include <chrono>
 #include <cmath>
 
-#include "metrics/ewma.hpp"
+#include "metrics/meter.hpp"
+
+#include "metrics/detail/ewma.hpp"
 
 namespace metrics {
 namespace detail {
 
 template<class Clock>
-class meter {
+class meter : public metrics::meter_t {
     typedef Clock clock_type;
     typedef typename clock_type::time_point time_point;
 
@@ -85,9 +87,13 @@ public:
         return mxxrate<2>();
     }
 
+    auto mark() -> void {
+        mark(1);
+    }
+
     /// Mark the occurrence of a given number of events.
     void
-    mark(std::uint64_t value = 1) {
+    mark(std::uint64_t value) {
         tick_maybe();
 
         d.count += value;

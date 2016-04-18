@@ -2,9 +2,10 @@
 
 #include <cmath>
 
-#include <metrics/ewma.hpp>
+#include <metrics/detail/ewma.hpp>
 
 namespace metrics {
+namespace detail {
 namespace testing {
 
 void
@@ -54,4 +55,5 @@ TEST(ewma, m15rate) {
 }
 
 }  // namespace testing
+}  // namespace detail
 }  // namespace metrics

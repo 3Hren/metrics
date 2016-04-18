@@ -15,7 +15,7 @@ public:
     std::shared_ptr<std::atomic<value_type>> value;
 
 public:
-    counter(tagged_t tagged, processor_t& processor);
+    counter(tags_t tags, processor_t& processor);
 
     /// Returns the counter's current value.
     auto get() const -> value_type;

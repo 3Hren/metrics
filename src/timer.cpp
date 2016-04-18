@@ -12,8 +12,8 @@ namespace {
 // ‘class metrics::timer<Accumulate>’.
 template<typename Duration, typename Accumulate>
 void
-update(processor_t* processor, tagged_t tagged, Duration elapsed) {
-    processor->timer<Accumulate>(std::move(tagged)).update(elapsed);
+update(processor_t* processor, tags_t tags, Duration elapsed) {
+    processor->timer<Accumulate>(std::move(tags)).update(elapsed);
 }
 
 }  // namespace
@@ -33,24 +33,24 @@ timer<Accumulate>::context_t::~context_t() {
     const auto now = clock_type::now();
     const auto elapsed = now - timestamp;
 
-    const auto tagged = parent->tagged();
+    const auto tags = parent->tags();
     const auto processor = parent->processor;
 
     processor->post(
-        std::bind(&update<clock_type::duration, Accumulate>, processor, std::move(tagged), elapsed)
+        std::bind(&update<clock_type::duration, Accumulate>, processor, std::move(tags), elapsed)
     );
 }
 
 template<class Accumulate>
-timer<Accumulate>::timer(tagged_t tagged, processor_t& processor) :
-    metric_t(std::move(tagged), processor)
+timer<Accumulate>::timer(tags_t tags, processor_t& processor) :
+    metric_t(std::move(tags), processor)
 {}
 
 template<class Accumulate>
 std::uint64_t
 timer<Accumulate>::count() const {
     auto rx = processor->post([&]() -> std::uint64_t {
-        return processor->timer<Accumulate>(tagged()).count();
+        return processor->timer<Accumulate>(tags()).count();
     });
 
     return rx.get();
@@ -60,7 +60,7 @@ template<class Accumulate>
 double
 timer<Accumulate>::m01rate() const {
     auto rx = processor->post([&]() -> double {
-        return processor->timer<Accumulate>(tagged()).m01rate();
+        return processor->timer<Accumulate>(tags()).m01rate();
     });
 
     return rx.get();
@@ -70,7 +70,7 @@ template<class Accumulate>
 double
 timer<Accumulate>::m05rate() const {
     auto rx = processor->post([&]() -> double {
-        return processor->timer<Accumulate>(tagged()).m05rate();
+        return processor->timer<Accumulate>(tags()).m05rate();
     });
 
     return rx.get();
@@ -80,7 +80,7 @@ template<class Accumulate>
 double
 timer<Accumulate>::m15rate() const {
     auto rx = processor->post([&]() -> double {
-        return processor->timer<Accumulate>(tagged()).m15rate();
+        return processor->timer<Accumulate>(tags()).m15rate();
     });
 
     return rx.get();
@@ -90,7 +90,7 @@ template<class Accumulate>
 typename timer<Accumulate>::snapshot_type
 timer<Accumulate>::snapshot() const {
     auto rx = processor->post([&]() -> typename timer<Accumulate>::snapshot_type {
-        return processor->timer<Accumulate>(tagged()).histogram().snapshot();
+        return processor->timer<Accumulate>(tags()).histogram().snapshot();
     });
 
     return rx.get();

@@ -1,4 +1,4 @@
-#include "metrics/ewma.hpp"
+#include "metrics/detail/ewma.hpp"
 
 #include <cmath>
 
@@ -11,6 +11,7 @@ namespace {
 }  // namespace
 
 namespace metrics {
+namespace detail {
 
 ewma_t::ewma_t(double alpha, clock_type::duration interval) :
     uncounted(0),
@@ -54,4 +55,5 @@ ewma_t::tick() {
     }
 }
 
+}  // namespace detail
 }  // namespace metrics

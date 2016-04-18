@@ -4,7 +4,7 @@
 #include <memory>
 #include <string>
 
-#include "metrics/tagged.hpp"
+#include "metrics/tags.hpp"
 
 namespace metrics {
 namespace detail {
@@ -52,25 +52,25 @@ public:
     /// Given a `metric` gauge, registers it under the given name with the given tags.
     template<typename M>
     void
-    listen(std::string name, tagged_t::container_type tags, typename M::function_type metric);
+    listen(std::string name, tags_t::container_type tags, typename M::function_type metric);
 
     /// \where `T` must be either `std::uint64_t`, `std::int64_t` or `long double`.
     template<typename T>
     metrics::gauge<T>
-    gauge(std::string name, tagged_t::container_type tags = tagged_t::container_type()) const;
+    gauge(std::string name, tags_t::container_type tags = tags_t::container_type()) const;
 
     /// \where `T` must be either `std::uint64_t` or `std::int64_t`.
     template<typename T>
     counter<T>
-    counter(std::string name, tagged_t::container_type tags = tagged_t::container_type()) const;
+    counter(std::string name, tags_t::container_type tags = tags_t::container_type()) const;
 
-    meter_t
-    meter(std::string name, tagged_t::container_type tags = tagged_t::container_type()) const;
+    // tagged<meter_t>
+    // meter(std::string name, tags_t::container_type tags = tags_t::container_type()) const;
 
     // TODO: Change default accumulator to `exponentially_decaying_t`.
     template<class Accumulate = accumulator::sliding::window_t>
     timer<Accumulate>
-    timer(std::string name, tagged_t::container_type tags = tagged_t::container_type()) const;
+    timer(std::string name, tags_t::container_type tags = tags_t::container_type()) const;
 };
 
 }  // namespace metrics

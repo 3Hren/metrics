@@ -1,31 +1,31 @@
-#include "metrics/tagged.hpp"
+#include "metrics/tags.hpp"
 
 #include <boost/optional/optional.hpp>
 
 namespace metrics {
 
-tagged_t::tagged_t(std::string name):
+tags_t::tags_t(std::string name):
     container({{"name", std::move(name)}})
 {}
 
-tagged_t::tagged_t(std::string name, container_type tags):
+tags_t::tags_t(std::string name, container_type tags):
     container(std::move(tags))
 {
     container["name"] = std::move(name);
 }
 
-const tagged_t::container_type&
-tagged_t::tags() const noexcept {
+const tags_t::container_type&
+tags_t::tags() const noexcept {
     return container;
 }
 
 const std::string&
-tagged_t::name() const noexcept {
+tags_t::name() const noexcept {
     return container.at("name");
 }
 
 boost::optional<std::string>
-tagged_t::tag(const std::string& key) const {
+tags_t::tag(const std::string& key) const {
     const auto it = container.find(key);
 
     if (it == container.end()) {
@@ -36,24 +36,24 @@ tagged_t::tag(const std::string& key) const {
 }
 
 bool
-tagged_t::operator==(const tagged_t& other) const {
+tags_t::operator==(const tags_t& other) const {
     return container == other.container;
 }
 
 bool
-tagged_t::operator!=(const tagged_t& other) const {
+tags_t::operator!=(const tags_t& other) const {
     return !(*this == other);
 }
 
 bool
-tagged_t::operator<(const tagged_t& other) const {
+tags_t::operator<(const tags_t& other) const {
     return container < other.container;
 }
 
 }  // namespace metrics
 
-std::hash<metrics::tagged_t>::result_type
-std::hash<metrics::tagged_t>::operator()(const argument_type& v) const {
+std::hash<metrics::tags_t>::result_type
+std::hash<metrics::tags_t>::operator()(const argument_type& v) const {
     result_type result = std::hash<std::string>()("");
 
     for (const auto& kv : v.tags()) {

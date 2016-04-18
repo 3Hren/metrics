@@ -7,8 +7,8 @@
 
 namespace metrics {
 
-/// The tagged struct represents tagged metric name.
-class tagged_t {
+/// The tags struct represents tagged metric name.
+class tags_t {
 public:
     typedef std::map<std::string, std::string> container_type;
 
@@ -17,10 +17,10 @@ private:
 
 public:
     /// Creates a tagged struct with a single `name` tag.
-    tagged_t(std::string name);
+    tags_t(std::string name);
 
     /// Creates a tagged struct with the given tags, overriding the `name` tag if required.
-    tagged_t(std::string name, container_type tags);
+    tags_t(std::string name, container_type tags);
 
     /// Returns a const reference to the underlying tag map.
     const container_type&
@@ -35,13 +35,13 @@ public:
     tag(const std::string& key) const;
 
     bool
-    operator==(const tagged_t& other) const;
+    operator==(const tags_t& other) const;
 
     bool
-    operator!=(const tagged_t& other) const;
+    operator!=(const tags_t& other) const;
 
     bool
-    operator<(const tagged_t& other) const;
+    operator<(const tags_t& other) const;
 };
 
 }  // namespace metrics
@@ -49,8 +49,8 @@ public:
 namespace std {
 
 template<>
-struct hash<metrics::tagged_t> {
-    typedef metrics::tagged_t argument_type;
+struct hash<metrics::tags_t> {
+    typedef metrics::tags_t argument_type;
     typedef std::size_t result_type;
 
     result_type
