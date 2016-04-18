@@ -43,7 +43,7 @@ ewma_t::update(std::uint64_t value) {
 
 void
 ewma_t::tick() {
-    const auto count = std::atomic_exchange(&uncounted, 0LLU);
+    const auto count = std::atomic_exchange(&uncounted, std::uint64_t(0));
     const auto instant_rate = count / interval;
 
     if (initialized.test_and_set()) {
