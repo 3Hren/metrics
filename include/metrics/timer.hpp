@@ -41,6 +41,10 @@ public:
         context_t(context_t&& other) = default;
 
         ~context_t() {
+            if (parent == nullptr) {
+                return;
+            }
+
             const auto now = parent->now();
             const auto elapsed = now - timestamp;
 

@@ -27,6 +27,7 @@ set(SOURCES
     src/accumulator/snapshot/uniform
     src/ewma
     src/factory
+    src/meter
     src/metric
     src/registry
     src/tags

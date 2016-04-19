@@ -9,7 +9,7 @@ namespace metrics {
 /// Just like the Unix load averages visible in `top`.
 class meter_t {
 public:
-    virtual ~meter_t() {}
+    virtual ~meter_t() = 0;
 
     /// Returns the number of events which have been marked.
     virtual auto count() const -> std::uint64_t = 0;
