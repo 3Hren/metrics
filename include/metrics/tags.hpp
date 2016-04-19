@@ -7,7 +7,7 @@
 
 namespace metrics {
 
-/// The tags struct represents tagged metric name.
+/// The tags struct represents immutable tagged metric name.
 class tags_t {
 public:
     typedef std::map<std::string, std::string> container_type;
