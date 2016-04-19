@@ -1,42 +1,33 @@
 #pragma once
 
+#include <memory>
 #include <string>
 
-#include "metrics/tags.hpp"
+#include <boost/optional/optional_fwd.hpp>
 
-namespace metrics {
-namespace detail {
-
-class processor_t;
-
-}  // namespace detail
-}  // namespace metrics
+#include "tags.hpp"
 
 namespace metrics {
 
-using detail::processor_t;
-
-class metric_t {
+template<typename T>
+class metric {
     struct data_t {
         tags_t tags;
+        std::shared_ptr<T> inner;
 
-        data_t(tags_t tags);
+        data_t(tags_t tags, std::shared_ptr<T> inner);
     } d;
 
-protected:
-    processor_t* processor;
-
 public:
-    metric_t(tags_t tags, processor_t& processor);
+    metric(tags_t tags, std::shared_ptr<T> inner);
 
-    const std::string&
-    name() const noexcept;
+    auto tags() const noexcept -> const tags_t&;
+    auto name() const noexcept -> const std::string&;
 
-    const tags_t&
-    tags() const noexcept;
+    auto tag(const std::string& key) const -> boost::optional<std::string>;
 
-    boost::optional<std::string>
-    tag(const std::string& key) const;
+    auto operator->() const -> T*;
+    auto get() const -> std::shared_ptr<T>;
 };
 
 }  // namespace metrics

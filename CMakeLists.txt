@@ -25,14 +25,14 @@ include_directories(
 set(SOURCES
     src/accumulator/sliding/window
     src/accumulator/snapshot/uniform
-    src/counter
+    # src/counter
     src/ewma
     src/factory
-    src/gauge
+    # src/gauge
     src/metric
     src/registry
-    src/tagged
-    src/timer
+    src/tags
+    # src/timer
 )
 
 if (METRICS_BUILD_STATIC)
@@ -101,10 +101,10 @@ if (ENABLE_TESTING)
         tests/detail/histogram
         tests/detail/meter
         tests/detail/timer
-        tests/gauge
-        tests/meter
+        # tests/gauge
+        # tests/meter
         tests/tagged
-        tests/timer
+        # tests/timer
     )
 
     add_executable(${LIBRARY_NAME}-tests ${SOURCES})

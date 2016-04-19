@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 
+#include "metrics/metric.hpp"
 #include "metrics/tags.hpp"
 
 namespace metrics {
@@ -19,9 +20,6 @@ namespace metrics {
 template<typename T>
 class gauge;
 
-template<typename T>
-class counter;
-
 class meter_t;
 
 template<class Accumulate>
@@ -34,6 +32,9 @@ class window_t;
 
 }  // namespace sliding
 }  // namespace accumulator
+
+template<typename T>
+class metric;
 
 using detail::processor_t;
 
@@ -59,13 +60,17 @@ public:
     metrics::gauge<T>
     gauge(std::string name, tags_t::container_type tags = tags_t::container_type()) const;
 
-    /// \where `T` must be either `std::uint64_t` or `std::int64_t`.
+    /// Obtains by either creating or getting an existing object of a counter with the given name
+    /// and returns it.
+    ///
+    /// \tparam `T` must be either `std::uint64_t` or `std::int64_t`.
+    /// \todo wording.
     template<typename T>
-    counter<T>
-    counter(std::string name, tags_t::container_type tags = tags_t::container_type()) const;
+    auto counter(std::string name, tags_t::container_type tags = tags_t::container_type()) const ->
+        metric<std::atomic<T>>;
 
-    // tagged<meter_t>
-    // meter(std::string name, tags_t::container_type tags = tags_t::container_type()) const;
+    auto meter(std::string name, tags_t::container_type tags = tags_t::container_type()) const ->
+        metric<meter_t>;
 
     // TODO: Change default accumulator to `exponentially_decaying_t`.
     template<class Accumulate = accumulator::sliding::window_t>

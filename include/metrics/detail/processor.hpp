@@ -65,7 +65,7 @@ class processor_t {
 
         tagged_collection<map_counter, std::int64_t, std::uint64_t> counters;
 
-        std::map<tags_t, meter_t> meters;
+        std::map<tags_t, std::shared_ptr<meter_t>> meters;
 
         tagged_collection<map_timer, accumulator::sliding::window_t> timers;
     } data;
@@ -179,7 +179,7 @@ public:
     }
 
     /// \warning must be called from event loop's thread.
-    meter_t&
+    std::shared_ptr<meter_t>
     meter(const tags_t& tags) {
         return data.meters[tags];
     }

@@ -1,33 +1,49 @@
 #include "metrics/metric.hpp"
 
-#include <memory>
-
 #include <boost/optional/optional.hpp>
+
+#include <metrics/meter.hpp>
 
 namespace metrics {
 
-metric_t::data_t::data_t(tags_t tags):
-    tags(std::move(tags))
+template<typename T>
+metric<T>::data_t::data_t(tags_t tags, std::shared_ptr<T> inner) :
+    tags(std::move(tags)),
+    inner(std::move(inner))
 {}
 
-metric_t::metric_t(tags_t tags, processor_t& processor):
-    d(std::move(tags)),
-    processor(std::addressof(processor))
+template<typename T>
+metric<T>::metric(tags_t tags, std::shared_ptr<T> inner) :
+    d(std::move(tags), std::move(inner))
 {}
 
-const std::string&
-metric_t::name() const noexcept {
-    return d.tags.name();
-}
-
-const tags_t&
-metric_t::tags() const noexcept {
+template<typename T>
+auto metric<T>::tags() const noexcept -> const tags_t& {
     return d.tags;
 }
 
-boost::optional<std::string>
-metric_t::tag(const std::string& key) const {
+template<typename T>
+auto metric<T>::name() const noexcept -> const std::string& {
+    return d.tags.name();
+}
+
+template<typename T>
+auto metric<T>::tag(const std::string& key) const -> boost::optional<std::string> {
     return d.tags.tag(key);
 }
+
+template<typename T>
+auto metric<T>::operator->() const -> T* {
+    return d.inner.get();
+}
+
+template<typename T>
+auto metric<T>::get() const -> std::shared_ptr<T> {
+    return d.inner;
+}
+
+template class metric<std::atomic<std::int64_t>>;
+template class metric<std::atomic<std::uint64_t>>;
+template class metric<meter_t>;
 
 }  // namespace metrics

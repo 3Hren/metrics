@@ -11,7 +11,7 @@ namespace metrics {
 /// If, for example, your application has a value which is maintained by a third-party library, you
 /// can easily expose it by registering a `gauge` instance which returns that value.
 template<typename T>
-class gauge : public metric_t {
+class gauge {
 public:
     typedef T value_type;
     typedef std::function<value_type()> function_type;

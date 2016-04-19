@@ -1,9 +1,11 @@
 #include "metrics/registry.hpp"
 
-#include "metrics/counter.hpp"
-#include "metrics/gauge.hpp"
+#include <future>
+
+// #include "metrics/gauge.hpp"
 #include "metrics/meter.hpp"
-#include "metrics/timer.hpp"
+#include "metrics/metric.hpp"
+// #include "metrics/timer.hpp"
 
 #include "metrics/detail/processor.hpp"
 
@@ -28,64 +30,73 @@ registry_t::registry_t():
 
 registry_t::~registry_t() {}
 
-template<typename M>
-void
-registry_t::listen(std::string name, typename M::function_type metric) {
-    metric_traits<M>::apply(*processor, std::move(name), {}, std::move(metric));
-}
-
-template<typename M>
-void
-registry_t::listen(std::string name, tags_t::container_type tags, typename M::function_type metric) {
-    metric_traits<M>::apply(*processor, std::move(name), std::move(tags), std::move(metric));
-}
-
+// template<typename M>
+// void
+// registry_t::listen(std::string name, typename M::function_type metric) {
+//     metric_traits<M>::apply(*processor, std::move(name), {}, std::move(metric));
+// }
+//
+// template<typename M>
+// void
+// registry_t::listen(std::string name, tags_t::container_type tags, typename M::function_type metric) {
+//     metric_traits<M>::apply(*processor, std::move(name), std::move(tags), std::move(metric));
+// }
+//
+// template<typename T>
+// gauge<T>
+// registry_t::gauge(std::string name, tags_t::container_type tags) const {
+//     return metrics::gauge<T>({std::move(name), std::move(tags)}, *processor);
+// }
+//
 template<typename T>
-gauge<T>
-registry_t::gauge(std::string name, tags_t::container_type tags) const {
-    return metrics::gauge<T>({std::move(name), std::move(tags)}, *processor);
+auto registry_t::counter(std::string name, tags_t::container_type other) const ->
+    metric<std::atomic<T>>
+{
+    tags_t tags(name, other);
+
+    auto meter = processor->post([&]() -> std::shared_ptr<std::atomic<T>> {
+        return processor->counter<T>(tags);
+    }).get();
+
+    return {std::move(tags), std::move(meter)};
 }
 
-template<typename T>
-counter<T>
-registry_t::counter(std::string name, tags_t::container_type tags) const {
-    return metrics::counter<T>({std::move(name), std::move(tags)}, *processor);
+auto registry_t::meter(std::string name, tags_t::container_type tags_) const -> metric<meter_t> {
+    tags_t tags(name, tags_);
+    auto meter = processor->meter(tags);
+
+    return {std::move(tags), std::move(meter)};
 }
 
-// meter_t
-// registry_t::meter(std::string name, tags_t::container_type tags) const {
-//     return meter_t({std::move(name), std::move(tags)}, *processor);
+// template<class Accumulate>
+// timer<Accumulate>
+// registry_t::timer(std::string name, tags_t::container_type tags) const {
+//     return metrics::timer<Accumulate>({std::move(name), std::move(tags)}, *processor);
 // }
 
-template<class Accumulate>
-timer<Accumulate>
-registry_t::timer(std::string name, tags_t::container_type tags) const {
-    return metrics::timer<Accumulate>({std::move(name), std::move(tags)}, *processor);
-}
-
 /// Instantiations.
+// template
+// void
+// registry_t::listen<gauge<std::uint64_t>>(std::string, std::function<std::uint64_t()>);
+//
+// template
+// void
+// registry_t::listen<gauge<std::uint64_t>>(std::string, tags_t::container_type, std::function<std::uint64_t()>);
+//
+// template
+// gauge<std::uint64_t>
+// registry_t::gauge<std::uint64_t>(std::string, tags_t::container_type) const;
+//
 template
-void
-registry_t::listen<gauge<std::uint64_t>>(std::string, std::function<std::uint64_t()>);
+auto registry_t::counter<std::int64_t>(std::string, tags_t::container_type) const ->
+    metric<std::atomic<std::int64_t>>;
 
 template
-void
-registry_t::listen<gauge<std::uint64_t>>(std::string, tags_t::container_type, std::function<std::uint64_t()>);
-
-template
-gauge<std::uint64_t>
-registry_t::gauge<std::uint64_t>(std::string, tags_t::container_type) const;
-
-template
-counter<std::int64_t>
-registry_t::counter<std::int64_t>(std::string, tags_t::container_type) const;
-
-template
-counter<std::uint64_t>
-registry_t::counter<std::uint64_t>(std::string, tags_t::container_type) const;
-
-template
-timer<accumulator::sliding::window_t>
-registry_t::timer<accumulator::sliding::window_t>(std::string, tags_t::container_type tags) const;
+auto registry_t::counter<std::uint64_t>(std::string, tags_t::container_type) const ->
+    metric<std::atomic<std::uint64_t>>;
+//
+// template
+// timer<accumulator::sliding::window_t>
+// registry_t::timer<accumulator::sliding::window_t>(std::string, tags_t::container_type tags) const;
 
 }  // namespace metrics

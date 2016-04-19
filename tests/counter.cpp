@@ -2,7 +2,6 @@
 
 #include <boost/optional/optional.hpp>
 
-#include <metrics/counter.hpp>
 #include <metrics/registry.hpp>
 
 namespace metrics {
@@ -14,7 +13,7 @@ TEST(Counter, Factory) {
     auto counter = registry.counter<std::uint64_t>("metrics.testing.counter");
 
     // Default value is 0.
-    EXPECT_EQ(0, counter.get());
+    EXPECT_EQ(0, counter->load());
 }
 
 TEST(Counter, Inc) {
@@ -22,14 +21,14 @@ TEST(Counter, Inc) {
 
     auto counter = registry.counter<std::uint64_t>("metrics.testing.counter");
 
-    counter.inc();
-    EXPECT_EQ(1, counter.get());
+    counter->fetch_add(1);
+    EXPECT_EQ(1, counter->load());
 
-    EXPECT_EQ(1, counter.inc());
-    EXPECT_EQ(2, counter.get());
+    EXPECT_EQ(1, counter->fetch_add(1));
+    EXPECT_EQ(2, counter->load());
 
-    EXPECT_EQ(2, counter.inc());
-    EXPECT_EQ(3, counter.get());
+    EXPECT_EQ(2, counter->fetch_add(1));
+    EXPECT_EQ(3, counter->load());
 }
 
 TEST(Counter, IncVal) {
@@ -37,14 +36,14 @@ TEST(Counter, IncVal) {
 
     auto counter = registry.counter<std::uint64_t>("metrics.testing.counter");
 
-    counter.inc(42);
-    EXPECT_EQ(42, counter.get());
+    counter->fetch_add(42);
+    EXPECT_EQ(42, counter->load());
 
-    EXPECT_EQ(42, counter.inc(10));
-    EXPECT_EQ(52, counter.get());
+    EXPECT_EQ(42, counter->fetch_add(10));
+    EXPECT_EQ(52, counter->load());
 
-    EXPECT_EQ(52, counter.inc(8));
-    EXPECT_EQ(60, counter.get());
+    EXPECT_EQ(52, counter->fetch_add(8));
+    EXPECT_EQ(60, counter->load());
 }
 
 TEST(Counter, Shared) {
@@ -52,16 +51,16 @@ TEST(Counter, Shared) {
 
     auto counter = registry.counter<std::uint64_t>("metrics.testing.counter");
 
-    counter.inc();
-    EXPECT_EQ(1, counter.get());
+    counter->fetch_add(1);
+    EXPECT_EQ(1, counter->load());
 
-    EXPECT_EQ(1, counter.inc());
-    EXPECT_EQ(2, counter.get());
+    EXPECT_EQ(1, counter->fetch_add(1));
+    EXPECT_EQ(2, counter->load());
 
     auto other = registry.counter<std::uint64_t>("metrics.testing.counter");
 
-    EXPECT_EQ(2, other.inc());
-    EXPECT_EQ(3, other.get());
+    EXPECT_EQ(2, other->fetch_add(1));
+    EXPECT_EQ(3, other->load());
 }
 
 TEST(Counter, Dec) {
@@ -69,14 +68,14 @@ TEST(Counter, Dec) {
 
     auto counter = registry.counter<std::int64_t>("metrics.testing.counter");
 
-    counter.dec();
-    EXPECT_EQ(-1, counter.get());
+    counter->fetch_add(-1);
+    EXPECT_EQ(-1, counter->load());
 
-    EXPECT_EQ(-1, counter.dec());
-    EXPECT_EQ(-2, counter.get());
+    EXPECT_EQ(-1, counter->fetch_add(-1));
+    EXPECT_EQ(-2, counter->load());
 
-    EXPECT_EQ(-2, counter.dec());
-    EXPECT_EQ(-3, counter.get());
+    EXPECT_EQ(-2, counter->fetch_add(-1));
+    EXPECT_EQ(-3, counter->load());
 }
 
 TEST(metric, counter_dec_val) {
@@ -85,14 +84,14 @@ TEST(metric, counter_dec_val) {
     auto counter = registry.counter<std::int64_t>("metrics.testing.counter");
 
     // Note, that we decrease by positive value, which results in substraction.
-    counter.dec(42);
-    EXPECT_EQ(-42, counter.get());
+    counter->fetch_add(-42);
+    EXPECT_EQ(-42, counter->load());
 
-    EXPECT_EQ(-42, counter.dec(10));
-    EXPECT_EQ(-52, counter.get());
+    EXPECT_EQ(-42, counter->fetch_add(-10));
+    EXPECT_EQ(-52, counter->load());
 
-    EXPECT_EQ(-52, counter.dec(8));
-    EXPECT_EQ(-60, counter.get());
+    EXPECT_EQ(-52, counter->fetch_add(-8));
+    EXPECT_EQ(-60, counter->load());
 }
 
 TEST(Counter, CopyAssignable) {
@@ -102,7 +101,7 @@ TEST(Counter, CopyAssignable) {
     counter = registry.counter<std::uint64_t>("metrics.testing.other_counter");
 
     // Default value is 0.
-    EXPECT_EQ(0, counter.get());
+    EXPECT_EQ(0, counter->load());
 }
 
 TEST(Counter, Name) {
@@ -132,14 +131,14 @@ TEST(Counter, DifferentByTagsInc) {
         {"tag", "#1"}
     });
 
-    counter1.inc();
+    counter1->fetch_add(1);
 
     auto counter2 = registry.counter<std::uint64_t>("metrics.testing.counter", {
         {"tag", "#2"}
     });
 
-    EXPECT_EQ(1, counter1.get());
-    EXPECT_EQ(0, counter2.get());
+    EXPECT_EQ(1, counter1->load());
+    EXPECT_EQ(0, counter2->load());
 }
 
 TEST(Counter, DifferentByTagsDec) {
@@ -149,14 +148,14 @@ TEST(Counter, DifferentByTagsDec) {
         {"tag", "#1"}
     });
 
-    counter1.dec();
+    counter1->fetch_add(-1);
 
     auto counter2 = registry.counter<std::int64_t>("metrics.testing.counter", {
         {"tag", "#2"}
     });
 
-    EXPECT_EQ(-1, counter1.get());
-    EXPECT_EQ(0, counter2.get());
+    EXPECT_EQ(-1, counter1->load());
+    EXPECT_EQ(0, counter2->load());
 }
 
 }  // namespace testing
