@@ -5,29 +5,54 @@
 
 #include <boost/optional/optional_fwd.hpp>
 
+#include "forwards.hpp"
 #include "tags.hpp"
 
 namespace metrics {
 
+/// Represents immutable tagged wrapper standalone metrics.
 template<typename T>
-class metric {
-    struct data_t {
-        tags_t tags;
-        std::shared_ptr<T> inner;
-
-        data_t(tags_t tags, std::shared_ptr<T> inner);
-    } d;
+class tagged {
+    tags_t value;
 
 public:
-    metric(tags_t tags, std::shared_ptr<T> inner);
+    explicit tagged(tags_t value);
 
-    auto tags() const noexcept -> const tags_t&;
+    /// Returns metric name.
     auto name() const noexcept -> const std::string&;
 
+    /// Extracts a tag with the given key, returning nothing otherwise.
     auto tag(const std::string& key) const -> boost::optional<std::string>;
 
+    /// Returns a const lvalue reference to the underlying tags.
+    auto tags() const noexcept -> const tags_t&;
+};
+
+template<typename T>
+struct wrapper_traits {
+    typedef std::shared_ptr<T> type;
+};
+
+template<typename T>
+struct wrapper_traits<gauge<T>> {
+    typedef std::function<T()> type;
+};
+
+/// Represents a tagged shared metric wrapper over standalone metrics.
+template<typename T>
+class metric : public tagged<T> {
+public:
+    typedef typename wrapper_traits<T>::type inner_type;
+
+private:
+    inner_type inner;
+
+public:
+    metric(tags_t tags, inner_type inner);
+
+    auto get() const -> inner_type;
+
     auto operator->() const -> T*;
-    auto get() const -> std::shared_ptr<T>;
 };
 
 }  // namespace metrics

@@ -28,7 +28,6 @@ set(SOURCES
     # src/counter
     src/ewma
     src/factory
-    # src/gauge
     src/metric
     src/registry
     src/tags
@@ -101,7 +100,6 @@ if (ENABLE_TESTING)
         tests/detail/histogram
         tests/detail/meter
         tests/detail/timer
-        # tests/gauge
         # tests/meter
         tests/tagged
         # tests/timer
