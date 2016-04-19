@@ -1,5 +1,7 @@
 #include "metrics/metric.hpp"
 
+#include <atomic>
+
 #include <boost/optional/optional.hpp>
 
 #include <metrics/meter.hpp>
