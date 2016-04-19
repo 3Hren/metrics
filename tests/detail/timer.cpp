@@ -30,8 +30,19 @@ struct meter_t {
 };
 
 struct histogram_t {
+    struct accumulator_t {
+        typedef accumulator::snapshot::uniform_t snapshot_type;
+
+        MOCK_CONST_METHOD0(snapshot, snapshot_type());
+        MOCK_CONST_METHOD1(update, void(std::uint64_t));
+    };
+
+    typedef accumulator_t accumulator_type;
+    typedef accumulator_type::snapshot_type snapshot_type;
+
     MOCK_CONST_METHOD0(count, std::uint64_t());
     MOCK_CONST_METHOD1(update, void(std::uint64_t));
+    MOCK_CONST_METHOD0(snapshot, snapshot_type());
 };
 
 } // namespace mock

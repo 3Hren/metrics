@@ -5,6 +5,7 @@
 #include <boost/optional/optional.hpp>
 
 #include <metrics/meter.hpp>
+#include <metrics/timer.hpp>
 
 namespace metrics {
 
@@ -51,5 +52,7 @@ template class tagged<meter_t>;
 template class metric<std::atomic<std::int64_t>>;
 template class metric<std::atomic<std::uint64_t>>;
 template class metric<meter_t>;
+
+template class metric<timer<accumulator::sliding::window_t>>;
 
 }  // namespace metrics

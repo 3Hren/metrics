@@ -3,15 +3,17 @@
 #include <array>
 #include <chrono>
 
+#include "metrics/timer.hpp"
+
 namespace metrics {
 namespace detail {
 
 /// A timer metric which aggregates timing durations and provides duration statistics, plus
 /// throughput statistics via `meter`.
 ///
-/// \type `Clock` must meet `TrivialClock` requirements and must be steady.
+/// \tparam `Clock` must meet `TrivialClock` requirements and must be steady.
 template<class Clock, class Meter, class Histogram>
-class timer {
+class timer : public metrics::timer<typename Histogram::accumulator_type> {
 public:
     typedef Clock clock_type;
     typedef typename clock_type::time_point time_point;
@@ -19,6 +21,7 @@ public:
 
     typedef Meter meter_type;
     typedef Histogram histogram_type;
+    typedef typename histogram_type::snapshot_type snapshot_type;
 
     // TODO: Suppress this check for GCC and pray, because `steady_clock` isn't available until 4.9.
 #ifdef __clang__
@@ -37,31 +40,6 @@ private:
         {}
     } d;
 
-    struct context_t {
-        timer* parent;
-        const time_point timestamp;
-
-        context_t(timer* parent):
-            parent(parent),
-            timestamp(parent->clock().now())
-        {}
-
-        context_t(const context_t& other) = delete;
-        context_t(context_t&&) = default;
-
-        ~context_t() {
-            const auto now = parent->clock().now();
-            const auto elapsed = now - timestamp;
-
-            try {
-                parent->update(elapsed);
-            } catch (...) {
-                // Ignore this, because of destructor exception safety reasons. Actually update
-                // operation should never throw.
-            }
-        }
-    };
-
 public:
     template<typename... Args>
     timer(Args&&... args):
@@ -71,64 +49,56 @@ public:
     /// Dependency observers.
 
     /// Returns a const reference to the clock implementation.
-    const clock_type&
-    clock() const noexcept {
+    auto clock() const noexcept -> const clock_type& {
         return d.clock;
     }
 
     /// Returns a const reference to the histogram implementation.
-    const histogram_type&
-    histogram() const noexcept {
+    auto histogram() const noexcept -> const histogram_type& {
         return d.histogram;
     }
 
-    const meter_type&
-    meter() const noexcept {
+    auto meter() const noexcept -> const meter_type& {
         return d.meter;
     }
 
     /// Lookup.
 
-    std::uint64_t
-    count() const noexcept {
+    auto now() const -> time_point {
+        return clock().now();
+    }
+
+    auto count() const noexcept -> std::uint64_t {
         return histogram().count();
     }
 
     /// Returns the one-minute exponentially-weighted moving average rate at which events have
     /// occurred since the timer was created.
-    double
-    m01rate() const {
+    auto m01rate() const -> double {
         return d.meter.m01rate();
     }
 
     /// Returns the five-minute exponentially-weighted moving average rate at which events have
     /// occurred since the timer was created.
-    double
-    m05rate() const {
+    auto m05rate() const -> double {
         return d.meter.m05rate();
     }
 
     /// Returns the fifteen-minute exponentially-weighted moving average rate at which events have
     /// occurred since the timer was created.
-    double
-    m15rate() const {
+    auto m15rate() const -> double {
         return d.meter.m15rate();
+    }
+
+    auto snapshot() const -> snapshot_type {
+        return histogram().snapshot();
     }
 
     /// Modifiers.
 
-    /// Adds a recorded duration.
-    void
-    update(duration_type duration) {
+    auto update(duration_type duration) -> void {
         d.histogram.update(std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count());
         d.meter.mark();
-    }
-
-    template<typename F>
-    auto
-    measure(F fn) -> decltype(fn()) {
-        context_t context(this);
-        return fn();
     }
 };
 

@@ -20,27 +20,37 @@ template<typename T>
 auto registry_t::counter(std::string name, tags_t::container_type other) const ->
     metric<std::atomic<T>>
 {
-    tags_t tags(name, other);
+    tags_t tags(std::move(name), std::move(other));
 
-    auto meter = processor->post([&]() -> std::shared_ptr<std::atomic<T>> {
+    auto counter = processor->post([&]() -> std::shared_ptr<std::atomic<T>> {
         return processor->counter<T>(tags);
+    }).get();
+
+    return {std::move(tags), std::move(counter)};
+}
+
+auto registry_t::meter(std::string name, tags_t::container_type other) const -> metric<meter_t> {
+    tags_t tags(std::move(name), std::move(other));
+
+    auto meter = processor->post([&]() -> std::shared_ptr<meter_t> {
+        return processor->meter(tags);
     }).get();
 
     return {std::move(tags), std::move(meter)};
 }
 
-auto registry_t::meter(std::string name, tags_t::container_type tags_) const -> metric<meter_t> {
-    tags_t tags(name, tags_);
-    auto meter = processor->meter(tags);
+template<class Accumulate>
+auto registry_t::timer(std::string name, tags_t::container_type other) const ->
+    metric<metrics::timer<Accumulate>>
+{
+    tags_t tags(std::move(name), std::move(other));
+
+    auto meter = processor->post([&]() -> std::shared_ptr<metrics::timer<Accumulate>> {
+        return processor->timer<Accumulate>(tags);
+    }).get();
 
     return {std::move(tags), std::move(meter)};
 }
-
-// template<class Accumulate>
-// timer<Accumulate>
-// registry_t::timer(std::string name, tags_t::container_type tags) const {
-//     return metrics::timer<Accumulate>({std::move(name), std::move(tags)}, *processor);
-// }
 
 /// Instantiations.
 
@@ -52,8 +62,8 @@ template
 auto registry_t::counter<std::uint64_t>(std::string, tags_t::container_type) const ->
     metric<std::atomic<std::uint64_t>>;
 
-// template
-// timer<accumulator::sliding::window_t>
-// registry_t::timer<accumulator::sliding::window_t>(std::string, tags_t::container_type tags) const;
+template
+auto registry_t::timer<accumulator::sliding::window_t>(std::string, tags_t::container_type tags) const ->
+    metric<metrics::timer<accumulator::sliding::window_t>>;
 
 }  // namespace metrics

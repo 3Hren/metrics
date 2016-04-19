@@ -25,13 +25,12 @@ include_directories(
 set(SOURCES
     src/accumulator/sliding/window
     src/accumulator/snapshot/uniform
-    # src/counter
     src/ewma
     src/factory
     src/metric
     src/registry
     src/tags
-    # src/timer
+    src/timer
 )
 
 if (METRICS_BUILD_STATIC)
