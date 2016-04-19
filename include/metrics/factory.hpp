@@ -13,8 +13,6 @@ public:
     auto meter() const -> std::unique_ptr<meter_t>;
 
     /// Creates default timer implementation using the specified accumulator type.
-    ///
-    /// \todo not implemented yet.
     template<typename Accumulate>
     auto timer() const -> std::unique_ptr<timer<Accumulate>>;
 };
