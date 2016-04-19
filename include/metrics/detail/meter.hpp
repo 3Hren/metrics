@@ -18,11 +18,11 @@ class meter : public metrics::meter_t {
 
     struct {
         clock_type clock;
-        std::uint64_t count;
+        std::atomic<std::uint64_t> count;
     } d;
 
     time_point birthstamp;
-    time_point prev;
+    std::atomic<std::int64_t> prev;
 
     std::array<ewma_t, 3> rates;
 
@@ -30,7 +30,7 @@ public:
     /// Creates a new `meter`.
     meter() :
         birthstamp(d.clock.now()),
-        prev(birthstamp),
+        prev(std::chrono::duration_cast<std::chrono::seconds>(birthstamp.time_since_epoch()).count()),
         rates{{ewma_t::m01rate(), ewma_t::m05rate(), ewma_t::m15rate()}}
     {
         d.count = 0;
@@ -45,14 +45,12 @@ public:
     }
 
     /// Returns the number of events which have been marked.
-    std::uint64_t
-    count() const {
+    auto count() const -> std::uint64_t {
         return d.count;
     }
 
     /// Returns the mean rate at which events have occurred since the meter was created.
-    double
-    mean_rate() const {
+    auto mean_rate() const -> double {
         const auto count = this->count();
 
         if (count == 0) {
@@ -68,22 +66,19 @@ public:
 
     /// Returns the one-minute exponentially-weighted moving average rate at which events have
     /// occurred since the meter was created.
-    double
-    m01rate() {
+    auto m01rate() -> double {
         return mxxrate<0>();
     }
 
     /// Returns the five-minute exponentially-weighted moving average rate at which events have
     /// occurred since the meter was created.
-    double
-    m05rate() {
+    auto m05rate() -> double {
         return mxxrate<1>();
     }
 
     /// Returns the fifteen-minute exponentially-weighted moving average rate at which events have
     /// occurred since the meter was created.
-    double
-    m15rate() {
+    auto m15rate() -> double {
         return mxxrate<2>();
     }
 
@@ -92,8 +87,7 @@ public:
     }
 
     /// Mark the occurrence of a given number of events.
-    void
-    mark(std::uint64_t value) {
+    auto mark(std::uint64_t value) -> void {
         tick_maybe();
 
         d.count += value;
@@ -105,25 +99,27 @@ public:
 
 private:
     template<std::size_t N>
-    typename std::enable_if<N >= 0 && N < 3, double>::type
-    mxxrate() {
+    auto mxxrate() -> typename std::enable_if<N >= 0 && N < 3, double>::type {
         tick_maybe();
         return rates[N].template rate<std::chrono::seconds>();
     }
 
-    void
-    tick_maybe() {
-        const auto now = clock().now();
+    auto tick_maybe() -> void {
+        const auto now = std::chrono::duration_cast<
+            std::chrono::seconds
+        >(clock().now().time_since_epoch()).count();
+        auto prev = this->prev.load();
         const auto elapsed = now - prev;
 
-        if (elapsed > std::chrono::seconds(5)) {
-            prev = now;
+        if (elapsed > 5) {
+            // Clock values should monotonically increase, so no ABA problem here is possible.
+            if (this->prev.compare_exchange_strong(prev, now - elapsed % 5)) {
+                const auto ticks = elapsed / 5;
 
-            const auto ticks = elapsed / std::chrono::seconds(5);
-
-            for (auto i = 0; i < ticks; ++i) {
-                for (auto& rate : rates) {
-                    rate.tick();
+                for (auto i = 0; i < ticks; ++i) {
+                    for (auto& rate : rates) {
+                        rate.tick();
+                    }
                 }
             }
         }
