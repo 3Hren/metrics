@@ -40,17 +40,13 @@ struct wrapper_traits<gauge<T>> {
 
 /// Represents a tagged shared metric wrapper over standalone metrics.
 template<typename T>
-class metric : public tagged<T> {
-public:
-    typedef typename wrapper_traits<T>::type inner_type;
-
-private:
-    inner_type inner;
+class shared_metric : public tagged<T> {
+    std::shared_ptr<T> inner;
 
 public:
-    metric(tags_t tags, inner_type inner);
+    shared_metric(tags_t tags, std::shared_ptr<T> inner);
 
-    auto get() const -> inner_type;
+    auto get() const -> std::shared_ptr<T>;
 
     auto operator->() const -> T*;
 };

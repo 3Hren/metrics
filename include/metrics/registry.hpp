@@ -13,6 +13,7 @@ namespace metrics {
 
 using detail::processor_t;
 
+/// TODO: Docs.
 class registry_t {
     std::unique_ptr<processor_t> processor;
 
@@ -29,23 +30,29 @@ public:
     ///
     /// \param name counter name.
     /// \param tags optional additional tags.
-    /// \tparam `T` must be either `std::uint64_t` or `std::int64_t`.
+    /// \tparam `T` must be either std::uint64_t or std::int64_t.
     template<typename T>
     auto counter(std::string name, tags_t::container_type tags = tags_t::container_type()) const ->
-        metric<std::atomic<T>>;
+        shared_metric<std::atomic<T>>;
 
     /// Returns a meter shared metric that is mapped to a given tags, performing a creation with
     /// registering if such metric does not already exist.
     ///
-    /// \param name counter name.
+    /// \param name meter name.
     /// \param tags optional additional tags.
     auto meter(std::string name, tags_t::container_type tags = tags_t::container_type()) const ->
-        metric<meter_t>;
+        shared_metric<meter_t>;
 
-    // TODO: Change default accumulator to `exponentially_decaying_t`.
+    /// Returns a timer shared metric that is mapped to a given tags, performing a creation with
+    /// registering if such metric does not already exist.
+    ///
+    /// \todo change default accumulator to `exponentially_decaying_t`.
+    /// \param name timer name.
+    /// \param tags optional additional tags.
+    /// \tparam Accumulate must meet Accumulate requirements.
     template<class Accumulate = accumulator::sliding::window_t>
     auto timer(std::string name, tags_t::container_type tags = tags_t::container_type()) const ->
-        metric<timer<Accumulate>>;
+        shared_metric<timer<Accumulate>>;
 };
 
 }  // namespace metrics

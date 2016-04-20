@@ -30,29 +30,31 @@ auto tagged<T>::tag(const std::string& key) const -> boost::optional<std::string
 }
 
 template<typename T>
-metric<T>::metric(tags_t tags, inner_type inner) :
+shared_metric<T>::shared_metric(tags_t tags, std::shared_ptr<T> inner) :
     tagged<T>(std::move(tags)),
     inner(std::move(inner))
 {}
 
 template<typename T>
-auto metric<T>::operator->() const -> T* {
+auto shared_metric<T>::operator->() const -> T* {
     return inner.get();
 }
 
 template<typename T>
-auto metric<T>::get() const -> inner_type {
+auto shared_metric<T>::get() const -> std::shared_ptr<T> {
     return inner;
 }
+
+/// Instantiations.
 
 template class tagged<std::atomic<std::int64_t>>;
 template class tagged<std::atomic<std::uint64_t>>;
 template class tagged<meter_t>;
+template class tagged<timer<accumulator::sliding::window_t>>;
 
-template class metric<std::atomic<std::int64_t>>;
-template class metric<std::atomic<std::uint64_t>>;
-template class metric<meter_t>;
-
-template class metric<timer<accumulator::sliding::window_t>>;
+template class shared_metric<std::atomic<std::int64_t>>;
+template class shared_metric<std::atomic<std::uint64_t>>;
+template class shared_metric<meter_t>;
+template class shared_metric<timer<accumulator::sliding::window_t>>;
 
 }  // namespace metrics

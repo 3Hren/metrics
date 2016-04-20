@@ -18,7 +18,7 @@ registry_t::~registry_t() = default;
 
 template<typename T>
 auto registry_t::counter(std::string name, tags_t::container_type other) const ->
-    metric<std::atomic<T>>
+    shared_metric<std::atomic<T>>
 {
     tags_t tags(std::move(name), std::move(other));
 
@@ -29,7 +29,9 @@ auto registry_t::counter(std::string name, tags_t::container_type other) const -
     return {std::move(tags), std::move(counter)};
 }
 
-auto registry_t::meter(std::string name, tags_t::container_type other) const -> metric<meter_t> {
+auto registry_t::meter(std::string name, tags_t::container_type other) const ->
+    shared_metric<meter_t>
+{
     tags_t tags(std::move(name), std::move(other));
 
     auto meter = processor->post([&]() -> std::shared_ptr<meter_t> {
@@ -41,7 +43,7 @@ auto registry_t::meter(std::string name, tags_t::container_type other) const -> 
 
 template<class Accumulate>
 auto registry_t::timer(std::string name, tags_t::container_type other) const ->
-    metric<metrics::timer<Accumulate>>
+    shared_metric<metrics::timer<Accumulate>>
 {
     tags_t tags(std::move(name), std::move(other));
 
@@ -56,14 +58,14 @@ auto registry_t::timer(std::string name, tags_t::container_type other) const ->
 
 template
 auto registry_t::counter<std::int64_t>(std::string, tags_t::container_type) const ->
-    metric<std::atomic<std::int64_t>>;
+    shared_metric<std::atomic<std::int64_t>>;
 
 template
 auto registry_t::counter<std::uint64_t>(std::string, tags_t::container_type) const ->
-    metric<std::atomic<std::uint64_t>>;
+    shared_metric<std::atomic<std::uint64_t>>;
 
 template
 auto registry_t::timer<accumulator::sliding::window_t>(std::string, tags_t::container_type tags) const ->
-    metric<metrics::timer<accumulator::sliding::window_t>>;
+    shared_metric<metrics::timer<accumulator::sliding::window_t>>;
 
 }  // namespace metrics
