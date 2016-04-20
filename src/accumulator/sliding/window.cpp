@@ -16,30 +16,30 @@ window_t::window_t(std::size_t size):
     count(0)
 {}
 
-window_t::snapshot_type
-window_t::snapshot() const {
+auto window_t::snapshot() const -> window_t::snapshot_type {
     const auto size = this->size();
 
     std::vector<std::uint64_t> result;
     result.reserve(size);
 
+    std::unique_lock<std::mutex> lock(mutex);
     std::copy_n(measurements.begin(), size, std::back_inserter(result));
+    lock.unlock();
 
     return snapshot_type(result);
 }
 
-std::size_t
-window_t::size() const noexcept {
-    return std::min(count, measurements.size());
+auto window_t::size() const noexcept -> std::size_t {
+    std::lock_guard<std::mutex> lock(mutex);
+    return std::min(count.load(), measurements.size());
 }
 
-void
-window_t::update(value_type value) noexcept {
+auto window_t::update(value_type value) noexcept -> void {
+    std::lock_guard<std::mutex> lock(mutex);
     measurements[count++ % measurements.size()] = value;
 }
 
-void
-window_t::operator()(value_type value) noexcept {
+auto window_t::operator()(value_type value) noexcept -> void {
     update(value);
 }
 
