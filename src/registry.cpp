@@ -6,12 +6,12 @@
 #include "metrics/metric.hpp"
 // #include "metrics/timer.hpp"
 
-#include "metrics/detail/processor.hpp"
+#include "metrics/detail/registry.hpp"
 
 namespace metrics {
 
 registry_t::registry_t():
-    processor(new processor_t)
+    inner(new inner_t)
 {}
 
 registry_t::~registry_t() = default;
@@ -22,11 +22,16 @@ auto registry_t::counter(std::string name, tags_t::container_type other) const -
 {
     tags_t tags(std::move(name), std::move(other));
 
-    auto counter = processor->post([&]() -> std::shared_ptr<std::atomic<T>> {
-        return processor->counter<T>(tags);
-    }).get();
+    std::lock_guard<std::mutex> lock(inner->counters.mutex);
+    auto& instances = inner->counters.template get<T>();
 
-    return {std::move(tags), std::move(counter)};
+    std::shared_ptr<std::atomic<T>> instance;
+    if((instance = instances[tags].lock()) == nullptr) {
+        instance = std::make_shared<std::atomic<T>>();
+        instances[tags] = instance;
+    }
+
+    return {std::move(tags), std::move(instance)};
 }
 
 auto registry_t::meter(std::string name, tags_t::container_type other) const ->
@@ -34,24 +39,41 @@ auto registry_t::meter(std::string name, tags_t::container_type other) const ->
 {
     tags_t tags(std::move(name), std::move(other));
 
-    auto meter = processor->post([&]() -> std::shared_ptr<meter_t> {
-        return processor->meter(tags);
-    }).get();
+    std::lock_guard<std::mutex> lock(inner->meters.mutex);
+    auto& instances = inner->meters.template get<detail::meter_t>();
 
-    return {std::move(tags), std::move(meter)};
+    std::shared_ptr<detail::meter_t> instance;
+    if((instance = instances[tags].lock()) == nullptr) {
+        instance = std::make_shared<detail::meter_t>();
+        instances[tags] = instance;
+    }
+
+    return {std::move(tags), std::move(instance)};
 }
 
 template<class Accumulate>
 auto registry_t::timer(std::string name, tags_t::container_type other) const ->
     shared_metric<metrics::timer<Accumulate>>
 {
+    typedef std::chrono::high_resolution_clock clock_type;
+    typedef detail::timer<
+        clock_type,
+        detail::meter<clock_type>,
+        detail::histogram<Accumulate>
+    > result_type;
+
     tags_t tags(std::move(name), std::move(other));
 
-    auto meter = processor->post([&]() -> std::shared_ptr<metrics::timer<Accumulate>> {
-        return processor->timer<Accumulate>(tags);
-    }).get();
+    std::lock_guard<std::mutex> lock(inner->timers.mutex);
+    auto& instances = inner->timers.template get<Accumulate>();
 
-    return {std::move(tags), std::move(meter)};
+    std::shared_ptr<result_type> instance;
+    if((instance = instances[tags].lock()) == nullptr) {
+        instance = std::make_shared<result_type>();
+        instances[tags] = instance;
+    }
+
+    return {std::move(tags), std::move(instance)};
 }
 
 /// Instantiations.

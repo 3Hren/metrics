@@ -30,9 +30,4 @@ class tagged;
 template<typename T>
 class shared_metric;
 
-namespace detail {
-
-class processor_t;
-
-}  // namespace detail
 }  // namespace metrics

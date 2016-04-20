@@ -11,11 +11,10 @@
 
 namespace metrics {
 
-using detail::processor_t;
-
 /// TODO: Docs.
 class registry_t {
-    std::unique_ptr<processor_t> processor;
+    class inner_t;
+    std::unique_ptr<inner_t> inner;
 
 public:
     /// Constructs a new metric registry.
