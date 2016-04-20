@@ -48,8 +48,8 @@ ewma_t::tick() {
     const auto instant_rate = count / interval;
 
     if (initialized.test_and_set()) {
-        // TODO: Spinlock required.
-        d.rate = d.rate + (alpha * (instant_rate - d.rate));
+        const auto rate = d.rate.load();
+        d.rate = rate + (alpha * (instant_rate - rate));
     } else {
         d.rate = instant_rate;
     }
