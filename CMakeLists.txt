@@ -25,6 +25,7 @@ include_directories(
 set(SOURCES
     src/accumulator/sliding/window
     src/accumulator/snapshot/uniform
+    src/accumulator/snapshot/weighted
     src/ewma
     src/factory
     src/meter
@@ -94,6 +95,7 @@ if (ENABLE_TESTING)
     set(SOURCES
         tests/accumulator/sliding/window
         tests/accumulator/snapshot/uniform
+        tests/accumulator/snapshot/weighted
         tests/counter
         tests/detail/cpp14/tuple
         tests/detail/ewma
