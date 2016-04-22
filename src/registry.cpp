@@ -57,7 +57,7 @@ auto registry_t::meter(std::string name, tags_t::container_type other) const ->
     tags_t tags(std::move(name), std::move(other));
 
     std::lock_guard<std::mutex> lock(inner->meters.mutex);
-    auto& instances = inner->meters.template get<detail::meter_t>();
+    auto& instances = inner->meters.get<detail::meter_t>();
 
     std::shared_ptr<detail::meter_t> instance;
     if((instance = instances[tags].lock()) == nullptr) {
