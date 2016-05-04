@@ -13,23 +13,3 @@
 
 ### References
 - http://www.johndcook.com/blog/standard_deviation/ - Accurately computing running variance.
-
-{
-  "rate": [0.9, 1.0, 2.5],
-  "timings": {
-    ...
-    "0.95": ...,
-  },
-  // Maybe allow to c§onfigure through manifest?
-  "reverse_timings": {
-    "1": 200,
-    "2": 100,
-    "5": 50,
-    "10": 20,
-    "20": 4,
-    "50": 2,
-    "100": 1
-    "1000": 1,
-    "10000": 10   
-  }
-}
