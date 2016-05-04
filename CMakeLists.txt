@@ -46,7 +46,7 @@ target_link_libraries(${LIBRARY_NAME}
 )
 
 set_target_properties(${LIBRARY_NAME} PROPERTIES
-    COMPILE_FLAGS "-std=c++0x -fPIC -Wall -Wextra -Winit-self -Wconversion -Wno-sign-conversion -Wold-style-cast -Woverloaded-virtual -Wctor-dtor-privacy -Wnon-virtual-dtor -Wunreachable-code -pedantic -pedantic-errors"
+    COMPILE_FLAGS "-std=c++0x -fPIC -Wall -Wextra -Winit-self -Wno-sign-conversion -Wold-style-cast -Woverloaded-virtual -Wctor-dtor-privacy -Wnon-virtual-dtor -Wunreachable-code -pedantic -pedantic-errors"
 )
 
 set_target_properties(${LIBRARY_NAME} PROPERTIES
@@ -120,6 +120,6 @@ if (ENABLE_TESTING)
     )
 
     set_target_properties(${LIBRARY_NAME}-tests PROPERTIES
-        COMPILE_FLAGS "-std=c++0x -Wall -Wextra -Winit-self -Wconversion -Wno-sign-conversion -Wold-style-cast -Woverloaded-virtual -Wctor-dtor-privacy -Wnon-virtual-dtor -Wunreachable-code -pedantic -pedantic-errors"
+        COMPILE_FLAGS "-std=c++0x -Wall -Wextra -Winit-self -Wno-sign-conversion -Wold-style-cast -Woverloaded-virtual -Wctor-dtor-privacy -Wnon-virtual-dtor -Wunreachable-code -pedantic -pedantic-errors"
     )
 endif()

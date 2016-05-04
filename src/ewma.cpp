@@ -19,7 +19,7 @@ ewma_t::ewma_t(double alpha, clock_type::duration interval) :
     interval(std::chrono::duration_cast<std::chrono::nanoseconds>(interval).count())
 {
     initialized.clear();
-    d.rate = 0.0;
+    d.rate.store(0.0);
 }
 
 ewma_t
@@ -49,9 +49,9 @@ ewma_t::tick() {
 
     if (initialized.test_and_set()) {
         const auto rate = d.rate.load();
-        d.rate = rate + (alpha * (instant_rate - rate));
+        d.rate.store(rate + (alpha * (instant_rate - rate)));
     } else {
-        d.rate = instant_rate;
+        d.rate.store(instant_rate);
     }
 }
 

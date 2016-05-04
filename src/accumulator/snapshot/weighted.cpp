@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <functional>
+#include <system_error>
 
 #include <boost/range/numeric.hpp>
 

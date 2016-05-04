@@ -9,7 +9,7 @@
 namespace metrics {
 
 auto factory_t::meter() const -> std::unique_ptr<meter_t> {
-    return std::unique_ptr<meter_t>(new detail::meter_t());
+    return std::unique_ptr<meter_t>(new detail::meter_t);
 }
 
 template<typename Accumulate>

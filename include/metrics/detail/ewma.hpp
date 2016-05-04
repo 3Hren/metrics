@@ -2,9 +2,30 @@
 
 #include <atomic>
 #include <chrono>
+#include <mutex>
+
+#define METRICS_HAVE_NORMAL_COMPILER \
+    defined(__clang__) || __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 8)
 
 namespace metrics {
 namespace detail {
+
+#if METRICS_HAVE_NORMAL_COMPILER == 0
+struct atomic_double {
+    double value;
+    mutable std::mutex mutex;
+
+    auto load() const -> double {
+        std::lock_guard<std::mutex> lock(mutex);
+        return value;
+    }
+
+    auto store(double value) -> void {
+        std::lock_guard<std::mutex> lock(mutex);
+        this->value = value;
+    }
+};
+#endif
 
 /// An exponentially-weighted moving average.
 ///
@@ -19,7 +40,11 @@ private:
     std::atomic_flag initialized;
 
     struct {
+#if METRICS_HAVE_NORMAL_COMPILER
         std::atomic<double> rate;
+#else
+        atomic_double rate;
+#endif
     } d;
 
     std::atomic<std::uint64_t> uncounted;
@@ -63,7 +88,7 @@ public:
     template<typename T>
     double
     rate() const {
-        return d.rate * std::chrono::duration_cast<std::chrono::nanoseconds>(T(1)).count();
+        return d.rate.load() * std::chrono::duration_cast<std::chrono::nanoseconds>(T(1)).count();
     }
 };
 
