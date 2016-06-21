@@ -10,7 +10,7 @@ if (APPLE)
 endif()
 
 # Description.
-set(LIBRARY_NAME metric)
+set(LIBRARY_NAME metrics)
 
 project(${LIBRARY_NAME})
 

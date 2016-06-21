@@ -1,0 +1,25 @@
+Source: metrics
+Priority: extra
+Maintainer: Evgeny Safronov <division494@gmail.com>
+Build-Depends: debhelper (>= 8.0.0), cmake,
+ libboost-dev | libboost1.48-dev,
+ libboost-system-dev | libboost-system1.48-dev
+Standards-Version: 3.9.3
+Section: libs
+Homepage: https://github.com/3Hren/metrics
+Vcs-Git: git://github.com/3Hren/metrics.git
+Vcs-Browser: https://github.com/3Hren/metrics.git
+
+Package: metrics-dev
+Section: libdevel
+Architecture: any
+Depends: ${misc:Depends}, libmetrics1 (= ${binary:Version})
+Description: Metrics for C++ - Development Headers
+ Development files for C++ metrics library.
+
+Package: libmetrics1
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Metrics for C++.
+ Fast C++ metrics library.
