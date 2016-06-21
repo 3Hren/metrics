@@ -34,6 +34,9 @@ public:
     auto counter(std::string name, tags_t::container_type tags = tags_t::container_type()) const ->
         shared_metric<std::atomic<T>>;
 
+    template<typename T>
+    auto counters() const -> std::map<tags_t, shared_metric<std::atomic<T>>>;
+
     /// Returns a meter shared metric that is mapped to a given tags, performing a creation with
     /// registering if such metric does not already exist.
     ///
@@ -41,6 +44,8 @@ public:
     /// \param tags optional additional tags.
     auto meter(std::string name, tags_t::container_type tags = tags_t::container_type()) const ->
         shared_metric<meter_t>;
+
+    auto meters() const -> std::map<tags_t, shared_metric<meter_t>>;
 
     /// Returns a timer shared metric that is mapped to a given tags, performing a creation with
     /// registering if such metric does not already exist.
@@ -52,6 +57,9 @@ public:
     template<class Accumulate = accumulator::sliding::window_t>
     auto timer(std::string name, tags_t::container_type tags = tags_t::container_type()) const ->
         shared_metric<timer<Accumulate>>;
+
+    template<class Accumulate = accumulator::sliding::window_t>
+    auto timers() const -> std::map<tags_t, shared_metric<metrics::timer<Accumulate>>>;
 };
 
 }  // namespace metrics

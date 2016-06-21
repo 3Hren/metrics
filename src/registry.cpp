@@ -34,6 +34,23 @@ auto registry_t::counter(std::string name, tags_t::container_type other) const -
     return {std::move(tags), std::move(instance)};
 }
 
+template<typename T>
+auto registry_t::counters() const -> std::map<tags_t, shared_metric<std::atomic<T>>> {
+    std::map<tags_t, shared_metric<std::atomic<T>>> result;
+
+    std::lock_guard<std::mutex> lock(inner->counters.mutex);
+    const auto& instances = inner->counters.template get<T>();
+
+    for (const auto& item : instances) {
+        const auto& tags = std::get<0>(item);
+        if (auto instance = std::get<1>(item).lock()) {
+            result.insert(std::make_pair(tags, shared_metric<std::atomic<T>>(tags, instance)));
+        }
+    }
+
+    return result;
+}
+
 auto registry_t::meter(std::string name, tags_t::container_type other) const ->
     shared_metric<meter_t>
 {
@@ -49,6 +66,22 @@ auto registry_t::meter(std::string name, tags_t::container_type other) const ->
     }
 
     return {std::move(tags), std::move(instance)};
+}
+
+auto registry_t::meters() const -> std::map<tags_t, shared_metric<meter_t>> {
+    std::map<tags_t, shared_metric<meter_t>> result;
+
+    std::lock_guard<std::mutex> lock(inner->meters.mutex);
+    const auto& instances = inner->meters.template get<detail::meter_t>();
+
+    for (const auto& item : instances) {
+        const auto& tags = std::get<0>(item);
+        if (auto instance = std::get<1>(item).lock()) {
+            result.insert(std::make_pair(tags, shared_metric<meter_t>(tags, instance)));
+        }
+    }
+
+    return result;
 }
 
 template<class Accumulate>
@@ -76,6 +109,23 @@ auto registry_t::timer(std::string name, tags_t::container_type other) const ->
     return {std::move(tags), std::move(instance)};
 }
 
+template<class Accumulate>
+auto registry_t::timers() const -> std::map<tags_t, shared_metric<metrics::timer<Accumulate>>> {
+    std::map<tags_t, shared_metric<metrics::timer<Accumulate>>> result;
+
+    std::lock_guard<std::mutex> lock(inner->timers.mutex);
+    const auto& instances = inner->timers.template get<Accumulate>();
+
+    for (const auto& item : instances) {
+        const auto& tags = std::get<0>(item);
+        if (auto instance = std::get<1>(item).lock()) {
+            result.insert(std::make_pair(tags, shared_metric<metrics::timer<Accumulate>>(tags, instance)));
+        }
+    }
+
+    return result;
+}
+
 /// Instantiations.
 
 template
@@ -87,7 +137,15 @@ auto registry_t::counter<std::uint64_t>(std::string, tags_t::container_type) con
     shared_metric<std::atomic<std::uint64_t>>;
 
 template
+auto registry_t::counters<std::int64_t>() const ->
+    std::map<tags_t, shared_metric<std::atomic<std::int64_t>>>;
+
+template
 auto registry_t::timer<accumulator::sliding::window_t>(std::string, tags_t::container_type tags) const ->
     shared_metric<metrics::timer<accumulator::sliding::window_t>>;
+
+template
+auto registry_t::timers<accumulator::sliding::window_t>() const ->
+    std::map<tags_t, shared_metric<metrics::timer<accumulator::sliding::window_t>>>;
 
 }  // namespace metrics
