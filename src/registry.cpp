@@ -72,7 +72,7 @@ auto registry_t::meters() const -> std::map<tags_t, shared_metric<meter_t>> {
     std::map<tags_t, shared_metric<meter_t>> result;
 
     std::lock_guard<std::mutex> lock(inner->meters.mutex);
-    const auto& instances = inner->meters.template get<detail::meter_t>();
+    const auto& instances = inner->meters.get<detail::meter_t>();
 
     for (const auto& item : instances) {
         const auto& tags = std::get<0>(item);
