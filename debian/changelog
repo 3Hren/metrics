@@ -1,3 +1,10 @@
+metrics (1.0.1) unstable; urgency=low
+
+  * Shared metrics are now stored in the registry by strong reference instead of
+    weak.
+
+ -- Evgeny Safronov <division494@gmail.com>  Wed, 29 Jun 2016 13:55:28 +0300
+
 metrics (1.0.0) unstable; urgency=low
 
   * Initial release.
