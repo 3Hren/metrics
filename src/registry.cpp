@@ -6,7 +6,7 @@
 #include "metrics/metric.hpp"
 // #include "metrics/timer.hpp"
 
-#include "metrics/detail/registry.hpp"
+#include "registry.hpp"
 
 namespace metrics {
 
@@ -26,7 +26,7 @@ auto registry_t::counter(std::string name, tags_t::container_type other) const -
     auto& instances = inner->counters.template get<T>();
 
     std::shared_ptr<std::atomic<T>> instance;
-    if((instance = instances[tags].lock()) == nullptr) {
+    if((instance = instances[tags]) == nullptr) {
         instance = std::make_shared<std::atomic<T>>();
         instances[tags] = instance;
     }
@@ -43,7 +43,7 @@ auto registry_t::counters() const -> std::map<tags_t, shared_metric<std::atomic<
 
     for (const auto& item : instances) {
         const auto& tags = std::get<0>(item);
-        if (auto instance = std::get<1>(item).lock()) {
+        if (auto instance = std::get<1>(item)) {
             result.insert(std::make_pair(tags, shared_metric<std::atomic<T>>(tags, instance)));
         }
     }
@@ -60,7 +60,7 @@ auto registry_t::meter(std::string name, tags_t::container_type other) const ->
     auto& instances = inner->meters.get<detail::meter_t>();
 
     std::shared_ptr<detail::meter_t> instance;
-    if((instance = instances[tags].lock()) == nullptr) {
+    if((instance = instances[tags]) == nullptr) {
         instance = std::make_shared<detail::meter_t>();
         instances[tags] = instance;
     }
@@ -76,7 +76,7 @@ auto registry_t::meters() const -> std::map<tags_t, shared_metric<meter_t>> {
 
     for (const auto& item : instances) {
         const auto& tags = std::get<0>(item);
-        if (auto instance = std::get<1>(item).lock()) {
+        if (auto instance = std::get<1>(item)) {
             result.insert(std::make_pair(tags, shared_metric<meter_t>(tags, instance)));
         }
     }
@@ -101,7 +101,7 @@ auto registry_t::timer(std::string name, tags_t::container_type other) const ->
     auto& instances = inner->timers.template get<Accumulate>();
 
     std::shared_ptr<result_type> instance;
-    if((instance = instances[tags].lock()) == nullptr) {
+    if((instance = instances[tags]) == nullptr) {
         instance = std::make_shared<result_type>();
         instances[tags] = instance;
     }
@@ -118,7 +118,7 @@ auto registry_t::timers() const -> std::map<tags_t, shared_metric<metrics::timer
 
     for (const auto& item : instances) {
         const auto& tags = std::get<0>(item);
-        if (auto instance = std::get<1>(item).lock()) {
+        if (auto instance = std::get<1>(item)) {
             result.insert(std::make_pair(tags, shared_metric<metrics::timer<Accumulate>>(tags, instance)));
         }
     }

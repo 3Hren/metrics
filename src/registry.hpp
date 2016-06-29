@@ -37,17 +37,22 @@ struct collection_of;
 /// Represents a tagged collection of metrics with various specializations.
 template<template<typename> class Tag, typename... U>
 struct collection_of<Tag, std::tuple<U...>> {
-    std::tuple<std::map<tags_t, std::weak_ptr<typename Tag<U>::type>>...> containers;
+    std::tuple<
+        std::map<
+            tags_t,
+            std::shared_ptr<typename Tag<U>::type>
+        >...
+    > containers;
     mutable std::mutex mutex;
 
     template<typename T>
-    auto get() noexcept -> std::map<tags_t, std::weak_ptr<typename Tag<T>::type>>& {
-        return cpp14::get<std::map<tags_t, std::weak_ptr<typename Tag<T>::type>>>(containers);
+    auto get() noexcept -> std::map<tags_t, std::shared_ptr<typename Tag<T>::type>>& {
+        return cpp14::get<std::map<tags_t, std::shared_ptr<typename Tag<T>::type>>>(containers);
     }
 
     template<typename T>
-    auto get() const noexcept -> const std::map<tags_t, std::weak_ptr<typename Tag<T>::type>>& {
-        return cpp14::get<std::map<tags_t, std::weak_ptr<typename Tag<T>::type>>>(containers);
+    auto get() const noexcept -> std::map<tags_t, std::shared_ptr<typename Tag<T>::type>> const& {
+        return cpp14::get<std::map<tags_t, std::shared_ptr<typename Tag<T>::type>>>(containers);
     }
 };
 
