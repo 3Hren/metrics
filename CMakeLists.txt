@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 2.8)
 
 # Options.
 OPTION(ENABLE_TESTING "Build the library with tests" OFF)
-OPTION(METRICS_BUILD_STATIC "Build the library as static" OFF)
 
 # Workaround for OS X.
 if (APPLE)
@@ -14,13 +13,9 @@ set(LIBRARY_NAME metrics)
 
 project(${LIBRARY_NAME})
 
-find_package(Boost 1.46 REQUIRED COMPONENTS
-    system
-)
+find_package(Boost 1.46 REQUIRED COMPONENTS system)
 
-include_directories(
-    ${PROJECT_SOURCE_DIR}/include
-)
+include_directories(${PROJECT_SOURCE_DIR}/include)
 
 set(SOURCES
     src/accumulator/sliding/window
@@ -32,18 +27,12 @@ set(SOURCES
     src/metric
     src/registry
     src/tags
-    src/timer
-)
+    src/timer)
 
-if (METRICS_BUILD_STATIC)
-    add_library(${LIBRARY_NAME} STATIC ${SOURCES})
-else()
-    add_library(${LIBRARY_NAME} SHARED ${SOURCES})
-endif()
+add_library(${LIBRARY_NAME} SHARED ${SOURCES})
 
 target_link_libraries(${LIBRARY_NAME}
-    ${Boost_LIBRARIES}
-)
+    ${Boost_LIBRARIES})
 
 set_target_properties(${LIBRARY_NAME} PROPERTIES
     COMPILE_FLAGS "-std=c++0x -fPIC -Wall -Wextra -Winit-self -Wno-sign-conversion -Wold-style-cast -Woverloaded-virtual -Wctor-dtor-privacy -Wnon-virtual-dtor -Wunreachable-code -pedantic -pedantic-errors"
@@ -54,24 +43,22 @@ set_target_properties(${LIBRARY_NAME} PROPERTIES
 )
 
 # Install section.
-if (NOT METRICS_BUILD_STATIC)
-    install(
-        TARGETS
-            ${LIBRARY_NAME}
-        LIBRARY DESTINATION lib
-    )
+install(
+    TARGETS
+        ${LIBRARY_NAME}
+    LIBRARY DESTINATION lib)
 
-    install(
-        DIRECTORY
-            ${PROJECT_SOURCE_DIR}/include/
-        DESTINATION include
-        COMPONENT development
-        PATTERN "detail" EXCLUDE
-    )
-endif()
+install(
+    DIRECTORY
+        ${PROJECT_SOURCE_DIR}/include/
+    DESTINATION include
+    COMPONENT development
+    PATTERN "detail" EXCLUDE)
 
 if (ENABLE_TESTING)
     list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/foreign/modules")
+
+    enable_testing()
 
     find_package(Threads)
 
@@ -82,15 +69,13 @@ if (ENABLE_TESTING)
 
     include_directories(
         SYSTEM ${GTEST_INCLUDE_DIR}
-        SYSTEM ${GMOCK_INCLUDE_DIR}
-    )
+        SYSTEM ${GMOCK_INCLUDE_DIR})
 
     link_directories(${GTEST_BINARY_DIR} ${GMOCK_BINARY_DIR})
 
     include_directories(
         ${PROJECT_SOURCE_DIR}
-        ${PROJECT_SOURCE_DIR}/include
-    )
+        ${PROJECT_SOURCE_DIR}/include)
 
     set(SOURCES
         tests/accumulator/sliding/window
@@ -116,8 +101,7 @@ if (ENABLE_TESTING)
         ${CMAKE_THREAD_LIBS_INIT}
         gmock
         gtest
-        gtest_main
-    )
+        gtest_main)
 
     set_target_properties(${LIBRARY_NAME}-tests PROPERTIES
         COMPILE_FLAGS "-std=c++0x -Wall -Wextra -Winit-self -Wno-sign-conversion -Wold-style-cast -Woverloaded-virtual -Wctor-dtor-privacy -Wnon-virtual-dtor -Wunreachable-code -pedantic -pedantic-errors"
