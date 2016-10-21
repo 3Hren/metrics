@@ -82,6 +82,7 @@ if (ENABLE_TESTING)
         tests/accumulator/snapshot/uniform
         tests/accumulator/snapshot/weighted
         tests/counter
+        tests/gauge
         tests/detail/cpp14/tuple
         tests/detail/ewma
         tests/detail/histogram

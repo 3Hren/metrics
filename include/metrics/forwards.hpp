@@ -4,9 +4,6 @@ namespace metrics {
 
 /// Standalone metrics.
 
-template<typename T>
-class gauge;
-
 class meter_t;
 
 template<class Accumulate>

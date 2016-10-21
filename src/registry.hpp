@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include "metrics/accumulator/sliding/window.hpp"
 #include "metrics/registry.hpp"
 
@@ -11,6 +13,11 @@
 namespace metrics {
 
 namespace tag {
+
+template<typename T>
+struct gauge {
+    typedef std::function<T()> type;
+};
 
 template<typename T>
 struct counter {
@@ -58,6 +65,7 @@ struct collection_of<Tag, std::tuple<U...>> {
 
 class registry_t::inner_t {
 public:
+    collection_of<tag::gauge, std::tuple<std::int64_t, std::uint64_t, double>> gauges;
     collection_of<tag::counter, std::tuple<std::int64_t, std::uint64_t>> counters;
     collection_of<tag::meter, std::tuple<meter_t>> meters;
     collection_of<tag::timer, std::tuple<accumulator::sliding::window_t>> timers;

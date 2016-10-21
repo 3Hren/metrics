@@ -2,6 +2,7 @@
 
 #include <future>
 
+#include "metrics/gauge.hpp"
 #include "metrics/meter.hpp"
 #include "metrics/metric.hpp"
 // #include "metrics/timer.hpp"
@@ -15,6 +16,33 @@ registry_t::registry_t():
 {}
 
 registry_t::~registry_t() = default;
+
+template<typename R>
+auto registry_t::register_gauge(std::string name, tags_t::container_type other, std::function<R()> fn) ->
+    void
+{
+    tags_t tags(std::move(name), std::move(other));
+
+    std::lock_guard<std::mutex> lock(inner->gauges.mutex);
+    auto& instances = inner->gauges.template get<R>();
+
+    std::shared_ptr<metrics::gauge<R>> instance;
+    if((instance = instances[tags]) == nullptr) {
+        instance = std::make_shared<metrics::gauge<R>>(std::move(fn));
+        instances[tags] = instance;
+    }
+}
+
+template<typename T>
+auto registry_t::gauge(std::string name, tags_t::container_type other) const
+    -> shared_metric<metrics::gauge<T>>
+{
+    tags_t tags(std::move(name), std::move(other));
+
+    std::lock_guard<std::mutex> lock(inner->gauges.mutex);
+    const auto& instances = inner->gauges.template get<T>();
+    return {tags, instances.at(tags)};
+}
 
 template<typename T>
 auto registry_t::counter(std::string name, tags_t::container_type other) const ->
@@ -127,6 +155,30 @@ auto registry_t::timers() const -> std::map<tags_t, shared_metric<metrics::timer
 }
 
 /// Instantiations.
+
+template
+auto registry_t::register_gauge<std::int64_t>(std::string, tags_t::container_type other, std::function<std::int64_t()> fn) ->
+    void;
+
+template
+auto registry_t::register_gauge<std::uint64_t>(std::string, tags_t::container_type other, std::function<std::uint64_t()> fn) ->
+    void;
+
+template
+auto registry_t::register_gauge<double>(std::string, tags_t::container_type other, std::function<double()> fn) ->
+    void;
+
+template
+auto registry_t::gauge<std::int64_t>(std::string, tags_t::container_type) const ->
+    shared_metric<metrics::gauge<std::int64_t>>;
+
+template
+auto registry_t::gauge<std::uint64_t>(std::string, tags_t::container_type) const ->
+    shared_metric<metrics::gauge<std::uint64_t>>;
+
+template
+auto registry_t::gauge<double>(std::string, tags_t::container_type) const ->
+    shared_metric<metrics::gauge<double>>;
 
 template
 auto registry_t::counter<std::int64_t>(std::string, tags_t::container_type) const ->

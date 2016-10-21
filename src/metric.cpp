@@ -4,8 +4,9 @@
 
 #include <boost/optional/optional.hpp>
 
-#include <metrics/meter.hpp>
-#include <metrics/timer.hpp>
+#include "metrics/gauge.hpp"
+#include "metrics/meter.hpp"
+#include "metrics/timer.hpp"
 
 namespace metrics {
 
@@ -47,11 +48,17 @@ auto shared_metric<T>::get() const -> std::shared_ptr<T> {
 
 /// Instantiations.
 
+template class tagged<gauge<std::int64_t>>;
+template class tagged<gauge<std::uint64_t>>;
+template class tagged<gauge<double>>;
 template class tagged<std::atomic<std::int64_t>>;
 template class tagged<std::atomic<std::uint64_t>>;
 template class tagged<meter_t>;
 template class tagged<timer<accumulator::sliding::window_t>>;
 
+template class shared_metric<gauge<std::int64_t>>;
+template class shared_metric<gauge<std::uint64_t>>;
+template class shared_metric<gauge<double>>;
 template class shared_metric<std::atomic<std::int64_t>>;
 template class shared_metric<std::atomic<std::uint64_t>>;
 template class shared_metric<meter_t>;

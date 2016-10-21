@@ -28,16 +28,6 @@ public:
     auto tags() const noexcept -> const tags_t&;
 };
 
-template<typename T>
-struct wrapper_traits {
-    typedef std::shared_ptr<T> type;
-};
-
-template<typename T>
-struct wrapper_traits<gauge<T>> {
-    typedef std::function<T()> type;
-};
-
 /// Represents a tagged shared metric wrapper over standalone metrics.
 template<typename T>
 class shared_metric : public tagged<T> {
