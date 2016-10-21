@@ -45,6 +45,23 @@ auto registry_t::gauge(std::string name, tags_t::container_type other) const
 }
 
 template<typename T>
+auto registry_t::gauges() const -> std::map<tags_t, shared_metric<metrics::gauge<T>>> {
+    std::map<tags_t, shared_metric<metrics::gauge<T>>> result;
+
+    std::lock_guard<std::mutex> lock(inner->gauges.mutex);
+    const auto& instances = inner->gauges.template get<T>();
+
+    for (const auto& item : instances) {
+        const auto& tags = std::get<0>(item);
+        if (auto instance = std::get<1>(item)) {
+            result.insert(std::make_pair(tags, shared_metric<metrics::gauge<T>>(tags, instance)));
+        }
+    }
+
+    return result;
+}
+
+template<typename T>
 auto registry_t::counter(std::string name, tags_t::container_type other) const ->
     shared_metric<std::atomic<T>>
 {
@@ -179,6 +196,18 @@ auto registry_t::gauge<std::uint64_t>(std::string, tags_t::container_type) const
 template
 auto registry_t::gauge<double>(std::string, tags_t::container_type) const ->
     shared_metric<metrics::gauge<double>>;
+
+template
+auto registry_t::gauges<std::int64_t>() const ->
+    std::map<tags_t, shared_metric<metrics::gauge<std::int64_t>>>;
+
+template
+auto registry_t::gauges<std::uint64_t>() const ->
+    std::map<tags_t, shared_metric<metrics::gauge<std::uint64_t>>>;
+
+template
+auto registry_t::gauges<double>() const ->
+    std::map<tags_t, shared_metric<metrics::gauge<double>>>;
 
 template
 auto registry_t::counter<std::int64_t>(std::string, tags_t::container_type) const ->

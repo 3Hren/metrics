@@ -46,6 +46,9 @@ public:
     auto gauge(std::string name, tags_t::container_type tags = tags_t::container_type()) const
         -> shared_metric<gauge<T>>;
 
+    template<typename T>
+    auto gauges() const -> std::map<tags_t, shared_metric<metrics::gauge<T>>>;
+
     /// Returns a counter shared metric that is mapped to a given tags, performing a creation with
     /// registering if such metric does not already exist.
     ///
