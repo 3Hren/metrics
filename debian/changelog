@@ -1,3 +1,9 @@
+metrics (1.1.0) unstable; urgency=low
+
+  * Add gauges category.
+
+ -- Evgeny Safronov <division494@gmail.com>  Mon, 24 Oct 2016 16:37:56 +0300
+
 metrics (1.0.1) unstable; urgency=low
 
   * Shared metrics are now stored in the registry by strong reference instead of
