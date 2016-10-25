@@ -1,6 +1,9 @@
 metrics (1.2.0) UNRELEASED; urgency=low
 
   * Timers can not be manually updated.
+  * Timer contexts can now be discarded.
+    The discarded timer context does not update the associated timer's
+    statistics.
 
  -- Evgeny Safronov <division494@gmail.com>  Tue, 25 Oct 2016 21:30:52 +0300
 
