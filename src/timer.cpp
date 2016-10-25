@@ -25,6 +25,10 @@ timer_t::context_t::~context_t() {
     }
 }
 
+auto timer_t::context_t::discard() -> void {
+    parent.reset();
+}
+
 auto timer_t::context() -> context_t {
     return context_t(this);
 }

@@ -35,6 +35,12 @@ public:
 
         auto operator=(const context_t& other) -> context_t& = delete;
         auto operator=(context_t&& other) -> context_t& = default;
+
+        /// Discards the current context, forcing it not to update the assosiated timer on
+        /// destruction.
+        ///
+        /// Can be safely called multiple times.
+        auto discard() -> void;
     };
 
 public:
