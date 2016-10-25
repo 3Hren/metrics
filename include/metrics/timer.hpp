@@ -58,8 +58,7 @@ public:
         return fn();
     }
 
-protected:
-    /// Adds a recorded duration.
+    /// Adds a manually recorded duration.
     virtual auto update(duration_type duration) -> void = 0;
 };
 
