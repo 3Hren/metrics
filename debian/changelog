@@ -1,4 +1,4 @@
-metrics (1.2.0) UNRELEASED; urgency=low
+metrics (1.2.0) unstable; urgency=low
 
   * Timers can not be manually updated.
   * Timer contexts can now be discarded.
