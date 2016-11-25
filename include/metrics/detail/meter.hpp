@@ -6,7 +6,7 @@
 
 #include "metrics/meter.hpp"
 
-#include "metrics/detail/ewma.hpp"
+#include "ewma.hpp"
 
 namespace metrics {
 namespace detail {
@@ -24,18 +24,14 @@ class meter : public metrics::meter_t {
     time_point birthstamp;
     std::atomic<std::int64_t> prev;
 
-    ewma_t m01r;
-    ewma_t m05r;
-    ewma_t m15r;
+    std::array<ewma_t, 3> rates;
 
 public:
     /// Creates a new `meter`.
     meter() :
         birthstamp(d.clock.now()),
         prev(std::chrono::duration_cast<std::chrono::seconds>(birthstamp.time_since_epoch()).count()),
-        m01r(ewma_t::m01rate()),
-        m05r(ewma_t::m05rate()),
-        m15r(ewma_t::m15rate())
+        rates({{ewma_t::m01rate(), ewma_t::m05rate(), ewma_t::m15rate()}})
     {
         d.count = 0;
     }
@@ -43,8 +39,7 @@ public:
     /// Dependency observers.
 
     /// Returns a const reference to the clock implementation.
-    const clock_type&
-    clock() const noexcept {
+    auto clock() const noexcept -> const clock_type& {
         return d.clock;
     }
 
@@ -72,21 +67,21 @@ public:
     /// occurred since the meter was created.
     auto m01rate() -> double {
         tick_maybe();
-        return m01r.template rate<std::chrono::seconds>();
+        return rates[0].template rate<std::chrono::seconds>();
     }
 
     /// Returns the five-minute exponentially-weighted moving average rate at which events have
     /// occurred since the meter was created.
     auto m05rate() -> double {
         tick_maybe();
-        return m05r.template rate<std::chrono::seconds>();
+        return rates[1].template rate<std::chrono::seconds>();
     }
 
     /// Returns the fifteen-minute exponentially-weighted moving average rate at which events have
     /// occurred since the meter was created.
     auto m15rate() -> double {
         tick_maybe();
-        return m15r.template rate<std::chrono::seconds>();
+        return rates[2].template rate<std::chrono::seconds>();
     }
 
     auto mark() -> void {
@@ -99,12 +94,9 @@ public:
 
         d.count += value;
 
-        m01r.update(value);
-        m05r.update(value);
-        m15r.update(value);
-        // for (auto& rate : rates) {
-        //     rate.update(value);
-        // }
+        for (auto& rate : rates) {
+            rate.update(value);
+        }
     }
 
 private:
@@ -121,12 +113,9 @@ private:
                 const auto ticks = elapsed / 5;
 
                 for (auto i = 0; i < ticks; ++i) {
-                    m01r.tick();
-                    m05r.tick();
-                    m15r.tick();
-                    // for (auto& rate : rates) {
-                    //     rate.tick();
-                    // }
+                    for (auto& rate : rates) {
+                        rate.tick();
+                    }
                 }
             }
         }
