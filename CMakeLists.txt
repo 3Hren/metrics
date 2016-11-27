@@ -27,7 +27,8 @@ set(SOURCES
     src/metric
     src/registry
     src/tags
-    src/timer)
+    src/timer
+    src/usts/ewma)
 
 add_library(${LIBRARY_NAME} SHARED ${SOURCES})
 
@@ -90,6 +91,7 @@ if (ENABLE_TESTING)
         tests/detail/timer
         # tests/meter
         tests/tagged
+        tests/usts
         # tests/timer
     )
 
@@ -107,4 +109,6 @@ if (ENABLE_TESTING)
     set_target_properties(${LIBRARY_NAME}-tests PROPERTIES
         COMPILE_FLAGS "-std=c++0x -Wall -Wextra -Winit-self -Wno-sign-conversion -Wold-style-cast -Woverloaded-virtual -Wctor-dtor-privacy -Wnon-virtual-dtor -Wunreachable-code -pedantic -pedantic-errors"
     )
+
+    add_test(metrics ${LIBRARY_NAME}-tests)
 endif()
