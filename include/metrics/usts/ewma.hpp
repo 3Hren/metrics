@@ -52,8 +52,14 @@ public:
     /// the EWMA, we expect it to be (almost) free of initialization errors.
     auto warmed_up() const -> bool;
 
+    /// Adds a point using current time, updating the moving average.
+    ///
+    /// \param value Observed value.
+    auto add(double value) -> void;
+
     /// Adds a point updating the moving average.
     ///
+    /// \overload
     /// \param time Time point. Must be monotonically increased comparing with previous values.
     /// \param value Observed value.
     auto add(time_point time, double value) -> void;

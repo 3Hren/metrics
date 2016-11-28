@@ -14,6 +14,11 @@ ewma<Clock>::ewma(duration interval) :
 }
 
 template<typename Clock>
+auto ewma<Clock>::add(double value) -> void {
+    add(clock_type::now(), value);
+}
+
+template<typename Clock>
 auto ewma<Clock>::add(time_point time, double value) -> void {
     if (time < prev) {
         throw std::invalid_argument("time argument must monotonically increase");
