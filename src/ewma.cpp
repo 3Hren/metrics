@@ -49,7 +49,7 @@ ewma_t::tick() {
 
     if (initialized.test_and_set()) {
         const auto rate = d.rate.load();
-        d.rate.store(rate + (alpha * (instant_rate - rate)));
+        d.rate.store(rate + alpha * (instant_rate - rate));
     } else {
         d.rate.store(instant_rate);
     }
