@@ -32,7 +32,7 @@ public:
 
 private:
     // Window size in nanoseconds.
-    const double τ;
+    const double tau;
 
     // Previous time point value.
     time_point prev;

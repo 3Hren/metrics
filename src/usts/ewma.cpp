@@ -5,7 +5,7 @@ namespace usts {
 
 template<typename Clock>
 ewma<Clock>::ewma(duration interval) :
-    τ(std::chrono::duration_cast<std::chrono::nanoseconds>(interval).count()),
+    tau(std::chrono::duration_cast<std::chrono::nanoseconds>(interval).count()),
     average()
 {
     if (interval == clock_type::duration::zero()) {
@@ -20,10 +20,10 @@ auto ewma<Clock>::add(time_point time, double value) -> void {
     }
 
     if (initialized.test_and_set()) {
-        const auto ẟ = std::chrono::duration_cast<std::chrono::nanoseconds>(time - prev).count();
-        const auto α = ẟ / τ;
-        const auto µ = std::exp(-α);
-        average = µ * average + (1 - µ) * value;
+        const auto delta = std::chrono::duration_cast<std::chrono::nanoseconds>(time - prev).count();
+        const auto alpha = delta / tau;
+        const auto mu = std::exp(-alpha);
+        average = mu * average + (1 - mu) * value;
     } else {
         average = value;
         birthstamp = time;
@@ -35,7 +35,7 @@ auto ewma<Clock>::add(time_point time, double value) -> void {
 template<typename Clock>
 auto ewma<Clock>::get() const -> double {
     return average;
-};
+}
 
 template<typename Clock>
 auto ewma<Clock>::warmed_up() const -> bool {
@@ -43,7 +43,7 @@ auto ewma<Clock>::warmed_up() const -> bool {
         std::chrono::nanoseconds
     >(prev - birthstamp).count();
 
-    return elapsed >= 35 * τ;
+    return elapsed >= 35 * tau;
 }
 
 template class ewma<std::chrono::high_resolution_clock>;
