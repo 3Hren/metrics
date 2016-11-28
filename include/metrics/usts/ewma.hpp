@@ -21,6 +21,7 @@ namespace usts {
 /// \tparam Clock Clock type, must be monotonic.
 ///
 /// \note Thread-safety: reentrant.
+/// \warning unstable. Use at your own risk.
 ///
 /// \sa http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.324.6082&rep=rep1&type=pdf.
 template<typename Clock>
