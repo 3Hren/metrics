@@ -89,7 +89,7 @@ if (ENABLE_TESTING)
         tests/detail/histogram
         tests/detail/meter
         tests/detail/timer
-        # tests/meter
+        tests/meter
         tests/tagged
         tests/usts
         # tests/timer
