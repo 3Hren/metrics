@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 namespace metrics {
 
 /// Standalone metrics.
@@ -21,10 +23,12 @@ class window_t;
 
 /// Metric wrappers.
 
-template<typename T>
+class tags_t;
 class tagged;
 
 template<typename T>
 class shared_metric;
+
+using query_t = std::function<bool(const tags_t& tags)>;
 
 }  // namespace metrics
