@@ -19,42 +19,48 @@ public:
     /// Creates a tagged struct with a single `name` tag.
     tags_t(std::string name);
 
-    /// Creates a tagged struct with the given tags, overriding the `name` tag if required.
+    /// Creates a tagged struct with the given tags, overriding the `name` tag
+    /// if required.
     tags_t(std::string name, container_type tags);
 
-    /// Returns a const reference to the underlying tag map.
-    const container_type&
-    tags() const noexcept;
-
     /// Returns a const reference to the name tag.
-    const std::string&
-    name() const noexcept;
+    auto
+    name() const noexcept -> const std::string&;
 
-    /// Returns the tag value that is mapped to a key equivalent to `key`, `boost::none` otherwise.
-    boost::optional<std::string>
-    tag(const std::string& key) const;
+    /// Returns a tag value that is mapped to a key equivalent to `key`, none
+    /// otherwise.
+    auto
+    tag(const std::string& key) const -> boost::optional<const std::string&>;
 
-    bool
-    operator==(const tags_t& other) const;
+    /// Returns a const reference to the underlying tags.
+    auto
+    tags() const noexcept -> const container_type&;
 
-    bool
-    operator!=(const tags_t& other) const;
+    /// Partial equality operators.
 
-    bool
-    operator<(const tags_t& other) const;
+    auto
+    operator==(const tags_t& other) const -> bool;
+
+    auto
+    operator!=(const tags_t& other) const -> bool;
+
+    /// Ordering operators.
+
+    auto
+    operator<(const tags_t& other) const -> bool;
 };
 
-}  // namespace metrics
+} // namespace metrics
 
 namespace std {
 
-template<>
+template <>
 struct hash<metrics::tags_t> {
     typedef metrics::tags_t argument_type;
     typedef std::size_t result_type;
 
-    result_type
-    operator()(const argument_type& v) const;
+    auto
+    operator()(const argument_type& v) const -> result_type;
 };
 
-}  // namespace std
+} // namespace std

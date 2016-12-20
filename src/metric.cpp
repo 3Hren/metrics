@@ -24,7 +24,7 @@ auto tagged_t::name() const -> std::string {
     return tags().name();
 }
 
-auto tagged_t::tag(const std::string& key) const -> boost::optional<std::string> {
+auto tagged_t::tag(const std::string& key) const -> boost::optional<const std::string&> {
     return tags().tag(key);
 }
 

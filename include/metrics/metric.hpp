@@ -31,7 +31,7 @@ public:
     auto name() const -> std::string override;
 
     /// Extracts a tag with the given key, returning nothing otherwise.
-    auto tag(const std::string& key) const -> boost::optional<std::string>;
+    auto tag(const std::string& key) const -> boost::optional<const std::string&>;
 
     /// Returns a const lvalue reference to the underlying tags.
     auto tags() const noexcept -> const tags_t&;
