@@ -16,8 +16,17 @@ namespace metrics {
 class metric_t {
 public:
     virtual ~metric_t() = default;
-    virtual auto name() const -> std::string = 0;
-    virtual auto apply(visitor_t& visitor) const -> void = 0;
+
+    /// Returns metric name.
+    virtual auto
+    name() const -> std::string = 0;
+
+    /// Returns string representation of metric type.
+    virtual auto
+    type() const -> std::string = 0;
+
+    virtual auto
+    apply(visitor_t& visitor) const -> void = 0;
 };
 
 /// An immutable tagged wrapper around standalone metric.
@@ -27,7 +36,6 @@ class tagged_t : public metric_t {
 public:
     explicit tagged_t(tags_t value);
 
-    /// Returns metric name.
     auto name() const -> std::string override;
 
     /// Extracts a tag with the given key, returning nothing otherwise.
@@ -44,6 +52,9 @@ class shared_metric : public tagged_t {
 
 public:
     shared_metric(tags_t tags, std::shared_ptr<T> inner);
+
+    auto
+    type() const -> std::string override;
 
     auto get() const -> std::shared_ptr<T>;
 

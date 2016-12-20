@@ -1,6 +1,6 @@
 #pragma once
 
-#include <functional>
+#include "fwd.hpp"
 
 namespace metrics {
 inline namespace v2 {
