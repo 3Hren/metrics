@@ -6,10 +6,10 @@
 #include <string>
 #include <vector>
 
-#include "metrics/forwards.hpp"
-#include "metrics/gauge.hpp"
-#include "metrics/metric.hpp"
-#include "metrics/tags.hpp"
+#include "fwd.hpp"
+#include "gauge.hpp"
+#include "metric.hpp"
+#include "tags.hpp"
 
 namespace metrics {
 

@@ -3,6 +3,7 @@
 #include "metrics/metric.hpp"
 
 namespace metrics {
+inline namespace v2 {
 
 /// A `meter` measures the rate at which a set of events occur.
 ///
@@ -36,4 +37,5 @@ public:
     virtual auto mark(std::uint64_t value) -> void = 0;
 };
 
-}  // namespace metrics
+} // namespace v2
+} // namespace metrics
