@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chrono>
+
 #include "metrics/metric.hpp"
 
 namespace metrics {
