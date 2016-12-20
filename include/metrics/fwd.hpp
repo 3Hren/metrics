@@ -6,9 +6,17 @@ namespace metrics {
 
 /// Standalone metrics.
 
-class meter_t;
+inline namespace v2 {
 
-template<class Accumulate>
+template <typename T>
+using gauge = std::function<T()>;
+
+class meter_t;
+class visitor_t;
+
+} // namespace v2
+
+template <class Accumulate>
 class timer;
 
 /// Accumulators and shapshots.
@@ -18,22 +26,17 @@ namespace sliding {
 
 class window_t;
 
-}  // namespace sliding
-}  // namespace accumulator
+} // namespace sliding
+} // namespace accumulator
 
 /// Metric wrappers.
 
 class tags_t;
 class tagged_t;
 
-template<typename T>
+template <typename T>
 class shared_metric;
 
 using query_t = std::function<bool(const tags_t& tags)>;
 
-inline namespace v2 {
-
-class visitor_t;
-
-}  // namespace v2
-}  // namespace metrics
+} // namespace metrics
