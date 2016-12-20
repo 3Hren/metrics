@@ -24,7 +24,7 @@ class window_t;
 /// Metric wrappers.
 
 class tags_t;
-class tagged;
+class tagged_t;
 
 template<typename T>
 class shared_metric;

@@ -15,7 +15,8 @@ project(${LIBRARY_NAME})
 
 find_package(Boost 1.46 REQUIRED COMPONENTS system)
 
-include_directories(${PROJECT_SOURCE_DIR}/include)
+include_directories(${PROJECT_SOURCE_DIR}/include
+    ${PROJECT_SOURCE_DIR}/foreign/rapidjson/include)
 
 set(SOURCES
     src/accumulator/sliding/window
@@ -23,6 +24,7 @@ set(SOURCES
     src/accumulator/snapshot/weighted
     src/ewma
     src/factory
+    src/format/json.cpp
     src/meter
     src/metric
     src/registry
@@ -85,12 +87,13 @@ if (ENABLE_TESTING)
         tests/accumulator/snapshot/uniform
         tests/accumulator/snapshot/weighted
         tests/counter
-        tests/gauge
         tests/detail/cpp14/tuple
         tests/detail/ewma
         tests/detail/histogram
         tests/detail/meter
         tests/detail/timer
+        tests/format.cpp
+        tests/gauge
         tests/meter
         tests/registry
         tests/tagged
