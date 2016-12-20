@@ -15,8 +15,7 @@ project(${LIBRARY_NAME})
 
 find_package(Boost 1.46 REQUIRED COMPONENTS system)
 
-include_directories(${PROJECT_SOURCE_DIR}/include
-    ${PROJECT_SOURCE_DIR}/foreign/rapidjson/include)
+include_directories(${PROJECT_SOURCE_DIR}/include)
 
 set(SOURCES
     src/accumulator/sliding/window
@@ -24,7 +23,6 @@ set(SOURCES
     src/accumulator/snapshot/weighted
     src/ewma
     src/factory
-    src/format/json.cpp
     src/meter
     src/metric
     src/registry
@@ -52,8 +50,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
         -pedantic-errors)
 else ()
     set_target_properties(${LIBRARY_NAME} PROPERTIES
-        COMPILE_FLAGS "-std=c++11 -fPIC -Wall -Wextra -Winit-self -Wno-sign-conversion -Wold-style-cast -Woverloaded-virtual -Wctor-dtor-privacy -Wnon-virtual-dtor -Wunreachable-code -pedantic -pedantic-errors"
-        LINK_FLAGS -Wl,--version-script=${PROJECT_SOURCE_DIR}/libmetrics2.version)
+        COMPILE_FLAGS "-std=c++11 -fPIC -Wall -Wextra -Winit-self -Wno-sign-conversion -Wold-style-cast -Woverloaded-virtual -Wctor-dtor-privacy -Wnon-virtual-dtor -Wunreachable-code -pedantic -pedantic-errors")
 endif ()
 
 # The rule is that: any breakage of the ABI must be indicated by incrementing the SOVERSION.
@@ -107,7 +104,6 @@ if (ENABLE_TESTING)
         tests/detail/histogram
         tests/detail/meter
         tests/detail/timer
-        tests/format.cpp
         tests/gauge
         tests/meter
         tests/registry
