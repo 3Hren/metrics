@@ -37,9 +37,24 @@ add_library(${LIBRARY_NAME} SHARED ${SOURCES})
 target_link_libraries(${LIBRARY_NAME}
     ${Boost_LIBRARIES})
 
-set_target_properties(${LIBRARY_NAME} PROPERTIES
-    COMPILE_FLAGS "-std=c++0x -fPIC -Wall -Wextra -Winit-self -Wno-sign-conversion -Wold-style-cast -Woverloaded-virtual -Wctor-dtor-privacy -Wnon-virtual-dtor -Wunreachable-code -pedantic -pedantic-errors"
-)
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+    target_compile_options(${LIBRARY_NAME} PRIVATE
+        -std=c++11
+        -Wno-global-constructors
+        -Wno-documentation
+        -Wno-documentation-unknown-command
+        -Wno-c++98-compat
+        -Wno-c++98-compat-pedantic
+        -Wno-padded
+        -Wno-shadow
+        -Wno-weak-vtables
+        -pedantic
+        -pedantic-errors)
+else ()
+    set_target_properties(${LIBRARY_NAME} PROPERTIES
+        COMPILE_FLAGS "-std=c++11 -fPIC -Wall -Wextra -Winit-self -Wno-sign-conversion -Wold-style-cast -Woverloaded-virtual -Wctor-dtor-privacy -Wnon-virtual-dtor -Wunreachable-code -pedantic -pedantic-errors"
+        LINK_FLAGS -Wl,--version-script=${PROJECT_SOURCE_DIR}/libmetrics2.version)
+endif ()
 
 # The rule is that: any breakage of the ABI must be indicated by incrementing the SOVERSION.
 # So, adding e.g. functions is no problem, modifying argument lists or removing functions would
