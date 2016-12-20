@@ -5,7 +5,7 @@
 
 #include <metrics/accumulator/snapshot/uniform.hpp>
 
-#include <metrics/detail/timer.hpp>
+#include <src/timer.hpp>
 
 namespace metrics {
 namespace testing {

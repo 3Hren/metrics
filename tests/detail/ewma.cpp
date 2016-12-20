@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-#include <metrics/detail/ewma.hpp>
+#include <src/ewma.hpp>
 
 namespace metrics {
 namespace detail {
