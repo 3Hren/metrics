@@ -2,10 +2,10 @@
 
 #include <boost/range/algorithm/transform.hpp>
 
+#include "metrics/counter.hpp"
 #include "metrics/gauge.hpp"
 #include "metrics/meter.hpp"
 #include "metrics/metric.hpp"
-// #include "metrics/timer.hpp"
 
 #include "registry.hpp"
 
