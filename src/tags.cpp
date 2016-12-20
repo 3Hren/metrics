@@ -4,13 +4,9 @@
 
 namespace metrics {
 
-tags_t::tags_t(std::string name):
-    container({{"name", std::move(name)}})
-{}
+tags_t::tags_t(std::string name) : container({{"name", std::move(name)}}) {}
 
-tags_t::tags_t(std::string name, container_type tags):
-    container(std::move(tags))
-{
+tags_t::tags_t(std::string name, container_type tags) : container(std::move(tags)) {
     container["name"] = std::move(name);
 }
 
@@ -24,7 +20,7 @@ tags_t::name() const noexcept {
     return container.at("name");
 }
 
-boost::optional<std::string>
+boost::optional<const std::string&>
 tags_t::tag(const std::string& key) const {
     const auto it = container.find(key);
 
@@ -50,7 +46,7 @@ tags_t::operator<(const tags_t& other) const {
     return container < other.container;
 }
 
-}  // namespace metrics
+} // namespace metrics
 
 std::hash<metrics::tags_t>::result_type
 std::hash<metrics::tags_t>::operator()(const argument_type& v) const {

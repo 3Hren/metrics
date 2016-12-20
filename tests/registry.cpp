@@ -21,12 +21,12 @@ TEST(resistry_t, Query) {
     });
 
     auto r1 = registry.select([](const tags_t& tags) -> bool {
-        return tags.tag("source") == boost::optional<std::string>("node");
+        return tags.tag("source") && *tags.tag("source") == "node";
     });
     EXPECT_EQ(2, r1.size());
 
     auto r2 = registry.select([](const tags_t& tags) -> bool {
-        return tags.tag("source") == boost::optional<std::string>("non-node");
+        return tags.tag("source") && *tags.tag("source") == "non-node";
     });
     EXPECT_EQ(1, r2.size());
 }
