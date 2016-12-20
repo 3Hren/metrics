@@ -49,6 +49,37 @@ instances(const query_t& query, M& map) -> registry_t::metric_set<R> {
     return result;
 }
 
+template<typename T>
+struct type_traits;
+
+template<typename T>
+struct type_traits<gauge<T>> {
+    static auto type_name() noexcept -> const char* {
+        return "gauge";
+    }
+};
+
+template<typename T>
+struct type_traits<std::atomic<T>> {
+    static auto type_name() noexcept -> const char* {
+        return "counter";
+    }
+};
+
+template<>
+struct type_traits<meter_t> {
+    static auto type_name() noexcept -> const char* {
+        return "meter";
+    }
+};
+
+template<typename T>
+struct type_traits<timer<T>> {
+    static auto type_name() noexcept -> const char* {
+        return "timer";
+    }
+};
+
 } // namespace
 
 registry_t::registry_t():
@@ -62,6 +93,7 @@ auto
 registry_t::register_gauge(std::string name, tags_t::container_type other, std::function<R()> fn) ->
     void
 {
+    other["type"] = type_traits<metrics::gauge<R>>::type_name();
     tags_t tags(std::move(name), std::move(other));
 
     std::lock_guard<std::mutex> lock(inner->gauges.mutex);
@@ -79,6 +111,7 @@ auto
 registry_t::gauge(std::string name, tags_t::container_type other) const ->
     shared_metric<metrics::gauge<T>>
 {
+    other["type"] = type_traits<metrics::gauge<T>>::type_name();
     tags_t tags(std::move(name), std::move(other));
 
     std::lock_guard<std::mutex> lock(inner->gauges.mutex);
@@ -103,6 +136,7 @@ auto
 registry_t::counter(std::string name, tags_t::container_type other) const ->
     shared_metric<std::atomic<T>>
 {
+    other["type"] = type_traits<std::atomic<T>>::type_name();
     tags_t tags(std::move(name), std::move(other));
 
     std::lock_guard<std::mutex> lock(inner->counters.mutex);
@@ -133,6 +167,7 @@ auto
 registry_t::meter(std::string name, tags_t::container_type other) const ->
     shared_metric<meter_t>
 {
+    other["type"] = type_traits<meter_t>::type_name();
     tags_t tags(std::move(name), std::move(other));
 
     std::lock_guard<std::mutex> lock(inner->meters.mutex);
@@ -168,6 +203,7 @@ auto registry_t::timer(std::string name, tags_t::container_type other) const ->
         detail::histogram<Accumulate>
     > result_type;
 
+    other["type"] = type_traits<metrics::timer<Accumulate>>::type_name();
     tags_t tags(std::move(name), std::move(other));
 
     std::lock_guard<std::mutex> lock(inner->timers.mutex);

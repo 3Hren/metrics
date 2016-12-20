@@ -12,37 +12,6 @@
 
 namespace metrics {
 
-template<typename T>
-struct type_traits;
-
-template<typename T>
-struct type_traits<gauge<T>> {
-    static auto type_name() noexcept -> const char* {
-        return "gauge";
-    }
-};
-
-template<typename T>
-struct type_traits<std::atomic<T>> {
-    static auto type_name() noexcept -> const char* {
-        return "counter";
-    }
-};
-
-template<>
-struct type_traits<meter_t> {
-    static auto type_name() noexcept -> const char* {
-        return "meter";
-    }
-};
-
-template<typename T>
-struct type_traits<timer<T>> {
-    static auto type_name() noexcept -> const char* {
-        return "timer";
-    }
-};
-
 tagged_t::tagged_t(tags_t value) :
     value(std::move(value))
 {}
@@ -68,7 +37,7 @@ shared_metric<T>::shared_metric(tags_t tags, std::shared_ptr<T> inner) :
 template<typename T>
 auto
 shared_metric<T>::type() const -> std::string {
-    return type_traits<T>::type_name();
+    return *tags().tag("type");
 }
 
 template<typename T>
