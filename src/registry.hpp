@@ -5,10 +5,10 @@
 #include "metrics/accumulator/sliding/window.hpp"
 #include "metrics/registry.hpp"
 
-#include "metrics/detail/cpp14/tuple.hpp"
-#include "metrics/detail/histogram.hpp"
-#include "metrics/detail/meter.hpp"
-#include "metrics/detail/timer.hpp"
+#include "cpp14/tuple.hpp"
+#include "histogram.hpp"
+#include "meter.hpp"
+#include "timer.hpp"
 
 namespace metrics {
 
@@ -20,7 +20,7 @@ struct gauge {
 };
 
 template<typename T>
-struct counter {
+struct count {
     typedef std::atomic<T> type;
 };
 
@@ -66,8 +66,8 @@ struct collection_of<Tag, std::tuple<U...>> {
 class registry_t::inner_t {
 public:
     collection_of<tag::gauge, std::tuple<std::int64_t, std::uint64_t, double>> gauges;
-    collection_of<tag::counter, std::tuple<std::int64_t, std::uint64_t>> counters;
-    collection_of<tag::meter, std::tuple<meter_t>> meters;
+    collection_of<tag::count, std::tuple<std::int64_t, std::uint64_t>> counters;
+    collection_of<tag::meter, std::tuple<detail::meter_t>> meters;
     collection_of<tag::timer, std::tuple<accumulator::sliding::window_t>> timers;
 };
 

@@ -1,6 +1,6 @@
 #include "metrics/registry.hpp"
 
-#include <future>
+#include <boost/range/algorithm/transform.hpp>
 
 #include "metrics/gauge.hpp"
 #include "metrics/meter.hpp"
@@ -11,6 +11,46 @@
 
 namespace metrics {
 
+namespace {
+
+const auto query_all = [](const tags_t&) -> bool {
+    return true;
+};
+
+struct transformer_t {
+    template<typename T>
+    auto
+    operator()(const std::pair<const tags_t, shared_metric<T>>& pair) const ->
+        std::shared_ptr<tagged_t>
+    {
+        return std::make_shared<shared_metric<T>>(pair.second);
+    }
+};
+
+template<typename R, typename T, typename M>
+auto
+instances(const query_t& query, M& map) -> registry_t::metric_set<R> {
+    typedef shared_metric<R> value_type;
+
+    registry_t::metric_set<R> result;
+
+    std::lock_guard<std::mutex> lock(map.mutex);
+    const auto& instances = map.template get<T>();
+
+    tags_t tags("");
+    std::shared_ptr<R> metric;
+    for (const auto& it : instances) {
+        std::tie(tags, metric) = it;
+        if (query(tags) && metric) {
+            result.insert(std::make_pair(tags, value_type(tags, metric)));
+        }
+    }
+
+    return result;
+}
+
+} // namespace
+
 registry_t::registry_t():
     inner(new inner_t)
 {}
@@ -18,7 +58,8 @@ registry_t::registry_t():
 registry_t::~registry_t() = default;
 
 template<typename R>
-auto registry_t::register_gauge(std::string name, tags_t::container_type other, std::function<R()> fn) ->
+auto
+registry_t::register_gauge(std::string name, tags_t::container_type other, std::function<R()> fn) ->
     void
 {
     tags_t tags(std::move(name), std::move(other));
@@ -34,8 +75,9 @@ auto registry_t::register_gauge(std::string name, tags_t::container_type other, 
 }
 
 template<typename T>
-auto registry_t::gauge(std::string name, tags_t::container_type other) const
-    -> shared_metric<metrics::gauge<T>>
+auto
+registry_t::gauge(std::string name, tags_t::container_type other) const ->
+    shared_metric<metrics::gauge<T>>
 {
     tags_t tags(std::move(name), std::move(other));
 
@@ -45,24 +87,20 @@ auto registry_t::gauge(std::string name, tags_t::container_type other) const
 }
 
 template<typename T>
-auto registry_t::gauges() const -> std::map<tags_t, shared_metric<metrics::gauge<T>>> {
-    std::map<tags_t, shared_metric<metrics::gauge<T>>> result;
-
-    std::lock_guard<std::mutex> lock(inner->gauges.mutex);
-    const auto& instances = inner->gauges.template get<T>();
-
-    for (const auto& item : instances) {
-        const auto& tags = std::get<0>(item);
-        if (auto instance = std::get<1>(item)) {
-            result.insert(std::make_pair(tags, shared_metric<metrics::gauge<T>>(tags, instance)));
-        }
-    }
-
-    return result;
+auto
+registry_t::gauges() const -> metric_set<metrics::gauge<T>> {
+    return gauges<T>(query_all);
 }
 
 template<typename T>
-auto registry_t::counter(std::string name, tags_t::container_type other) const ->
+auto
+registry_t::gauges(const query_t& query) const -> metric_set<metrics::gauge<T>> {
+    return instances<metrics::gauge<T>, T>(query, inner->gauges);
+}
+
+template<typename T>
+auto
+registry_t::counter(std::string name, tags_t::container_type other) const ->
     shared_metric<std::atomic<T>>
 {
     tags_t tags(std::move(name), std::move(other));
@@ -80,23 +118,19 @@ auto registry_t::counter(std::string name, tags_t::container_type other) const -
 }
 
 template<typename T>
-auto registry_t::counters() const -> std::map<tags_t, shared_metric<std::atomic<T>>> {
-    std::map<tags_t, shared_metric<std::atomic<T>>> result;
-
-    std::lock_guard<std::mutex> lock(inner->counters.mutex);
-    const auto& instances = inner->counters.template get<T>();
-
-    for (const auto& item : instances) {
-        const auto& tags = std::get<0>(item);
-        if (auto instance = std::get<1>(item)) {
-            result.insert(std::make_pair(tags, shared_metric<std::atomic<T>>(tags, instance)));
-        }
-    }
-
-    return result;
+auto
+registry_t::counters() const -> metric_set<std::atomic<T>> {
+    return counters<T>(query_all);
 }
 
-auto registry_t::meter(std::string name, tags_t::container_type other) const ->
+template<typename T>
+auto
+registry_t::counters(const query_t& query) const -> metric_set<std::atomic<T>> {
+    return instances<std::atomic<T>, T>(query, inner->counters);
+}
+
+auto
+registry_t::meter(std::string name, tags_t::container_type other) const ->
     shared_metric<meter_t>
 {
     tags_t tags(std::move(name), std::move(other));
@@ -113,20 +147,14 @@ auto registry_t::meter(std::string name, tags_t::container_type other) const ->
     return {std::move(tags), std::move(instance)};
 }
 
-auto registry_t::meters() const -> std::map<tags_t, shared_metric<meter_t>> {
-    std::map<tags_t, shared_metric<meter_t>> result;
+auto
+registry_t::meters() const -> metric_set<meter_t> {
+    return meters(query_all);
+}
 
-    std::lock_guard<std::mutex> lock(inner->meters.mutex);
-    const auto& instances = inner->meters.get<detail::meter_t>();
-
-    for (const auto& item : instances) {
-        const auto& tags = std::get<0>(item);
-        if (auto instance = std::get<1>(item)) {
-            result.insert(std::make_pair(tags, shared_metric<meter_t>(tags, instance)));
-        }
-    }
-
-    return result;
+auto
+registry_t::meters(const query_t& query) const -> metric_set<meter_t> {
+    return instances<meter_t, detail::meter_t>(query, inner->meters);
 }
 
 template<class Accumulate>
@@ -155,18 +183,37 @@ auto registry_t::timer(std::string name, tags_t::container_type other) const ->
 }
 
 template<class Accumulate>
-auto registry_t::timers() const -> std::map<tags_t, shared_metric<metrics::timer<Accumulate>>> {
-    std::map<tags_t, shared_metric<metrics::timer<Accumulate>>> result;
+auto
+registry_t::timers() const -> metric_set<metrics::timer<Accumulate>> {
+    return timers<Accumulate>(query_all);
+}
 
-    std::lock_guard<std::mutex> lock(inner->timers.mutex);
-    const auto& instances = inner->timers.template get<Accumulate>();
+template<class Accumulate>
+auto
+registry_t::timers(const query_t& query) const -> metric_set<metrics::timer<Accumulate>> {
+    return instances<metrics::timer<Accumulate>, Accumulate>(query, inner->timers);
+}
 
-    for (const auto& item : instances) {
-        const auto& tags = std::get<0>(item);
-        if (auto instance = std::get<1>(item)) {
-            result.insert(std::make_pair(tags, shared_metric<metrics::timer<Accumulate>>(tags, instance)));
-        }
-    }
+auto
+registry_t::select() const -> std::vector<std::shared_ptr<tagged_t>> {
+    return select(query_all);
+}
+
+auto
+registry_t::select(const query_t& query) const ->
+    std::vector<std::shared_ptr<tagged_t>>
+{
+    std::vector<std::shared_ptr<tagged_t>> result;
+    auto fn = transformer_t();
+    auto out = std::back_inserter(result);
+
+    boost::transform(gauges<std::int64_t>(query), out, fn);
+    boost::transform(gauges<std::uint64_t>(query), out, fn);
+    boost::transform(gauges<std::double_t>(query), out, fn);
+    boost::transform(counters<std::int64_t>(query), out, fn);
+    boost::transform(counters<std::uint64_t>(query), out, fn);
+    boost::transform(meters(query), out, fn);
+    boost::transform(timers<>(query), out, fn);
 
     return result;
 }

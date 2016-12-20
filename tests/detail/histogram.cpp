@@ -3,7 +3,7 @@
 
 #include <metrics/accumulator/snapshot/uniform.hpp>
 
-#include <metrics/detail/histogram.hpp>
+#include <src/histogram.hpp>
 
 namespace metrics {
 namespace testing {

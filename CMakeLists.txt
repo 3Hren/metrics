@@ -39,9 +39,12 @@ set_target_properties(${LIBRARY_NAME} PROPERTIES
     COMPILE_FLAGS "-std=c++0x -fPIC -Wall -Wextra -Winit-self -Wno-sign-conversion -Wold-style-cast -Woverloaded-virtual -Wctor-dtor-privacy -Wnon-virtual-dtor -Wunreachable-code -pedantic -pedantic-errors"
 )
 
-set_target_properties(${LIBRARY_NAME} PROPERTIES
-    VERSION 1
-)
+# The rule is that: any breakage of the ABI must be indicated by incrementing the SOVERSION.
+# So, adding e.g. functions is no problem, modifying argument lists or removing functions would
+# required the SOVERSION to be incremented. Similar rules hold of course for non-opaque
+# data-structures.
+set_target_properties(${LIBRARY_NAME} PROPERTIES VERSION 2.0.0)
+set_target_properties(${LIBRARY_NAME} PROPERTIES SOVERSION 2)
 
 # Install section.
 install(
@@ -53,8 +56,7 @@ install(
     DIRECTORY
         ${PROJECT_SOURCE_DIR}/include/
     DESTINATION include
-    COMPONENT development
-    PATTERN "detail" EXCLUDE)
+    COMPONENT development)
 
 if (ENABLE_TESTING)
     list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/foreign/modules")
@@ -90,6 +92,7 @@ if (ENABLE_TESTING)
         tests/detail/meter
         tests/detail/timer
         tests/meter
+        tests/registry
         tests/tagged
         tests/usts
         # tests/timer

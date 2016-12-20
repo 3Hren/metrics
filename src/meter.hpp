@@ -22,9 +22,9 @@ class meter : public metrics::meter_t {
     } d;
 
     time_point birthstamp;
-    std::atomic<std::int64_t> prev;
+    mutable std::atomic<std::int64_t> prev;
 
-    std::array<ewma_t, 3> rates;
+    mutable std::array<ewma_t, 3> rates;
 
 public:
     /// Creates a new `meter`.
@@ -65,21 +65,21 @@ public:
 
     /// Returns the one-minute exponentially-weighted moving average rate at which events have
     /// occurred since the meter was created.
-    auto m01rate() -> double {
+    auto m01rate() const -> double {
         tick_maybe();
         return rates[0].template rate<std::chrono::seconds>();
     }
 
     /// Returns the five-minute exponentially-weighted moving average rate at which events have
     /// occurred since the meter was created.
-    auto m05rate() -> double {
+    auto m05rate() const -> double {
         tick_maybe();
         return rates[1].template rate<std::chrono::seconds>();
     }
 
     /// Returns the fifteen-minute exponentially-weighted moving average rate at which events have
     /// occurred since the meter was created.
-    auto m15rate() -> double {
+    auto m15rate() const -> double {
         tick_maybe();
         return rates[2].template rate<std::chrono::seconds>();
     }
@@ -100,7 +100,7 @@ public:
     }
 
 private:
-    auto tick_maybe() -> void {
+    auto tick_maybe() const -> void {
         const auto now = std::chrono::duration_cast<
             std::chrono::seconds
         >(clock().now().time_since_epoch()).count();

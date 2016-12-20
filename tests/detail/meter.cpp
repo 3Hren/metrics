@@ -3,7 +3,7 @@
 
 #include <chrono>
 
-#include <metrics/detail/meter.hpp>
+#include <src/meter.hpp>
 
 namespace metrics {
 namespace testing {

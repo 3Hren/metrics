@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <metrics/detail/cpp14/tuple.hpp>
+#include <src/cpp14/tuple.hpp>
 
 namespace metrics {
 namespace testing {

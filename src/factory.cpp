@@ -2,9 +2,9 @@
 
 #include "metrics/accumulator/sliding/window.hpp"
 
-#include "metrics/detail/histogram.hpp"
-#include "metrics/detail/meter.hpp"
-#include "metrics/detail/timer.hpp"
+#include "histogram.hpp"
+#include "meter.hpp"
+#include "timer.hpp"
 
 namespace metrics {
 

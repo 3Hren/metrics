@@ -31,4 +31,9 @@ class shared_metric;
 
 using query_t = std::function<bool(const tags_t& tags)>;
 
+inline namespace v2 {
+
+class visitor_t;
+
+}  // namespace v2
 }  // namespace metrics

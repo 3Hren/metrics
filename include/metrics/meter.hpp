@@ -19,15 +19,15 @@ public:
 
     /// Returns the one-minute exponentially-weighted moving average rate at which events have
     /// occurred since the meter was created.
-    virtual auto m01rate() -> double = 0;
+    virtual auto m01rate() const -> double = 0;
 
     /// Returns the five-minute exponentially-weighted moving average rate at which events have
     /// occurred since the meter was created.
-    virtual auto m05rate() -> double = 0;
+    virtual auto m05rate() const -> double = 0;
 
     /// Returns the fifteen-minute exponentially-weighted moving average rate at which events have
     /// occurred since the meter was created.
-    virtual auto m15rate() -> double = 0;
+    virtual auto m15rate() const -> double = 0;
 
     /// Mark the occurrence of an event.
     virtual auto mark() -> void = 0;

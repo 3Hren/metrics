@@ -1,25 +1,34 @@
 #pragma once
 
+#include <cmath>
 #include <memory>
 #include <string>
 
 #include <boost/optional/optional_fwd.hpp>
 
-#include "forwards.hpp"
+#include "fwd.hpp"
+#include "gauge.hpp"
 #include "tags.hpp"
 
 namespace metrics {
 
-/// Represents immutable tagged wrapper standalone metrics.
-template<typename T>
-class tagged {
+/// Metric interface.
+class metric_t {
+public:
+    virtual ~metric_t() = default;
+    virtual auto name() const -> std::string = 0;
+    virtual auto apply(visitor_t& visitor) const -> void = 0;
+};
+
+/// An immutable tagged wrapper around standalone metric.
+class tagged_t : public metric_t {
     tags_t value;
 
 public:
-    explicit tagged(tags_t value);
+    explicit tagged_t(tags_t value);
 
     /// Returns metric name.
-    auto name() const noexcept -> const std::string&;
+    auto name() const -> std::string override;
 
     /// Extracts a tag with the given key, returning nothing otherwise.
     auto tag(const std::string& key) const -> boost::optional<std::string>;
@@ -28,9 +37,9 @@ public:
     auto tags() const noexcept -> const tags_t&;
 };
 
-/// Represents a tagged shared metric wrapper over standalone metrics.
+/// A tagged shared metric wrapper over standalone metrics.
 template<typename T>
-class shared_metric : public tagged<T> {
+class shared_metric : public tagged_t {
     std::shared_ptr<T> inner;
 
 public:
@@ -39,6 +48,8 @@ public:
     auto get() const -> std::shared_ptr<T>;
 
     auto operator->() const -> T*;
+
+    auto apply(visitor_t& visitor) const -> void override;
 };
 
 }  // namespace metrics

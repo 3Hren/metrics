@@ -1,8 +1,8 @@
-#include "metrics/detail/ewma.hpp"
+#include "ewma.hpp"
 
 #include <cmath>
 
-#include "metrics/detail/cpp14/utility.hpp"
+#include "cpp14/utility.hpp"
 
 namespace {
     const auto m01alpha = -std::expm1(-5.0 / 60 / std::chrono::minutes(1).count());
