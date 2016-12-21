@@ -1,4 +1,4 @@
-metrics (2.0.0-0alpha1) UNRELEASED; urgency=low
+metrics (2.0.0-0alpha1) unstable; urgency=low
 
   * Meter interface with visitor support.
   * Registry now allows to select metrics using filter.
