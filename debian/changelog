@@ -1,6 +1,12 @@
+metrics (2.0.0-0alpha3) unstable; urgency=low
+
+  * Query now accepts tagged metric instead of just tags.
+
+ -- Evgeny Safronov <division494@gmail.com>  Thu, 22 Dec 2016 12:09:30 +0300
+
 metrics (2.0.0-0alpha2) unstable; urgency=low
 
-  * Satisfy debian package system.
+  * Satisfy Debian package system.
 
  -- Evgeny Safronov <division494@gmail.com>  Wed, 21 Dec 2016 15:39:19 +0300
 
