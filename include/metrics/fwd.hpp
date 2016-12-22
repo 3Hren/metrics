@@ -37,6 +37,6 @@ class tagged_t;
 template <typename T>
 class shared_metric;
 
-using query_t = std::function<bool(const tags_t& tags)>;
+using query_t = std::function<bool(const tagged_t& metric)>;
 
 } // namespace metrics

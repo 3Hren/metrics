@@ -13,7 +13,7 @@ namespace metrics {
 
 namespace {
 
-const auto query_all = [](const tags_t&) -> bool {
+const auto query_all = [](const tagged_t&) -> bool {
     return true;
 };
 
@@ -41,8 +41,9 @@ instances(const query_t& query, M& map) -> registry_t::metric_set<R> {
     std::shared_ptr<R> metric;
     for (const auto& it : instances) {
         std::tie(tags, metric) = it;
-        if (query(tags) && metric) {
-            result.insert(std::make_pair(tags, value_type(tags, metric)));
+        auto shared = value_type(tags, metric);
+        if (query(shared) && metric) {
+            result.insert(std::make_pair(tags, std::move(shared)));
         }
     }
 

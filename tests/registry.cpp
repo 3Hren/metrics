@@ -20,13 +20,13 @@ TEST(resistry_t, Query) {
         {"source", "non-node"}
     });
 
-    auto r1 = registry.select([](const tags_t& tags) -> bool {
-        return tags.tag("source") && *tags.tag("source") == "node";
+    auto r1 = registry.select([](const tagged_t& metric) -> bool {
+        return metric.tag("source") && *metric.tag("source") == "node";
     });
     EXPECT_EQ(2, r1.size());
 
-    auto r2 = registry.select([](const tags_t& tags) -> bool {
-        return tags.tag("source") && *tags.tag("source") == "non-node";
+    auto r2 = registry.select([](const tagged_t& metric) -> bool {
+        return metric.tag("source") && *metric.tag("source") == "non-node";
     });
     EXPECT_EQ(1, r2.size());
 }
