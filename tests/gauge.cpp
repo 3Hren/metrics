@@ -19,11 +19,9 @@ TEST(Gauge, Factory) {
 
     rolling_mean_t mean(boost::accumulators::rolling_window_size = 5);
     registry_t registry;
-    registry.register_gauge<double>("metrics.testing.gauge", {}, [&]() -> double {
+    auto gauge = registry.register_gauge<double>("metrics.testing.gauge", {}, [&]() -> double {
         return boost::accumulators::rolling_mean(mean);
     });
-
-    auto gauge = registry.gauge<double>("metrics.testing.gauge");
 
     mean(0.0);
     mean(1.0);

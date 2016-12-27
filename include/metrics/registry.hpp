@@ -37,7 +37,7 @@ public:
     template<typename R>
     auto
     register_gauge(std::string name, tags_t::container_type tags, std::function<R()> fn) ->
-        void;
+        shared_metric<metrics::gauge<R>>;
 
     /// Returns a gauge shared metric that is mapped to a given tags.
     ///

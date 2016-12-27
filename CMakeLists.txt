@@ -1,23 +1,27 @@
 cmake_minimum_required(VERSION 2.8)
 
-# Options.
-OPTION(ENABLE_TESTING "Build the library with tests" OFF)
-
-# Workaround for OS X.
-if (APPLE)
-    set(CMAKE_MACOSX_RPATH ON)
-endif()
-
 # Description.
 set(LIBRARY_NAME metrics)
-
 project(${LIBRARY_NAME})
 
-find_package(Boost 1.46 REQUIRED COMPONENTS system)
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
+# Choose new behaviour for CMP0042.
+# See http://www.cmake.org/cmake/help/v3.0/policy/CMP0042.html for more details.
+if (POLICY CMP0042)
+	cmake_policy(SET CMP0042 NEW)
+endif (POLICY CMP0042)
+
+find_package(Boost 1.54 REQUIRED COMPONENTS
+    system
+)
+
+# System is required to get rid of errors in foreign libs
+include_directories(BEFORE SYSTEM ${Boost_INCLUDE_DIRS})
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
-set(SOURCES
+add_library(${LIBRARY_NAME} SHARED
     src/accumulator/sliding/window
     src/accumulator/snapshot/uniform
     src/accumulator/snapshot/weighted
@@ -28,30 +32,28 @@ set(SOURCES
     src/registry
     src/tags
     src/timer
-    src/usts/ewma)
-
-add_library(${LIBRARY_NAME} SHARED ${SOURCES})
+    src/usts/ewma
+)
 
 target_link_libraries(${LIBRARY_NAME}
     ${Boost_LIBRARIES})
 
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-    target_compile_options(${LIBRARY_NAME} PRIVATE
-        -std=c++11
-        -Wno-global-constructors
-        -Wno-documentation
-        -Wno-documentation-unknown-command
-        -Wno-c++98-compat
-        -Wno-c++98-compat-pedantic
-        -Wno-padded
-        -Wno-shadow
-        -Wno-weak-vtables
-        -pedantic
-        -pedantic-errors)
-else ()
-    set_target_properties(${LIBRARY_NAME} PROPERTIES
-        COMPILE_FLAGS "-std=c++11 -fPIC -Wall -Wextra -Winit-self -Wno-sign-conversion -Wold-style-cast -Woverloaded-virtual -Wctor-dtor-privacy -Wnon-virtual-dtor -Wunreachable-code -pedantic -pedantic-errors")
-endif ()
+set(COMPILE_FLAGS "-std=c++11")
+set(COMPILE_FLAGS "${COMPILE_FLAGS} -Wall")
+set(COMPILE_FLAGS "${COMPILE_FLAGS} -Wextra")
+set(COMPILE_FLAGS "${COMPILE_FLAGS} -Waddress")
+set(COMPILE_FLAGS "${COMPILE_FLAGS} -Warray-bounds")
+set(COMPILE_FLAGS "${COMPILE_FLAGS} -Wbuiltin-macro-redefined")
+set(COMPILE_FLAGS "${COMPILE_FLAGS} -Wctor-dtor-privacy")
+set(COMPILE_FLAGS "${COMPILE_FLAGS} -Winit-self")
+set(COMPILE_FLAGS "${COMPILE_FLAGS} -Wnon-virtual-dtor")
+set(COMPILE_FLAGS "${COMPILE_FLAGS} -Wold-style-cast")
+set(COMPILE_FLAGS "${COMPILE_FLAGS} -Woverloaded-virtual")
+set(COMPILE_FLAGS "${COMPILE_FLAGS} -Wswitch")
+set(COMPILE_FLAGS "${COMPILE_FLAGS} -Wunreachable-code")
+set(COMPILE_FLAGS "${COMPILE_FLAGS} -pedantic -pedantic-errors")
+
+set_target_properties(${LIBRARY_NAME} PROPERTIES COMPILE_FLAGS ${COMPILE_FLAGS})
 
 # The rule is that: any breakage of the ABI must be indicated by incrementing the SOVERSION.
 # So, adding e.g. functions is no problem, modifying argument lists or removing functions would
@@ -64,68 +66,56 @@ set_target_properties(${LIBRARY_NAME} PROPERTIES SOVERSION 2)
 install(
     TARGETS
         ${LIBRARY_NAME}
-    LIBRARY DESTINATION lib)
+    LIBRARY DESTINATION lib
+)
 
 install(
     DIRECTORY
         ${PROJECT_SOURCE_DIR}/include/
     DESTINATION include
-    COMPONENT development)
+    COMPONENT development
+)
 
-if (ENABLE_TESTING)
-    list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/foreign/modules")
+# Testing Framework.
+enable_testing()
 
-    enable_testing()
+add_subdirectory(${PROJECT_SOURCE_DIR}/tests/.googletest)
 
-    find_package(Threads)
+include_directories(BEFORE SYSTEM
+    ${Boost_INCLUDE_DIRS}
+    ${PROJECT_SOURCE_DIR}/tests/.googletest/googletest/include
+)
 
-    # Prepare testing infrastructure.
-    include(DownloadGoogleTesting)
+include_directories(
+    ${PROJECT_SOURCE_DIR}
+    ${PROJECT_SOURCE_DIR}/include
+)
 
-    download_google_testing()
+add_executable(libmetrics-tests
+    tests/accumulator/sliding/window
+    tests/accumulator/snapshot/uniform
+    tests/accumulator/snapshot/weighted
+    tests/counter
+    tests/detail/cpp14/tuple
+    tests/detail/ewma
+    tests/detail/histogram
+    tests/detail/meter
+    tests/detail/timer
+    tests/gauge
+    tests/meter
+    tests/registry
+    tests/tagged
+)
 
-    include_directories(
-        SYSTEM ${GTEST_INCLUDE_DIR}
-        SYSTEM ${GMOCK_INCLUDE_DIR})
+set_target_properties(libmetrics-tests PROPERTIES
+	COMPILE_FLAGS "${COMPILE_FLAGS}"
+)
 
-    link_directories(${GTEST_BINARY_DIR} ${GMOCK_BINARY_DIR})
+target_link_libraries(libmetrics-tests
+	metrics
+    gmock
+	gtest
+	gtest_main
+)
 
-    include_directories(
-        ${PROJECT_SOURCE_DIR}
-        ${PROJECT_SOURCE_DIR}/include)
-
-    set(SOURCES
-        tests/accumulator/sliding/window
-        tests/accumulator/snapshot/uniform
-        tests/accumulator/snapshot/weighted
-        tests/counter
-        tests/detail/cpp14/tuple
-        tests/detail/ewma
-        tests/detail/histogram
-        tests/detail/meter
-        tests/detail/timer
-        tests/gauge
-        tests/meter
-        tests/registry
-        tests/tagged
-        tests/usts
-        # tests/timer
-    )
-
-    add_executable(${LIBRARY_NAME}-tests ${SOURCES})
-
-    add_dependencies(${LIBRARY_NAME}-tests googlemock)
-
-    target_link_libraries(${LIBRARY_NAME}-tests
-        ${LIBRARY_NAME}
-        ${CMAKE_THREAD_LIBS_INIT}
-        gmock
-        gtest
-        gtest_main)
-
-    set_target_properties(${LIBRARY_NAME}-tests PROPERTIES
-        COMPILE_FLAGS "-std=c++0x -Wall -Wextra -Winit-self -Wno-sign-conversion -Wold-style-cast -Woverloaded-virtual -Wctor-dtor-privacy -Wnon-virtual-dtor -Wunreachable-code -pedantic -pedantic-errors"
-    )
-
-    add_test(metrics ${LIBRARY_NAME}-tests)
-endif()
+add_test(metrics libmetrics-tests)

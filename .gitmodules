@@ -1,3 +1,3 @@
-[submodule "foreign/modules"]
-	path = foreign/modules
-	url = https://github.com/3Hren/modules.git
+[submodule "tests/.googletest"]
+	path = tests/.googletest
+	url = https://github.com/google/googletest.git

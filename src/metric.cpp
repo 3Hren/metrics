@@ -60,6 +60,7 @@ auto shared_metric<T>::apply(visitor_t& visitor) const -> void {
 template class shared_metric<gauge<std::int64_t>>;
 template class shared_metric<gauge<std::uint64_t>>;
 template class shared_metric<gauge<std::double_t>>;
+template class shared_metric<gauge<std::string>>;
 template class shared_metric<std::atomic<std::int64_t>>;
 template class shared_metric<std::atomic<std::uint64_t>>;
 template class shared_metric<meter_t>;
