@@ -37,13 +37,13 @@ instances(const query_t& query, M& map) -> registry_t::metric_set<R> {
     std::lock_guard<std::mutex> lock(map.mutex);
     const auto& instances = map.template get<T>();
 
-    tags_t tags("");
-    std::shared_ptr<R> metric;
     for (const auto& it : instances) {
-        std::tie(tags, metric) = it;
-        auto shared = value_type(tags, metric);
-        if (query(shared) && metric) {
-            result.insert(std::make_pair(tags, std::move(shared)));
+        if (auto metric = std::get<1>(it).lock()) {
+            const auto& tags = std::get<0>(it);
+            auto shared = value_type(tags, metric);
+            if (query(shared) && metric) {
+                result.insert(std::make_pair(tags, std::move(shared)));
+            }
         }
     }
 
@@ -92,7 +92,7 @@ registry_t::~registry_t() = default;
 template<typename R>
 auto
 registry_t::register_gauge(std::string name, tags_t::container_type other, std::function<R()> fn) ->
-    void
+    shared_metric<metrics::gauge<R>>
 {
     other["type"] = type_traits<metrics::gauge<R>>::type_name();
     tags_t tags(std::move(name), std::move(other));
@@ -101,10 +101,11 @@ registry_t::register_gauge(std::string name, tags_t::container_type other, std::
     auto& instances = inner->gauges.template get<R>();
 
     std::shared_ptr<metrics::gauge<R>> instance;
-    if((instance = instances[tags]) == nullptr) {
+    if((instance = instances[tags].lock()) == nullptr) {
         instance = std::make_shared<metrics::gauge<R>>(std::move(fn));
         instances[tags] = instance;
     }
+    return {tags, instance};
 }
 
 template<typename T>
@@ -117,7 +118,11 @@ registry_t::gauge(std::string name, tags_t::container_type other) const ->
 
     std::lock_guard<std::mutex> lock(inner->gauges.mutex);
     const auto& instances = inner->gauges.template get<T>();
-    return {tags, instances.at(tags)};
+    std::shared_ptr<metrics::gauge<T>> instance;
+    if((instance = instances.at(tags).lock()) == nullptr) {
+        throw std::invalid_argument(name);
+    }
+    return {tags, instance};
 }
 
 template<typename T>
@@ -144,7 +149,7 @@ registry_t::counter(std::string name, tags_t::container_type other) const ->
     auto& instances = inner->counters.template get<T>();
 
     std::shared_ptr<std::atomic<T>> instance;
-    if((instance = instances[tags]) == nullptr) {
+    if((instance = instances[tags].lock()) == nullptr) {
         instance = std::make_shared<std::atomic<T>>();
         instances[tags] = instance;
     }
@@ -175,7 +180,7 @@ registry_t::meter(std::string name, tags_t::container_type other) const ->
     auto& instances = inner->meters.get<detail::meter_t>();
 
     std::shared_ptr<detail::meter_t> instance;
-    if((instance = instances[tags]) == nullptr) {
+    if((instance = instances[tags].lock()) == nullptr) {
         instance = std::make_shared<detail::meter_t>();
         instances[tags] = instance;
     }
@@ -211,7 +216,7 @@ auto registry_t::timer(std::string name, tags_t::container_type other) const ->
     auto& instances = inner->timers.template get<Accumulate>();
 
     std::shared_ptr<result_type> instance;
-    if((instance = instances[tags]) == nullptr) {
+    if((instance = instances[tags].lock()) == nullptr) {
         instance = std::make_shared<result_type>();
         instances[tags] = instance;
     }
@@ -247,9 +252,13 @@ registry_t::select(const query_t& query) const ->
     boost::transform(gauges<std::int64_t>(query), out, fn);
     boost::transform(gauges<std::uint64_t>(query), out, fn);
     boost::transform(gauges<std::double_t>(query), out, fn);
+    boost::transform(gauges<std::string>(query), out, fn);
+
     boost::transform(counters<std::int64_t>(query), out, fn);
     boost::transform(counters<std::uint64_t>(query), out, fn);
+
     boost::transform(meters(query), out, fn);
+
     boost::transform(timers<>(query), out, fn);
 
     return result;
@@ -258,16 +267,20 @@ registry_t::select(const query_t& query) const ->
 /// Instantiations.
 
 template
-auto registry_t::register_gauge<std::int64_t>(std::string, tags_t::container_type other, std::function<std::int64_t()> fn) ->
-    void;
+auto registry_t::register_gauge<std::int64_t>(std::string, tags_t::container_type, std::function<std::int64_t()>) ->
+    shared_metric<metrics::gauge<std::int64_t>>;
 
 template
-auto registry_t::register_gauge<std::uint64_t>(std::string, tags_t::container_type other, std::function<std::uint64_t()> fn) ->
-    void;
+auto registry_t::register_gauge<std::uint64_t>(std::string, tags_t::container_type, std::function<std::uint64_t()>) ->
+    shared_metric<metrics::gauge<std::uint64_t>>;
 
 template
-auto registry_t::register_gauge<double>(std::string, tags_t::container_type other, std::function<double()> fn) ->
-    void;
+auto registry_t::register_gauge<double>(std::string, tags_t::container_type, std::function<double()>) ->
+    shared_metric<metrics::gauge<double>>;
+
+template
+auto registry_t::register_gauge<std::string>(std::string, tags_t::container_type, std::function<std::string()>) ->
+    shared_metric<metrics::gauge<std::string>>;
 
 template
 auto registry_t::gauge<std::int64_t>(std::string, tags_t::container_type) const ->
@@ -282,6 +295,10 @@ auto registry_t::gauge<double>(std::string, tags_t::container_type) const ->
     shared_metric<metrics::gauge<double>>;
 
 template
+auto registry_t::gauge<std::string>(std::string, tags_t::container_type) const ->
+    shared_metric<metrics::gauge<std::string>>;
+
+template
 auto registry_t::gauges<std::int64_t>() const ->
     std::map<tags_t, shared_metric<metrics::gauge<std::int64_t>>>;
 
@@ -292,6 +309,10 @@ auto registry_t::gauges<std::uint64_t>() const ->
 template
 auto registry_t::gauges<double>() const ->
     std::map<tags_t, shared_metric<metrics::gauge<double>>>;
+
+template
+auto registry_t::gauges<std::string>() const ->
+    std::map<tags_t, shared_metric<metrics::gauge<std::string>>>;
 
 template
 auto registry_t::counter<std::int64_t>(std::string, tags_t::container_type) const ->

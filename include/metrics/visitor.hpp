@@ -15,6 +15,7 @@ public:
     virtual auto visit(const gauge<std::int64_t>& metric) -> void = 0;
     virtual auto visit(const gauge<std::uint64_t>& metric) -> void = 0;
     virtual auto visit(const gauge<std::double_t>& metric) -> void = 0;
+    virtual auto visit(const gauge<std::string>& metric) -> void = 0;
     virtual auto visit(const std::atomic<std::int64_t>& metric) -> void = 0;
     virtual auto visit(const std::atomic<std::uint64_t>& metric) -> void = 0;
     virtual auto visit(const meter_t& metric) -> void = 0;

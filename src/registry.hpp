@@ -47,25 +47,25 @@ struct collection_of<Tag, std::tuple<U...>> {
     std::tuple<
         std::map<
             tags_t,
-            std::shared_ptr<typename Tag<U>::type>
+            std::weak_ptr<typename Tag<U>::type>
         >...
     > containers;
     mutable std::mutex mutex;
 
     template<typename T>
-    auto get() noexcept -> std::map<tags_t, std::shared_ptr<typename Tag<T>::type>>& {
-        return cpp14::get<std::map<tags_t, std::shared_ptr<typename Tag<T>::type>>>(containers);
+    auto get() noexcept -> std::map<tags_t, std::weak_ptr<typename Tag<T>::type>>& {
+        return cpp14::get<std::map<tags_t, std::weak_ptr<typename Tag<T>::type>>>(containers);
     }
 
     template<typename T>
-    auto get() const noexcept -> std::map<tags_t, std::shared_ptr<typename Tag<T>::type>> const& {
-        return cpp14::get<std::map<tags_t, std::shared_ptr<typename Tag<T>::type>>>(containers);
+    auto get() const noexcept -> std::map<tags_t, std::weak_ptr<typename Tag<T>::type>> const& {
+        return cpp14::get<std::map<tags_t, std::weak_ptr<typename Tag<T>::type>>>(containers);
     }
 };
 
 class registry_t::inner_t {
 public:
-    collection_of<tag::gauge, std::tuple<std::int64_t, std::uint64_t, double>> gauges;
+    collection_of<tag::gauge, std::tuple<std::int64_t, std::uint64_t, std::double_t, std::string>> gauges;
     collection_of<tag::count, std::tuple<std::int64_t, std::uint64_t>> counters;
     collection_of<tag::meter, std::tuple<detail::meter_t>> meters;
     collection_of<tag::timer, std::tuple<accumulator::sliding::window_t>> timers;
