@@ -1,3 +1,13 @@
+metrics (2.0.0-0alpha4) unstable; urgency=low
+
+  * Now after registering a gauge it is returned.
+  * Added string gauge.
+  * Internal metrics now lives until at least there is someone having one
+    reference to them.
+  * Reorganized testing suite.
+
+ -- Evgeny Safronov <division494@gmail.com>  Thu, 29 Dec 2016 12:26:31 +0300
+
 metrics (2.0.0-0alpha3) unstable; urgency=low
 
   * Query now accepts tagged metric instead of just tags.
