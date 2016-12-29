@@ -79,7 +79,7 @@ install(
 # Testing Framework.
 enable_testing()
 
-add_subdirectory(${PROJECT_SOURCE_DIR}/tests/.googletest)
+add_subdirectory(${PROJECT_SOURCE_DIR}/tests/.googletest EXCLUDE_FROM_ALL)
 
 include_directories(BEFORE SYSTEM
     ${Boost_INCLUDE_DIRS}
