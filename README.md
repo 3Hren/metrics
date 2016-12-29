@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/3Hren/metrics.svg?branch=master)](https://travis-ci.org/3Hren/metrics)
+
 ### Advantages
 
 - No lock-free bullshit (yet, until required)
