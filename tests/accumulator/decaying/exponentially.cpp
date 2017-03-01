@@ -19,8 +19,8 @@ TEST(exponentially_t, Accumulate100OutOf1000Elements) {
     const auto snapshot = accumulator.snapshot();
     EXPECT_EQ(100, snapshot.size());
 
-    for (auto value : snapshot) {
-        ASSERT_TRUE(0 <= value && value <= 1000);
+    for (auto value : snapshot.values()) {
+        ASSERT_TRUE(value <= 1000);
     }
 }
 

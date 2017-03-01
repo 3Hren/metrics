@@ -23,6 +23,7 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 
 add_library(${LIBRARY_NAME} SHARED
     src/accumulator/sliding/window
+    src/accumulator/decaying/exponentially
     src/accumulator/snapshot/uniform
     src/accumulator/snapshot/weighted
     src/ewma
@@ -93,6 +94,7 @@ include_directories(
 
 add_executable(libmetrics-tests
     tests/accumulator/sliding/window
+    tests/accumulator/decaying/exponentially
     tests/accumulator/snapshot/uniform
     tests/accumulator/snapshot/weighted
     tests/counter
@@ -113,7 +115,7 @@ set_target_properties(libmetrics-tests PROPERTIES
 
 target_link_libraries(libmetrics-tests
 	metrics
-    gmock
+	gmock
 	gtest
 	gtest_main
 )
