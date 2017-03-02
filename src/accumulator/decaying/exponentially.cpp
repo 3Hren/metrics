@@ -10,7 +10,7 @@ namespace metrics {
 namespace accumulator {
 namespace decaying {
 
-constexpr auto RESCALE_TRESHOLD = std::chrono::hours(1);
+constexpr auto RESCALE_THRESHOLD = std::chrono::hours(1);
 
 exponentially_t::exponentially_t(std::size_t sz, double al) :
     sample_size{sz},
@@ -29,7 +29,7 @@ exponentially_t::exponentially_t(std::size_t sz, double al) :
     std::random_device dev;
     gen.seed(dev());
 
-    const auto rescale_since_epoch = start_time.time_since_epoch() + RESCALE_TRESHOLD;
+    const auto rescale_since_epoch = start_time.time_since_epoch() + RESCALE_THRESHOLD;
     rescale_time = std::chrono::duration_cast<us_type>(rescale_since_epoch).count();
 }
 
@@ -85,7 +85,7 @@ auto exponentially_t::snapshot() const -> snapshot_type {
 
 auto exponentially_t::rescale(time_point now, us_int_type next) -> void {
 
-    const auto rescale_since_epoch = now.time_since_epoch() + RESCALE_TRESHOLD;
+    const auto rescale_since_epoch = now.time_since_epoch() + RESCALE_THRESHOLD;
     const auto addon = std::chrono::duration_cast<us_type>(rescale_since_epoch).count();
 
     if (rescale_time.compare_exchange_strong(next, addon)) {
