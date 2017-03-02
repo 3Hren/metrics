@@ -68,7 +68,7 @@ auto exponentially_t::size() const -> size_t {
 
 auto exponentially_t::snapshot() const -> snapshot_type {
     std::vector<sample_type> result;
-    result.reserve(samples.size());
+    result.reserve(sample_size);
 
     {
         std::unique_lock<std::mutex> lock(samples_mut);
