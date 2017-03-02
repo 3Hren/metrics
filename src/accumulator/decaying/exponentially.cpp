@@ -12,19 +12,6 @@ namespace decaying {
 
 constexpr auto RESCALE_TRESHOLD = std::chrono::hours(1);
 
-namespace aux {
-
-    // TODO: remove after testings
-    typedef exponentially_t::priority_sample_type point_t;
-    struct heap_comp_t {
-        bool operator()(const point_t& a, const point_t& b) const {
-            return a.first > b.first;
-        }
-    };
-
-    constexpr heap_comp_t heap_rcmp;
-}
-
 exponentially_t::exponentially_t(std::size_t sz, double al) :
     sample_size{sz},
     alpha{al},
@@ -39,19 +26,20 @@ exponentially_t::exponentially_t(std::size_t sz, double al) :
         throw std::invalid_argument("alpha should be greater then zero");
     }
 
-    // samples.reserve(sample_size);
-
     std::random_device dev;
     gen.seed(dev());
 
-    rescale_time = start_time + RESCALE_TRESHOLD;
+    const auto rescale_since_epoch = start_time.time_since_epoch() + RESCALE_TRESHOLD;
+    rescale_time = std::chrono::duration_cast<us_type>(rescale_since_epoch).count();
 }
 
-auto exponentially_t::update(std::uint64_t value, time_point tp) -> void {
+auto exponentially_t::update(std::uint64_t value, time_point t) -> void {
+
     // rescale "if ever that time come"
     const auto now = clock_type::now();
-    if (now > rescale_time) {
-        rescale(now);
+    const auto rtm = us_type{rescale_time.load()};
+    if (now.time_since_epoch() > rtm) {
+        rescale(now, rtm.count());
     }
 
     const auto u = uniform_dist(gen);
@@ -59,23 +47,17 @@ auto exponentially_t::update(std::uint64_t value, time_point tp) -> void {
         return;
     }
 
-    const auto t_diff_ms = std::chrono::duration_cast<std::chrono::milliseconds>(tp - start_time);
+    const auto t_diff_ms = std::chrono::duration_cast<std::chrono::seconds>(t - start_time);
 
-    // Note: non normolized weights, sufficient for sampling
+    // Note: non normolized weights, sufficient for reservoir sampling
     const auto w = exp(alpha * t_diff_ms.count());
     const auto prior = w / u;
 
     std::unique_lock<std::mutex> lock(samples_mut);
 
-    samples.emplace(prior, sample_type{value, w} );
-
-    // samples.emplace_back(prior, {value, w});
-    // std::push_heap(std::begin(samples), std::end(samples), heap_rcmp);
+    samples.emplace(prior, sample_type{value, w});
 
     if (samples.size() > sample_size) {
-        // std::pop_heap(std::begin(samples), std::end(samples), heap_rcmp);
-        // samples.pop_back();
-
         samples.erase(std::begin(samples));
     }
 }
@@ -84,42 +66,50 @@ auto exponentially_t::size() const -> size_t {
     return std::min(sample_size, samples.size());
 }
 
-auto exponentially_t::snapshot() const -> snapshot::weighted_t {
-    std::vector<sample_type> v;
-    v.reserve(samples.size());
+auto exponentially_t::snapshot() const -> snapshot_type {
+    std::vector<sample_type> result;
+    result.reserve(samples.size());
 
-    std::unique_lock<std::mutex> lock(samples_mut);
+    {
+        std::unique_lock<std::mutex> lock(samples_mut);
 
-    std::transform(std::begin(samples), std::end(samples),
-        std::back_inserter(v),
-        [] (const priority_sample_type& smpl) {
-            return smpl.second;
-    });
-
-    return snapshot::weighted_t(std::move(v));
-}
-
-auto exponentially_t::rescale(time_point now) -> void {
-    const auto old_time = start_time;
-
-    start_time = now;
-    rescale_time = start_time + RESCALE_TRESHOLD;
-
-    const auto tm_diff = std::chrono::duration_cast<std::chrono::milliseconds>(start_time - old_time);
-    const auto scale = exp(-alpha * tm_diff.count());
-
-    decltype(samples) new_samples;
-
-    std::unique_lock<std::mutex> lock(samples_mut);
-
-    for(const auto& kv : samples) {
-        const auto& k = kv.first;
-        const auto& v = kv.second;
-
-        new_samples.emplace(k * scale, sample_type{ v.value, v.weight * scale });
+        std::transform(std::begin(samples), std::end(samples),
+            std::back_inserter(result),
+            [] (const priority_sample_type& smpl) {
+                return smpl.second;
+        });
     }
 
-    samples.swap(new_samples);
+    return snapshot_type(std::move(result));
+}
+
+auto exponentially_t::rescale(time_point now, us_int_type next) -> void {
+
+    const auto rescale_since_epoch = now.time_since_epoch() + RESCALE_TRESHOLD;
+    const auto addon = std::chrono::duration_cast<us_type>(rescale_since_epoch).count();
+
+    if (rescale_time.compare_exchange_strong(next, addon)) {
+        const auto old_time = start_time;
+
+        start_time = now;
+        rescale_time.store(addon);
+
+        const auto tm_diff = std::chrono::duration_cast<std::chrono::seconds>(start_time - old_time);
+        const auto scale = exp(-alpha * tm_diff.count());
+
+        decltype(samples) new_samples;
+
+        std::unique_lock<std::mutex> lock(samples_mut);
+
+        for(const auto& kv : samples) {
+            const auto& k = kv.first;
+            const auto& v = kv.second;
+
+            new_samples.emplace(k * scale, sample_type{v.value, v.weight * scale});
+        }
+
+        samples.swap(new_samples);
+    }
 }
 
 }  // namespace decaying

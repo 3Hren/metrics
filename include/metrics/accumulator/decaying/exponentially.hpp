@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <chrono>
 #include <map>
 #include <mutex>
@@ -19,24 +20,27 @@ public:
     typedef clock_type::time_point time_point;
     typedef clock_type::duration duration_type;
 
+    using us_type = std::chrono::microseconds;
+    using us_int_type = us_type::rep;
+
     // sample_type = struct{ .value, .weight }
-    typedef snapshot::weighted_t::sample_t sample_type;
+    typedef snapshot::weighted_t snapshot_type;
+    typedef snapshot_type::sample_t sample_type;
     typedef std::pair<double, sample_type> priority_sample_type;
 
-    // TODO: remove `mapping` after testing
     typedef std::map<double, sample_type> samples_mapping_type;
-    // typedef std::vector<priority_sample_type> samples_heap_type;
 private:
     size_t sample_size;
     double alpha;
 
     // Forward decay starting point (aka L in `literature`)
+    // Note: all time difference computations are done within seconds resolution,
+    //       but `rescale_time` stored and adjusted in microseconds resolution
+    //       in order to be compatible with tiny rescale periods.
     time_point start_time;
-    time_point rescale_time;
+    std::atomic<us_int_type> rescale_time;
 
-    // TODO: remove unused one
     samples_mapping_type samples;
-    // samples_heap_type samples;
 
     std::mt19937 gen;
     std::uniform_real_distribution<> uniform_dist;
@@ -53,11 +57,11 @@ public:
     exponentially_t(std::size_t size, double alpha);
 
     auto update(std::uint64_t value, time_point timestamp = clock_type::now()) -> void;
-    auto snapshot() const -> snapshot::weighted_t;
+    auto snapshot() const -> snapshot_type;
 
     auto size() const -> size_t;
 private:
-    auto rescale(time_point current) -> void;
+    auto rescale(time_point current, us_int_type next) -> void;
 };
 
 }  // namespace decaying
