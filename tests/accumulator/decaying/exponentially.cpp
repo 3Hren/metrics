@@ -22,6 +22,12 @@ TEST(exponentially_t, Accumulate100OutOf1000Elements) {
     for (auto value : snapshot.values()) {
         ASSERT_TRUE(value <= 1000);
     }
+
+    EXPECT_NEAR(snapshot.mean(), 500, 150);
+    EXPECT_NEAR(snapshot.stddev(), 288, 150);
+
+    EXPECT_NEAR(snapshot.min(), 0, 150);
+    EXPECT_NEAR(snapshot.max(), 1000, 150);
 }
 
 }  // namespace
