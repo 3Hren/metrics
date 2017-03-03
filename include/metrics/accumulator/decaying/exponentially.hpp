@@ -8,7 +8,7 @@
 
 #include <cstddef>
 
-#include <metrics/accumulator/snapshot/weighted.hpp>
+#include "metrics/accumulator/snapshot/weighted.hpp"
 
 namespace metrics {
 namespace accumulator {
@@ -20,8 +20,6 @@ public:
     typedef clock_type::time_point time_point;
     typedef clock_type::duration duration_type;
 
-    typedef std::uint64_t value_type;
-
     typedef std::chrono::seconds seconds_type;
     typedef std::chrono::microseconds us_type;
     typedef us_type::rep us_int_type;
@@ -29,7 +27,6 @@ public:
     // sample_type = struct{ .value, .weight }
     typedef snapshot::weighted_t snapshot_type;
     typedef snapshot_type::sample_t sample_type;
-    typedef std::pair<double, sample_type> priority_sample_type;
 
     typedef std::map<double, sample_type> samples_mapping_type;
 private:
@@ -47,7 +44,7 @@ private:
 
     std::mt19937 gen;
     std::uniform_real_distribution<> uniform_dist;
-    typedef decltype(uniform_dist)::result_type distr_real_type;
+    typedef std::uniform_real_distribution<>::result_type distr_real_type;
 
     // should be shared_mutex or probably atomic based logic someday
     mutable std::mutex samples_mut;
@@ -59,8 +56,8 @@ public:
     ///     accumulator will be towards newer values.
     exponentially_t(std::size_t size, double alpha);
 
-    auto update(value_type value, time_point timestamp = clock_type::now()) noexcept -> void;
-    auto operator()(value_type value, time_point timestamp = clock_type::now()) noexcept -> void;
+    auto update(std::uint64_t value, time_point timestamp = clock_type::now()) -> void;
+    auto operator()(std::uint64_t value, time_point timestamp = clock_type::now()) -> void;
 
     auto snapshot() const -> snapshot_type;
 
