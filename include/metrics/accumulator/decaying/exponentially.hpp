@@ -20,8 +20,10 @@ public:
     typedef clock_type::time_point time_point;
     typedef clock_type::duration duration_type;
 
-    using us_type = std::chrono::microseconds;
-    using us_int_type = us_type::rep;
+    typedef std::uint64_t value_type;
+
+    typedef std::chrono::microseconds us_type;
+    typedef us_type::rep us_int_type;
 
     // sample_type = struct{ .value, .weight }
     typedef snapshot::weighted_t snapshot_type;
@@ -56,10 +58,12 @@ public:
     ///     accumulator will be towards newer values.
     exponentially_t(std::size_t size, double alpha);
 
-    auto update(std::uint64_t value, time_point timestamp = clock_type::now()) -> void;
+    auto update(value_type value, time_point timestamp = clock_type::now()) noexcept -> void;
+    auto operator()(value_type value, time_point timestamp = clock_type::now()) noexcept -> void;
+
     auto snapshot() const -> snapshot_type;
 
-    auto size() const -> size_t;
+    auto size() const noexcept -> size_t;
 private:
     auto rescale(time_point current, us_int_type next) -> void;
 };

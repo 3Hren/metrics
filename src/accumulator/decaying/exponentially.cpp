@@ -33,7 +33,7 @@ exponentially_t::exponentially_t(std::size_t sz, double al) :
     rescale_time = std::chrono::duration_cast<us_type>(rescale_since_epoch).count();
 }
 
-auto exponentially_t::update(std::uint64_t value, time_point t) -> void {
+auto exponentially_t::update(value_type value, time_point t) noexcept -> void {
 
     // rescale "if ever that time come"
     const auto now = clock_type::now();
@@ -47,10 +47,10 @@ auto exponentially_t::update(std::uint64_t value, time_point t) -> void {
         return;
     }
 
-    const auto t_diff_ms = std::chrono::duration_cast<std::chrono::seconds>(t - start_time);
+    const auto diff = std::chrono::duration_cast<std::chrono::seconds>(t - start_time);
 
     // Note: non normolized weights, sufficient for reservoir sampling
-    const auto w = exp(alpha * t_diff_ms.count());
+    const auto w = exp(alpha * diff.count());
     const auto prior = w / u;
 
     std::unique_lock<std::mutex> lock(samples_mut);
@@ -62,7 +62,11 @@ auto exponentially_t::update(std::uint64_t value, time_point t) -> void {
     }
 }
 
-auto exponentially_t::size() const -> size_t {
+auto exponentially_t::operator()(value_type value, time_point timestamp) noexcept -> void {
+    update(value, timestamp);
+}
+
+auto exponentially_t::size() const noexcept -> size_t {
     return std::min(sample_size, samples.size());
 }
 
