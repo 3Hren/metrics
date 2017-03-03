@@ -47,7 +47,7 @@ auto exponentially_t::update(value_type value, time_point t) noexcept -> void {
         return;
     }
 
-    const auto diff = std::chrono::duration_cast<std::chrono::seconds>(t - start_time);
+    const auto diff = std::chrono::duration_cast<seconds_type>(t - start_time);
 
     // Note: non normolized weights, sufficient for reservoir sampling
     const auto w = exp(alpha * diff.count());
@@ -89,16 +89,14 @@ auto exponentially_t::snapshot() const -> snapshot_type {
 
 auto exponentially_t::rescale(time_point now, us_int_type next) -> void {
 
-    const auto rescale_since_epoch = now.time_since_epoch() + RESCALE_THRESHOLD;
-    const auto addon = std::chrono::duration_cast<us_type>(rescale_since_epoch).count();
+    const auto rsctm = now.time_since_epoch() + RESCALE_THRESHOLD;
+    const auto addon = std::chrono::duration_cast<us_type>(rsctm).count();
 
     if (rescale_time.compare_exchange_strong(next, addon)) {
         const auto old_time = start_time;
-
         start_time = now;
-        rescale_time.store(addon);
 
-        const auto tm_diff = std::chrono::duration_cast<std::chrono::seconds>(start_time - old_time);
+        const auto tm_diff = std::chrono::duration_cast<seconds_type>(start_time - old_time);
         const auto scale = exp(-alpha * tm_diff.count());
 
         decltype(samples) new_samples;

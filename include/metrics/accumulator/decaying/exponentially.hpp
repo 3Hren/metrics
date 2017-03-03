@@ -22,6 +22,7 @@ public:
 
     typedef std::uint64_t value_type;
 
+    typedef std::chrono::seconds seconds_type;
     typedef std::chrono::microseconds us_type;
     typedef us_type::rep us_int_type;
 
