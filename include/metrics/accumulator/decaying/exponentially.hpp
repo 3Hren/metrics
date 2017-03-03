@@ -38,6 +38,7 @@ private:
     //       but `rescale_time` stored and adjusted in microseconds resolution
     //       in order to be compatible with tiny rescale periods.
     time_point start_time;
+    const duration_type rescale_threshold;
     std::atomic<us_int_type> rescale_time;
 
     samples_mapping_type samples;
@@ -54,7 +55,7 @@ public:
     /// \param size the number of samples to keep in the sampling accumulator.
     /// \param alpha the exponential decay factor; the higher this is, the more biased the
     ///     accumulator will be towards newer values.
-    exponentially_t(std::size_t size, double alpha);
+    exponentially_t(std::size_t size, double alpha, duration_type scale_period = std::chrono::hours(1));
 
     auto update(std::uint64_t value, time_point timestamp = clock_type::now()) -> void;
     auto operator()(std::uint64_t value, time_point timestamp = clock_type::now()) -> void;

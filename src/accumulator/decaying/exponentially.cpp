@@ -10,13 +10,12 @@ namespace metrics {
 namespace accumulator {
 namespace decaying {
 
-constexpr auto RESCALE_THRESHOLD = std::chrono::hours(1);
-
-exponentially_t::exponentially_t(std::size_t size, double alpha) :
+exponentially_t::exponentially_t(std::size_t size, double alpha, duration_type rescale_period) :
     sample_size{size},
     alpha{alpha},
-    start_time(clock_type::now()),
-    uniform_dist(0.0, std::nextafter(1.0, std::numeric_limits<distr_real_type>::max()))
+    start_time{clock_type::now()},
+    rescale_threshold{rescale_period},
+    uniform_dist{0.0, std::nextafter(1.0, std::numeric_limits<distr_real_type>::max())}
 {
     if (sample_size == 0) {
         throw std::invalid_argument("sample reservoir can't be of zero size");
@@ -29,7 +28,7 @@ exponentially_t::exponentially_t(std::size_t size, double alpha) :
     std::random_device dev;
     gen.seed(dev());
 
-    const auto rescale_since_epoch = start_time.time_since_epoch() + RESCALE_THRESHOLD;
+    const auto rescale_since_epoch = start_time.time_since_epoch() + rescale_threshold;
     rescale_time = std::chrono::duration_cast<us_type>(rescale_since_epoch).count();
 }
 
@@ -86,7 +85,7 @@ auto exponentially_t::snapshot() const -> snapshot_type {
 }
 
 auto exponentially_t::rescale(time_point now, us_int_type next) -> void {
-    const auto rsctm = now.time_since_epoch() + RESCALE_THRESHOLD;
+    const auto rsctm = now.time_since_epoch() + rescale_threshold;
     const auto addon = std::chrono::duration_cast<us_type>(rsctm).count();
 
     if (rescale_time.compare_exchange_strong(next, addon)) {
