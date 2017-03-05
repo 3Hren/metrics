@@ -10,7 +10,7 @@ namespace metrics {
 namespace accumulator {
 namespace decaying {
 
-exponentially_t::exponentially_t(std::size_t size, double alpha, duration_type rescale_period) :
+exponentially_t::exponentially_t(std::size_t size, double alpha, duration_type rescale_period, int seed) :
     sample_size{size},
     alpha{alpha},
     start_time{clock_type::now()},
@@ -25,8 +25,12 @@ exponentially_t::exponentially_t(std::size_t size, double alpha, duration_type r
         throw std::invalid_argument("alpha should be greater then zero");
     }
 
-    std::random_device dev;
-    gen.seed(dev());
+    if (seed < 0) {
+        std::random_device dev;
+        gen.seed(dev());
+    } else {
+        gen.seed(seed);
+    }
 
     const auto rescale_since_epoch = start_time.time_since_epoch() + rescale_threshold;
     rescale_time = std::chrono::duration_cast<us_type>(rescale_since_epoch).count();

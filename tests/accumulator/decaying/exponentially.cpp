@@ -11,10 +11,12 @@
 namespace metrics {
 namespace accumulator {
 namespace decaying {
-namespace {
+
+constexpr auto RANDOM_SEED = 7;
+constexpr auto EPSILON = 150.0;
 
 TEST(exponentially_t, Accumulate100OutOf1000Elements) {
-    exponentially_t accumulator(100, 0.99);
+    exponentially_t accumulator(100, 0.99, std::chrono::milliseconds(10), RANDOM_SEED);
 
     for (int i = 0; i < 1000; ++i) {
         accumulator.update(i);
@@ -29,8 +31,6 @@ TEST(exponentially_t, Accumulate100OutOf1000Elements) {
         ASSERT_TRUE(value <= 1000);
     }
 
-    constexpr auto EPSILON = double{150};
-
     EXPECT_NEAR(snapshot.mean(), 500, EPSILON);
     EXPECT_NEAR(snapshot.stddev(), 288, EPSILON);
 
@@ -39,7 +39,7 @@ TEST(exponentially_t, Accumulate100OutOf1000Elements) {
 }
 
 TEST(exponentially_t, rescale) {
-    exponentially_t accumulator(100, 0.05, std::chrono::milliseconds(10));
+    exponentially_t accumulator(100, 0.05, std::chrono::milliseconds(10), RANDOM_SEED);
 
     for (int i = 0; i < 1000; ++i) {
         if (i % 100 == 0) {
@@ -48,8 +48,6 @@ TEST(exponentially_t, rescale) {
 
         accumulator.update(i);
     }
-
-    constexpr auto EPSILON = double{150};
 
     const auto snapshot = accumulator.snapshot();
 
@@ -76,11 +74,10 @@ TEST_P(margins_test, marginal_cases_test) {
 
     const auto &test = GetParam();
 
-    std::random_device rd;
-    std::mt19937 gen{rd()};
+    std::mt19937 gen; // defaults to 5489u
     std::normal_distribution<> norm{test.mean, test.stddev};
 
-    exponentially_t accumulator(test.size, test.alpha, std::chrono::milliseconds{1});
+    exponentially_t accumulator(test.size, test.alpha, std::chrono::milliseconds{5}, RANDOM_SEED);
 
     for(int i = 0; i < 1000; ++i) {
         accumulator(abs(norm(gen)) % 1000);
@@ -98,15 +95,18 @@ TEST_P(margins_test, marginal_cases_test) {
 INSTANTIATE_TEST_CASE_P(exponentially_t, margins_test,
     ::testing::Values(
         //              SIZE, ALPHA, AVG, SDEV, EPS1
-        marginal_case_t{1000, 0.001, 500, 288, 150},
-        marginal_case_t{1000, 13.10, 500, 288, 150},
-        marginal_case_t{ 100, 0.001, 500, 288, 200},
-        marginal_case_t{ 100, 13.10, 500, 288, 200},
-        marginal_case_t{  10, 0.001, 500, 288, 700},
-        marginal_case_t{  10, 13.10, 500, 288, 700}
+        marginal_case_t{1000,    0.001, 500, 288, 42},
+        marginal_case_t{1000,    13.10, 500, 288, 42},
+
+        marginal_case_t{ 100,    0.001, 500, 288, 42},
+        marginal_case_t{ 100,    13.10, 500, 288, 42},
+        marginal_case_t{ 100,   0.0001, 500, 288, 42},
+        marginal_case_t{ 100, 100500.0, 500, 288, 42},
+
+        marginal_case_t{  10,    0.001, 500, 288, 180},
+        marginal_case_t{  10,    13.10, 500, 288, 180}
     ));
 
-}  // namespace
 }  // namespace decaying
 }  // namespace accumulator
 }  // namespace metrics
