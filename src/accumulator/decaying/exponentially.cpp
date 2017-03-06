@@ -11,7 +11,7 @@ namespace accumulator {
 namespace decaying {
 
 constexpr auto DEFAULT_SIZE = 1024;
-constexpr auto ALPHA_INIT = 0.75;
+constexpr auto ALPHA_INIT = 0.015;
 
 exponentially_t::exponentially_t() : exponentially_t(DEFAULT_SIZE, ALPHA_INIT)
 {}
