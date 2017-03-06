@@ -1,6 +1,8 @@
+#include <iostream>
 #include <chrono>
 #include <thread>
 #include <random>
+#include <stdexcept>
 
 #include <cmath>
 
@@ -14,6 +16,14 @@ namespace decaying {
 
 constexpr auto RANDOM_SEED = 100500;
 constexpr auto EPSILON = 150.0;
+
+template<typename Snapshot>
+void dump_snapshot(std::ostream &o, const Snapshot &s) {
+    o << "mean: " << s.mean() << ' '
+      << "std: " << s.stddev() << ' '
+      << "min: " << s.min() << ' '
+      << "max: " << s.max() << '\n';
+}
 
 TEST(exponentially_t, Accumulate100OutOf1000Elements) {
     exponentially_t accumulator(100, 0.99, std::chrono::milliseconds(10), RANDOM_SEED);
@@ -36,6 +46,44 @@ TEST(exponentially_t, Accumulate100OutOf1000Elements) {
 
     EXPECT_NEAR(snapshot.min(), 0, EPSILON);
     EXPECT_NEAR(snapshot.max(), 1000, EPSILON);
+}
+
+TEST(exponentially_t, empty) {
+    exponentially_t acc(1, 1e-10, std::chrono::milliseconds(1), RANDOM_SEED);
+
+    const auto snapshot = acc.snapshot();
+
+    EXPECT_FLOAT_EQ(snapshot.mean(), 0);
+    EXPECT_FLOAT_EQ(snapshot.stddev(), 0);
+
+    EXPECT_FLOAT_EQ(snapshot.min(), 0);
+    EXPECT_FLOAT_EQ(snapshot.max(), 0);
+}
+
+TEST(exponentially, const_fill_by_10k_vals) {
+    exponentially_t acc(10, 1e-10, std::chrono::milliseconds(100), RANDOM_SEED);
+
+    constexpr int FILL_VALUE = 100500;
+
+    for(int i = 0; i < 10 * 1000; ++i) {
+        acc(FILL_VALUE);
+    }
+
+    const auto snapshot = acc.snapshot();
+
+    EXPECT_FLOAT_EQ(snapshot.mean(), FILL_VALUE);
+    EXPECT_FLOAT_EQ(snapshot.stddev(), 0);
+    EXPECT_FLOAT_EQ(snapshot.min(), FILL_VALUE);
+    EXPECT_FLOAT_EQ(snapshot.max(), FILL_VALUE);
+}
+
+TEST(exponentially_t, wrong_ctor_args) {
+    EXPECT_THROW(exponentially_t(1, -1), std::invalid_argument);
+    EXPECT_THROW(exponentially_t(1, 0), std::invalid_argument);
+    EXPECT_THROW(exponentially_t(0, 1), std::invalid_argument);
+    EXPECT_THROW(exponentially_t(13, 10, std::chrono::hours(0)), std::invalid_argument);
+
+    EXPECT_NO_THROW(exponentially_t(13, 10, std::chrono::hours(1)));
 }
 
 TEST(exponentially_t, rescale) {

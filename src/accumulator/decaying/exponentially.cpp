@@ -26,6 +26,10 @@ exponentially_t::exponentially_t(std::size_t size, double alpha,
         throw std::invalid_argument("alpha should be greater then zero");
     }
 
+    if (rescale_period.count() == 0) {
+        throw std::invalid_argument("can't manage empty rescale interval");
+    }
+
     if (seed) {
         gen.seed(*seed);
     } else {
