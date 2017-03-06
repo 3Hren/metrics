@@ -1,6 +1,7 @@
 #include "metrics/timer.hpp"
 
 #include "metrics/accumulator/sliding/window.hpp"
+#include "metrics/accumulator/decaying/exponentially.hpp"
 
 namespace metrics {
 
@@ -37,5 +38,6 @@ timer_t::~timer_t() = default;
 
 /// Instantiations.
 template class timer<accumulator::sliding::window_t>;
+template class timer<accumulator::decaying::exponentially_t>;
 
 }  // namespace metrics

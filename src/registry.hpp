@@ -3,6 +3,7 @@
 #include <functional>
 
 #include "metrics/accumulator/sliding/window.hpp"
+#include "metrics/accumulator/decaying/exponentially.hpp"
 #include "metrics/registry.hpp"
 
 #include "cpp14/tuple.hpp"
@@ -68,7 +69,7 @@ public:
     collection_of<tag::gauge, std::tuple<std::int64_t, std::uint64_t, std::double_t, std::string>> gauges;
     collection_of<tag::count, std::tuple<std::int64_t, std::uint64_t>> counters;
     collection_of<tag::meter, std::tuple<detail::meter_t>> meters;
-    collection_of<tag::timer, std::tuple<accumulator::sliding::window_t>> timers;
+    collection_of<tag::timer, std::tuple<accumulator::sliding::window_t, accumulator::decaying::exponentially_t>> timers;
 };
 
 }  // namespace metrics

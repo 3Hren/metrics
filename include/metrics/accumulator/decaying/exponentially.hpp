@@ -66,6 +66,9 @@ public:
         duration_type rescale_period = std::chrono::hours(1),
         boost::optional<std::mt19937::result_type> seed = boost::none);
 
+    /// Creates a decaying accumulator with size = 1024 and alpha = 0.75
+    exponentially_t();
+
     auto update(std::uint64_t value, time_point timestamp = clock_type::now()) -> void;
     auto operator()(std::uint64_t value, time_point timestamp = clock_type::now()) -> void;
 

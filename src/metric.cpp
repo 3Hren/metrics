@@ -5,6 +5,7 @@
 #include <boost/optional/optional.hpp>
 
 #include "metrics/accumulator/sliding/window.hpp"
+#include "metrics/accumulator/decaying/exponentially.hpp"
 #include "metrics/gauge.hpp"
 #include "metrics/meter.hpp"
 #include "metrics/timer.hpp"
@@ -65,5 +66,6 @@ template class shared_metric<std::atomic<std::int64_t>>;
 template class shared_metric<std::atomic<std::uint64_t>>;
 template class shared_metric<meter_t>;
 template class shared_metric<timer<accumulator::sliding::window_t>>;
+template class shared_metric<timer<accumulator::decaying::exponentially_t>>;
 
 }  // namespace metrics

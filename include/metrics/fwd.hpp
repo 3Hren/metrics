@@ -27,6 +27,11 @@ namespace sliding {
 class window_t;
 
 } // namespace sliding
+namespace decaying {
+
+class exponentially_t;
+
+} // namespace decaying
 } // namespace accumulator
 
 /// Metric wrappers.

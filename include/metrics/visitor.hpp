@@ -20,6 +20,7 @@ public:
     virtual auto visit(const std::atomic<std::uint64_t>& metric) -> void = 0;
     virtual auto visit(const meter_t& metric) -> void = 0;
     virtual auto visit(const timer<accumulator::sliding::window_t>& metric) -> void = 0;
+    virtual auto visit(const timer<accumulator::decaying::exponentially_t>& metric) -> void = 0;
 };
 
 }  // namespace v2

@@ -259,7 +259,8 @@ registry_t::select(const query_t& query) const ->
 
     boost::transform(meters(query), out, fn);
 
-    boost::transform(timers<>(query), out, fn);
+    boost::transform(timers<accumulator::sliding::window_t>(query), out, fn);
+    boost::transform(timers<accumulator::decaying::exponentially_t>(query), out, fn);
 
     return result;
 }
@@ -331,7 +332,15 @@ auto registry_t::timer<accumulator::sliding::window_t>(std::string, tags_t::cont
     shared_metric<metrics::timer<accumulator::sliding::window_t>>;
 
 template
+auto registry_t::timer<accumulator::decaying::exponentially_t>(std::string, tags_t::container_type tags) const ->
+    shared_metric<metrics::timer<accumulator::decaying::exponentially_t>>;
+
+template
 auto registry_t::timers<accumulator::sliding::window_t>() const ->
     std::map<tags_t, shared_metric<metrics::timer<accumulator::sliding::window_t>>>;
+
+template
+auto registry_t::timers<accumulator::decaying::exponentially_t>() const ->
+    std::map<tags_t, shared_metric<metrics::timer<accumulator::decaying::exponentially_t>>>;
 
 }  // namespace metrics

@@ -10,6 +10,12 @@ namespace metrics {
 namespace accumulator {
 namespace decaying {
 
+constexpr auto DEFAULT_SIZE = 1024;
+constexpr auto ALPHA_INIT = 0.75;
+
+exponentially_t::exponentially_t() : exponentially_t(DEFAULT_SIZE, ALPHA_INIT)
+{}
+
 exponentially_t::exponentially_t(std::size_t size, double alpha,
         duration_type rescale_period, boost::optional<std::mt19937::result_type> seed) :
     sample_size{size},
