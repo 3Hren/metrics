@@ -8,6 +8,8 @@
 
 #include <cstddef>
 
+#include <boost/optional.hpp>
+
 #include "metrics/accumulator/snapshot/weighted.hpp"
 
 namespace metrics {
@@ -58,10 +60,11 @@ public:
     /// \param rescale_period upon that time interval rescaling should be done,
     ///     note that rescaling is done on value update, but before value sampling
     ///     into reservoir.
-    /// \param seed to random device, ignored if less then zero
-    ///     (std::random_device is used in that case), provided mostly for debug and testing.
+    /// \param seed to random device (std::random_device is used in case of boost::none),
+    ///     provided mostly for debug and testing.
     exponentially_t(std::size_t size, double alpha,
-        duration_type rescale_period = std::chrono::hours(1), int seed = -1);
+        duration_type rescale_period = std::chrono::hours(1),
+        boost::optional<std::mt19937::result_type> seed = boost::none);
 
     auto update(std::uint64_t value, time_point timestamp = clock_type::now()) -> void;
     auto operator()(std::uint64_t value, time_point timestamp = clock_type::now()) -> void;
