@@ -25,6 +25,13 @@ public:
         return self().value(0.75);
     }
 
+    /// Returns the value at the 90th percentile in the distribution.
+    ///
+    /// \return the value at the 90th percentile.
+    auto p90() const -> double {
+        return self().value(0.90);
+    }
+
     /// Returns the value at the 95th percentile in the distribution.
     ///
     /// \return the value at the 95th percentile.
