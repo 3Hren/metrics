@@ -89,6 +89,12 @@ public:
     /// \return the value in the distribution at quantile.
     auto value(double quantile) const -> double;
 
+    /// Reverse of this->value(quantile)
+    ///
+    /// \param value value to found a quantile for.
+    /// \return the phi (weighted proportion) for value in [0..1].
+    auto phi(double value) const -> double;
+
     /// Returns the lowest value in the snapshot.
     auto min() const -> std::uint64_t;
 

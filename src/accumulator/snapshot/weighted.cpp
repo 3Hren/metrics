@@ -57,6 +57,33 @@ auto weighted_t::value(double quantile) const -> double {
     return data[std::distance(quantiles.begin(), it)];
 }
 
+auto weighted_t::phi(double value) const -> double {
+    // implicit assertion that |data| = |quantiles|
+    if (data.empty()) {
+        return 0.0;
+    }
+
+    const auto it = std::upper_bound(data.begin(), data.end(), value);
+    if (it == data.end()) {
+        return 1.0;
+    }
+
+    if (it == data.begin()) {
+        // as real value unknown, return middle of first interval
+        return quantiles.front() * 0.5;
+    }
+
+    const auto i = std::distance(data.begin(), it);
+
+    const auto y0 = data[i - 1];
+    const auto y1 = data[i];
+    const auto dx = quantiles[i] - quantiles[i - 1];
+
+    // note: assured that y1 > y0 by std::upper_bound,
+    //       so no check for zero devision here
+    return quantiles[i - 1] + dx * (value - y0) / (y1 - y0);
+}
+
 auto weighted_t::min() const -> std::uint64_t {
     if (size() == 0) {
         return 0;
