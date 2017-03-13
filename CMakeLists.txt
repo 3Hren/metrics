@@ -92,6 +92,14 @@ include_directories(
     ${PROJECT_SOURCE_DIR}/include
 )
 
+include(CheckCXXCompilerFlag)
+check_cxx_compiler_flag("-Wno-gnu-zero-variadic-macro-arguments" SUPPORTS_NO_GNU_ZERO_VARIADIC_MACRO_ARGUMENTS_FLAG)
+
+# Some parts of gtest rely on this GNU extension, don't warn on it.
+if(SUPPORTS_NO_GNU_ZERO_VARIADIC_MACRO_ARGUMENTS_FLAG)
+	add_definitions("-Wno-gnu-zero-variadic-macro-arguments")
+endif()
+
 add_executable(libmetrics-tests
     tests/accumulator/sliding/window
     tests/accumulator/decaying/exponentially

@@ -48,8 +48,7 @@ exponentially_t::exponentially_t(std::size_t size, double alpha,
 }
 
 auto exponentially_t::update(std::uint64_t value, time_point t) -> void {
-
-    // rescale "if ever that time come"
+    // Rescale "if ever that time come".
     const auto now = clock_type::now();
     const auto rtm = us_type{rescale_time.load()};
     if (now.time_since_epoch() > rtm) {
