@@ -25,6 +25,13 @@ public:
         return self().value(0.75);
     }
 
+    /// Returns the value at the 90th percentile in the distribution.
+    ///
+    /// \return the value at the 90th percentile.
+    auto p90() const -> double {
+        return self().value(0.90);
+    }
+
     /// Returns the value at the 95th percentile in the distribution.
     ///
     /// \return the value at the 95th percentile.
@@ -81,6 +88,12 @@ public:
     /// \param quantile a given quantile, in [0..1].
     /// \return the value in the distribution at quantile.
     auto value(double quantile) const -> double;
+
+    /// Reverse of this->value(quantile)
+    ///
+    /// \param value value to found a quantile for.
+    /// \return the phi (weighted proportion) for value in [0..1].
+    auto phi(double value) const -> double;
 
     /// Returns the lowest value in the snapshot.
     auto min() const -> std::uint64_t;
