@@ -12,9 +12,14 @@ template <typename T>
 using gauge = std::function<T()>;
 
 class meter_t;
-class visitor_t;
 
 } // namespace v2
+
+inline namespace v3 {
+
+class visitor_t;
+
+} // namespace v3
 
 template <class Accumulate>
 class timer;

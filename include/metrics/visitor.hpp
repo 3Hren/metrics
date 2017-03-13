@@ -6,7 +6,7 @@
 #include "fwd.hpp"
 
 namespace metrics {
-inline namespace v2 {
+inline namespace v3 {
 
 class visitor_t {
 public:
@@ -23,5 +23,5 @@ public:
     virtual auto visit(const timer<accumulator::decaying::exponentially_t>& metric) -> void = 0;
 };
 
-}  // namespace v2
+}  // namespace v3
 }  // namespace metrics
