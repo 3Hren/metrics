@@ -12,20 +12,15 @@ public:
 public:
     virtual ~counter_t() = default;
 
-    virtual auto
-    get() const -> value_type;
+    virtual auto get() const -> value_type;
 
-    virtual auto
-    inc() -> value_type = 0;
+    virtual auto inc() -> value_type = 0;
 
-    virtual auto
-    inc(value_type value) -> value_type = 0;
+    virtual auto inc(value_type value) -> value_type = 0;
 
-    virtual auto
-    dec() -> value_type = 0;
+    virtual auto dec() -> value_type = 0;
 
-    virtual auto
-    dec(value_type value) -> value_type = 0;
+    virtual auto dec(value_type value) -> value_type = 0;
 };
 
 } // namespace v2

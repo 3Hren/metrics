@@ -37,6 +37,6 @@ public:
     auto operator()(value_type value) noexcept -> void;
 };
 
-}  // namespace sliding
-}  // namespace accumulator
-}  // namespace metrics
+} // namespace sliding
+} // namespace accumulator
+} // namespace metrics

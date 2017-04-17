@@ -31,6 +31,7 @@ public:
     typedef snapshot_type::sample_t sample_type;
 
     typedef std::map<double, sample_type> samples_mapping_type;
+
 private:
     size_t sample_size;
     double alpha;
@@ -51,6 +52,7 @@ private:
 
     // should be shared_mutex or probably atomic based logic someday
     mutable std::mutex samples_mut;
+
 public:
     /// Creates a new exponentially decaying accumulator.
     ///
@@ -63,8 +65,8 @@ public:
     /// \param seed to random device (std::random_device is used in case of boost::none),
     ///     provided mostly for debug and testing.
     exponentially_t(std::size_t size, double alpha,
-        duration_type rescale_period = std::chrono::hours(1),
-        boost::optional<std::mt19937::result_type> seed = boost::none);
+                    duration_type rescale_period = std::chrono::hours(1),
+                    boost::optional<std::mt19937::result_type> seed = boost::none);
 
     /// Creates a decaying accumulator with size = 1024 and alpha = 0.015
     exponentially_t();
@@ -75,10 +77,11 @@ public:
     auto snapshot() const -> snapshot_type;
 
     auto size() const noexcept -> size_t;
+
 private:
     auto rescale(time_point current, us_int_type next) -> void;
 };
 
-}  // namespace decaying
-}  // namespace accumulator
-}  // namespace metrics
+} // namespace decaying
+} // namespace accumulator
+} // namespace metrics

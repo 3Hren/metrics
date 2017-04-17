@@ -23,5 +23,5 @@ public:
     virtual auto visit(const timer<accumulator::decaying::exponentially_t>& metric) -> void = 0;
 };
 
-}  // namespace v3
-}  // namespace metrics
+} // namespace v3
+} // namespace metrics

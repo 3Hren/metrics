@@ -8,20 +8,16 @@ namespace metrics {
 
 inline namespace v2 {
 
-template <typename T>
+template<typename T>
 using gauge = std::function<T()>;
 
 class meter_t;
 
 } // namespace v2
 
-inline namespace v3 {
+inline namespace v3 { class visitor_t; } // namespace v3
 
-class visitor_t;
-
-} // namespace v3
-
-template <class Accumulate>
+template<class Accumulate>
 class timer;
 
 /// Accumulators and shapshots.
@@ -44,7 +40,7 @@ class exponentially_t;
 class tags_t;
 class tagged_t;
 
-template <typename T>
+template<typename T>
 class shared_metric;
 
 using query_t = std::function<bool(const tagged_t& metric)>;

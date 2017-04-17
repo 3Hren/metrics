@@ -71,5 +71,5 @@ public:
 
 using ewma_t = ewma<std::chrono::high_resolution_clock>;
 
-}  // namespace usts
-}  // namespace metrics
+} // namespace usts
+} // namespace metrics
