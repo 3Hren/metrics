@@ -64,6 +64,9 @@ struct collection_of<Tag, std::tuple<U...>> {
     }
 };
 
+template<template<typename> class Tag>
+struct select_container;
+
 class registry_t::inner_t {
 public:
     collection_of<tag::gauge, std::tuple<std::int64_t, std::uint64_t, std::double_t, std::string>> gauges;
