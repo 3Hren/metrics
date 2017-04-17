@@ -9,7 +9,7 @@ inline namespace v2 {
 ///
 /// Useful if, for example, your application has a value which is maintained by a third-party
 /// library, you can easily expose it by registering a gauge instance which returns that value.
-template <typename T>
+template<typename T>
 using gauge = std::function<T()>;
 
 } // namespace v2

@@ -88,7 +88,7 @@ public:
 
     /// Returns the one-minute exponentially-weighted moving average rate at which events have
     /// occurred since the timer was created.
-    virtual auto m01rate() const -> double = 0 ;
+    virtual auto m01rate() const -> double = 0;
 
     /// Returns the five-minute exponentially-weighted moving average rate at which events have
     /// occurred since the timer was created.
@@ -102,4 +102,4 @@ public:
     virtual auto snapshot() const -> snapshot_type = 0;
 };
 
-}  // namespace metrics
+} // namespace metrics

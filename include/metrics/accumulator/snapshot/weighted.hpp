@@ -108,6 +108,6 @@ public:
     auto stddev() const -> double;
 };
 
-}  // namespace snapshot
-}  // namespace accumulator
-}  // namespace metrics
+} // namespace snapshot
+} // namespace accumulator
+} // namespace metrics

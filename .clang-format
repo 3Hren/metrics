@@ -1,0 +1,15 @@
+---
+# We'll use defaults from the LLVM style, but with 4 columns indentation.
+BasedOnStyle: LLVM
+AccessModifierOffset: -4
+IndentWidth: 4
+ColumnLimit: 100
+PointerAlignment: Left
+AlwaysBreakTemplateDeclarations: true
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+MaxEmptyLinesToKeep: 1
+AllowShortIfStatementsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: Empty
+BinPackParameters: true
+SpaceAfterTemplateKeyword: false
+FixNamespaceComments: true
