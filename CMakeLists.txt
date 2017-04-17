@@ -60,7 +60,7 @@ set_target_properties(${LIBRARY_NAME} PROPERTIES COMPILE_FLAGS ${COMPILE_FLAGS})
 # So, adding e.g. functions is no problem, modifying argument lists or removing functions would
 # required the SOVERSION to be incremented. Similar rules hold of course for non-opaque
 # data-structures.
-set_target_properties(${LIBRARY_NAME} PROPERTIES VERSION 3.0.0)
+set_target_properties(${LIBRARY_NAME} PROPERTIES VERSION 3.1.0)
 set_target_properties(${LIBRARY_NAME} PROPERTIES SOVERSION 3)
 
 # Install section.
