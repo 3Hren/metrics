@@ -39,15 +39,11 @@ TEST(resistry_t, SameGaugesExactSize) {
     const auto name = "<test>";
 
     registry_t registry;
-    auto c1 = registry.register_gauge<std::int64_t>(name, {}, [] {
-        return 42;
-    });
+    auto c1 = registry.register_gauge<std::int64_t>(name, {}, [] { return 42; });
     EXPECT_EQ(1, registry.gauges<std::int64_t>().size());
 
     // This one overrides.
-    auto r1 = registry.register_gauge<std::int64_t>(name, {}, [] {
-        return 100500;
-    });
+    auto r1 = registry.register_gauge<std::int64_t>(name, {}, [] { return 100500; });
     EXPECT_EQ(1, registry.gauges<std::int64_t>().size());
 }
 
@@ -55,9 +51,7 @@ TEST(resistry_t, RemoveGauge) {
     const auto name = "<test>";
 
     registry_t registry;
-    auto c1 = registry.register_gauge<std::int64_t>(name, {}, [] {
-        return 42;
-    });
+    auto c1 = registry.register_gauge<std::int64_t>(name, {}, [] { return 42; });
 
     EXPECT_TRUE(registry.remove<gauge<std::int64_t>>(name, {}));
     EXPECT_EQ(0, registry.gauges<std::int64_t>().size());
