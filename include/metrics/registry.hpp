@@ -120,6 +120,25 @@ public:
     auto
     select(const query_t& query) const ->
         std::vector<std::shared_ptr<tagged_t>>;
+
+    /// Removes the metric with the given name.
+    ///
+    /// \param name The name of the metric.
+    /// \param tags Additional tags.
+    ///
+    /// \return Whether or not the metric was removed.
+    template<typename T>
+    auto
+    remove(const std::string& name, const tags_t::container_type& tags) -> bool;
 };
+
+extern template auto registry_t::remove<gauge<std::int64_t>>(const std::string& name, const tags_t::container_type& tags) -> bool;
+extern template auto registry_t::remove<gauge<std::uint64_t>>(const std::string& name, const tags_t::container_type& tags) -> bool;
+extern template auto registry_t::remove<gauge<std::double_t>>(const std::string& name, const tags_t::container_type& tags) -> bool;
+extern template auto registry_t::remove<std::atomic<std::int64_t>>(const std::string& name, const tags_t::container_type& tags) -> bool;
+extern template auto registry_t::remove<std::atomic<std::uint64_t>>(const std::string& name, const tags_t::container_type& tags) -> bool;
+extern template auto registry_t::remove<meter_t>(const std::string& name, const tags_t::container_type& tags) -> bool;
+extern template auto registry_t::remove<timer<accumulator::sliding::window_t>>(const std::string& name, const tags_t::container_type& tags) -> bool;
+extern template auto registry_t::remove<timer<accumulator::decaying::exponentially_t>>(const std::string& name, const tags_t::container_type& tags) -> bool;
 
 }  // namespace metrics

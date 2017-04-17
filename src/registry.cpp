@@ -265,6 +265,66 @@ registry_t::select(const query_t& query) const ->
     return result;
 }
 
+template<typename T>
+struct remove_metric {
+    template<typename D>
+    static auto apply(D& d, const std::string& name, const tags_t::container_type& tags) -> bool;
+};
+
+template<typename T>
+struct remove_metric<metrics::gauge<T>> {
+    template<typename D>
+    static auto apply(D& d, const std::string& name, tags_t::container_type other) -> bool {
+        other["type"] = type_traits<metrics::gauge<T>>::type_name();
+        tags_t tags(std::move(name), std::move(other));
+
+        std::lock_guard<std::mutex> lock(d->gauges.mutex);
+        return d->gauges.template get<T>().erase(tags);
+    }
+};
+
+template<typename T>
+struct remove_metric<std::atomic<T>> {
+    template<typename D>
+    static auto apply(D& d, const std::string& name, tags_t::container_type other) -> bool {
+        other["type"] = type_traits<std::atomic<T>>::type_name();
+        tags_t tags(std::move(name), std::move(other));
+
+        std::lock_guard<std::mutex> lock(d->counters.mutex);
+        return d->counters.template get<T>().erase(tags);
+    }
+};
+
+template<>
+struct remove_metric<meter_t> {
+    template<typename D>
+    static auto apply(D& d, const std::string& name, tags_t::container_type other) -> bool {
+        other["type"] = type_traits<meter_t>::type_name();
+        tags_t tags(std::move(name), std::move(other));
+
+        std::lock_guard<std::mutex> lock(d->meters.mutex);
+        return d->meters.template get<detail::meter_t>().erase(tags);
+    }
+};
+
+template<typename Accumulate>
+struct remove_metric<timer<Accumulate>> {
+    template<typename D>
+    static auto apply(D& d, const std::string& name, tags_t::container_type other) -> bool {
+        other["type"] = type_traits<metrics::timer<Accumulate>>::type_name();
+        tags_t tags(std::move(name), std::move(other));
+
+        std::lock_guard<std::mutex> lock(d->timers.mutex);
+        return d->timers.template get<Accumulate>().erase(tags);
+    }
+};
+
+template<typename T>
+auto
+registry_t::remove(const std::string& name, const tags_t::container_type& tags) -> bool {
+    return remove_metric<T>::apply(inner, name, tags);
+}
+
 /// Instantiations.
 
 template
@@ -342,5 +402,14 @@ auto registry_t::timers<accumulator::sliding::window_t>() const ->
 template
 auto registry_t::timers<accumulator::decaying::exponentially_t>() const ->
     std::map<tags_t, shared_metric<metrics::timer<accumulator::decaying::exponentially_t>>>;
+
+template auto registry_t::remove<gauge<std::int64_t>>(const std::string& name, const tags_t::container_type& tags) -> bool;
+template auto registry_t::remove<gauge<std::uint64_t>>(const std::string& name, const tags_t::container_type& tags) -> bool;
+template auto registry_t::remove<gauge<std::double_t>>(const std::string& name, const tags_t::container_type& tags) -> bool;
+template auto registry_t::remove<std::atomic<std::int64_t>>(const std::string& name, const tags_t::container_type& tags) -> bool;
+template auto registry_t::remove<std::atomic<std::uint64_t>>(const std::string& name, const tags_t::container_type& tags) -> bool;
+template auto registry_t::remove<meter_t>(const std::string& name, const tags_t::container_type& tags) -> bool;
+template auto registry_t::remove<timer<accumulator::sliding::window_t>>(const std::string& name, const tags_t::container_type& tags) -> bool;
+template auto registry_t::remove<timer<accumulator::decaying::exponentially_t>>(const std::string& name, const tags_t::container_type& tags) -> bool;
 
 }  // namespace metrics
