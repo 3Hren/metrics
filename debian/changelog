@@ -1,6 +1,12 @@
+metrics (3.1.0-1) unstable; urgency=low
+
+  * Feature: allow to erase metrics from registry.
+
+ -- Evgeny Safronov <division494@gmail.com>  Mon, 17 Apr 2017 14:15:14 +0300
+
 metrics (3.0.0-1) unstable; urgency=low
 
-  * Feature: Weighted Reservoir Sampling accumulator (#13).
+  * Feature: weighted Reservoir Sampling accumulator (#13).
 
  -- Evgeny Safronov <division494@gmail.com>  Mon, 13 Mar 2017 15:46:45 +0300
 
