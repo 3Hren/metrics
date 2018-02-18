@@ -69,7 +69,7 @@ auto weighted_t::phi(double value) const -> double {
     }
 
     if (it == data.begin()) {
-        // as real value unknown, return middle of first interval
+        // As real value unknown, return middle of first interval.
         return quantiles.front() * 0.5;
     }
 
@@ -79,8 +79,8 @@ auto weighted_t::phi(double value) const -> double {
     const auto y1 = data[i];
     const auto dx = quantiles[i] - quantiles[i - 1];
 
-    // note: assured that y1 > y0 by std::upper_bound,
-    //       so no check for zero devision here
+    // Note: assured that y1 > y0 by std::upper_bound,
+    //       so no check for zero division here.
     return quantiles[i - 1] + dx * (value - y0) / (y1 - y0);
 }
 
