@@ -1,3 +1,10 @@
+metrics (3.1.1-1) unstable; urgency=low
+
+  * fix: typo
+  * feat: instantiate ewma class with steady_clock
+
+ -- Kirill Smorodinnikov <shaitkir@gmail.com>  Mon, 21 May 2018 13:10:39 +0300
+
 metrics (3.1.0-1) unstable; urgency=low
 
   * Feature: allow to erase metrics from registry.
