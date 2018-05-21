@@ -69,6 +69,7 @@ public:
     auto get() const -> double;
 };
 
+// TODO: use steady_clock since it is expected that timer is monotonic.
 using ewma_t = ewma<std::chrono::high_resolution_clock>;
 
 } // namespace usts

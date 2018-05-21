@@ -52,6 +52,7 @@ auto ewma<Clock>::warmed_up() const -> bool {
 }
 
 template class ewma<std::chrono::high_resolution_clock>;
+template class ewma<std::chrono::steady_clock>;
 
 }  // namespace usts
 }  // namespace metrics
